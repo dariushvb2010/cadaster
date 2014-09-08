@@ -1,0 +1,61 @@
+/*
+In the name of Allah
+
+salam bar mahdi
+
+*/
+/* 
+    Created on : Jun 12, 2014, 12:24:11 PM
+    Author     : AmirAlMomenin
+*/
+
+.landLord-add {
+    background-image: url('images/landlord_add.gif') !important;
+}
+
+.fieldset{
+    border-width: 2px;
+    direction: rtl;
+    float: right;
+    text-align: right;
+    font-family: "b mitra";
+    font-size: 25px;
+    //left: 31px;
+}
+.baseFieldset{
+    border-width: 2px;
+    padding: 2px;
+    border-top-width: 4px;
+    width: 828px;
+    direction: rtl;
+    float: right;
+    text-align: right;
+    font-family: "b mitra";
+    font-size: 20px;
+    
+}
+.fieldcontainer{
+    direction: rtl;
+    float: right;
+    text-align: right;
+    font-family: "b mitra";
+    //left: 31px;
+}
+
+.layout{
+    direction: rtl;
+    float: right;
+    text-align: right;
+    font-family: "b mitra";
+    //left: 31px;
+}
+
+.mmlabel{
+    font-family: "b mitra";
+    font-size: 17px;
+}
+
+.mmField{
+    font-family: "b mitra";
+    font-size: 19px;
+}
