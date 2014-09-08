@@ -144,6 +144,9 @@ return array(
 	'params'=>array(
 		// this is used in contact page
 		'adminEmail'=>'malvandi.m@gmail.com',
+		'lib.openlayers' => '/Lib/openlayers-2.13.1/openlayers.js',
+        'lib.ext'=>'/Lib/ext-4.1.1a/ext.js',
+        'lib.ext.loader'=>'/loader_4.1.1a.js'
                 
 	),
 );
