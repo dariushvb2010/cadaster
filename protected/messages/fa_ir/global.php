@@ -11,6 +11,8 @@ return array(
     'about'=>'درباره',
     'contact'=>'ارتباط با ما',
     'login'=>'ورود',
-    'logout'=>'خروج'
+    'logout'=>'خروج',
+    'user access'=>'دسترسی کاربران',
+    'user management'=>'مدیریت کاربران',
     
 );

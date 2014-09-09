@@ -157,7 +157,7 @@ class RightsModule extends CWebModule
 			if( $this->cssFile===null )
 				$this->cssFile = $assetsUrl.'/css/default.css';
 			else
-				$this->cssFile = Yii::app()->request->baseUrl.$this->cssFile;
+				$this->cssFile = Yii::app()->request->baseUrl.'/'.$this->cssFile;
 
 			// Register the style sheet
 			$cs->registerCssFile($this->cssFile);
