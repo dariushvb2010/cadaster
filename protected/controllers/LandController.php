@@ -19,8 +19,8 @@ class LandController extends Controller {
                 'users' => array('*'),
             ),
             array('allow', // allow authenticated user to perform 'create' and 'update' actions
-                'actions' => array('create', 'update'),
-                'users' => array('@'),
+                'actions' => array('create', 'update','search'),
+                'roles' => array('admin'),
             ),
             array('allow', // allow admin user to perform 'admin' and 'delete' actions
                 'actions' => array('admin', 'delete'),
@@ -41,6 +41,15 @@ class LandController extends Controller {
             $lands = ($simplified ? Land::model()->simplified()->findAll() : Land::model()->findAll());
             echo $this->makeGeoJson($lands);
         }
+    }
+    
+    public function actionSearch(){
+        
+        $paramName='x';
+        $paramValue="23";
+        $operator="<";
+        $lands = Land::model()->byCondition($paramName, $paramValue, $operator)->findAll();
+        var_dump($lands);
     }
 
     public function actionIntersection() {

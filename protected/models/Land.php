@@ -119,6 +119,11 @@ class Land extends CActiveRecord {
         );
     }
 
+    /**
+     * SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSScope
+     * @param type $value
+     * @return \Land
+     */
     public function simplifiedBy($value) {
         $criteria = new CDbCriteria();
         $criteria->select = array('ST_AsGeoJson(ST_Transform(ST_Simplify(geom,' . $value . '),4326)) as geojson'
@@ -128,6 +133,11 @@ class Land extends CActiveRecord {
         return $this;
     }
 
+    /**
+     * SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSScope
+     * @param type $geoText
+     * @return \Land
+     */
     public function byIntersectionWith($geoText) {
         $criteria = new CDbCriteria();
         $criteria->condition = "ST_Area(ST_intersection(ST_Transform(geom," . self::SRID_4326 . "),ST_GeomFromText('" . $geoText . "'," . self::SRID_4326 . ")))>0";
@@ -135,15 +145,52 @@ class Land extends CActiveRecord {
         return $this;
     }
 
+    /**
+     * SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSScope
+     * this scope has not select, use it in combination with another scope
+     * @param mixed(number|array) $userId
+     * @return \Land
+     */
     public function byUserId($userId) {
-        $lordCodeCol = Yii::app()->db->quoteColumnName("userId");
+        $userIdCol = Yii::app()->db->quoteColumnName("userId");
         $criteria = new CDbCriteria;
-        $criteria->select = '*,ST_AsGeoJson(geom) as geojson';
-        $criteria->condition = " $lordCodeCol=:lc";
-        $criteria->params = array(':lc' => $userId);
+        //$criteria->select = '*,ST_AsGeoJson(geom) as geojson';
+        if (is_array($userId)) {
+            $userId = implode(',', $userId);
+            $criteria->condition = "$userIdCol in (:id)";
+        } else {
+            $criteria->condition = " $userIdCol=:id";
+        }
+        $criteria->params = array(':id' => $userId);
 
         $this->getDbCriteria()->mergeWith($criteria);
         return $this;
+    }
+
+    public function byCondition($paramName, $paramValue, $operator) {
+        $crit = new CDbCriteria();
+        $column = self::paramAlternative($paramName);
+        $crit->Compare($column, $operator . $paramValue); // see compare documentation
+        $this->getDbCriteria()->mergeWith($crit);
+        return $this;
+    }
+
+    /**
+     * @see Land#byCondition
+     * @param type $param
+     */
+    private static function paramAlternative($param) {
+        $searchAliases = array(
+            'area' => 'ST_Area(geom)',
+            'x' => 'ST_XMin(ST_Transform(geom,'.self::SRID_4326.'))',
+            'y' => 'ST_YMin(ST_Transform(geom,'.self::SRID_4326.'))',
+            'villageCode' => 'villageCode',
+            'villageName' => 'villageName',
+        );
+        if (!array_key_exists($paramName, $searchAliases)) {
+            throw new CHttpException(400, 'bad request');
+        }
+        return self::$searchAliases[$paramName];
     }
 
     /**
@@ -253,7 +300,11 @@ class Land extends CActiveRecord {
         } else {
             $m = self::model();
         }
-        $lands = $m->findAllByAttributes(array('userId' => $userId * 1));
+
+        //$lands = $m->findAllByAttributes(array('userId' => $userId * 1));
+        $lands = $m->byUserId($userId)->findAll();
+
+
         $res = array();
         if (count($lands) > 0) {
             foreach ($lands as $land) {
