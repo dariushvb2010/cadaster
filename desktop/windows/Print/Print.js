@@ -417,7 +417,10 @@ Ext.application({
     },
     
     launch: function(){
-        var postData = {userId:window.opener.params.userId};
+        var postData = {
+            userId:window.opener.params.userId,
+            simplified:1
+        };
         console.log('userId: ' + window.opener.params.userId);
         var rootThis = this;
         

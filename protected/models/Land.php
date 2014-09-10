@@ -2,6 +2,14 @@
 
 /**
  * This is the model class for table "land".
+ * 
+ * FeatureArray is array of this:
+ * return array(
+ *          'geometry' => $this->geojson,
+ *          'properties' => array_merge(
+ *                  $this->attributes, array('area' => $this->area, 'perimeter' => $this->perimeter)
+ *          )
+ *      );
  *
  * The followings are the available columns in table 'land':
  * @property integer $ID
@@ -40,17 +48,27 @@ class Land extends CActiveRecord {
     const SRID_4326 = 4326;
 
     /**
+     *  ST_simplify(geom,value)
+     * the values must be sorted in descending order (nozooli)
+     * we simplify the geoms with $simplifyValues[0] and if it returned 0 points, we would try $simplifyValues[1] and ...
+     * @var type 
+     */
+    private static $simplifyValues = array(2, 1, 0.2);
+
+    const DEFAULT_SIMPLIFY_VALUE = 1;
+
+    /**
      * @return string the associated database table name
      */
     public function tableName() {
         return 'morteza2';
     }
 
-    public function relateions() {
-        return array(
-            'user' => array(self::BELONGS_TO, 'MyUser', 'userId'),
-        );
-    }
+//    public function relateions() {
+//        return array(
+//            'user' => array(self::BELONGS_TO, 'MyUser', 'userId'),
+//        );
+//    }
 
     /**
      * @return array validation rules for model attributes.
@@ -84,7 +102,7 @@ class Land extends CActiveRecord {
     public function scopes() {
         return array(
             'simplified' => array(
-                'select' => array('ST_AsGeoJson(ST_Transform(ST_Simplify(geom,1),4326)) as geojson'
+                'select' => array('ST_AsGeoJson(ST_Transform(ST_Simplify(geom,' . self::DEFAULT_SIMPLIFY_VALUE . '),4326)) as geojson'
                     , 'ST_Area(geom) as area'
                     , 'ST_Perimeter(geom) as perimeter')
             )
@@ -99,6 +117,15 @@ class Land extends CActiveRecord {
                 , 'ST_Area(geom) as area'
                 , 'ST_Perimeter(geom) as perimeter')
         );
+    }
+
+    public function simplifiedBy($value) {
+        $criteria = new CDbCriteria();
+        $criteria->select = array('ST_AsGeoJson(ST_Transform(ST_Simplify(geom,' . $value . '),4326)) as geojson'
+            , 'ST_Area(geom) as area'
+            , 'ST_Perimeter(geom) as perimeter');
+        $this->getDbCriteria()->mergeWith($criteria);
+        return $this;
     }
 
     public function byIntersectionWith($geoText) {
@@ -213,34 +240,65 @@ class Land extends CActiveRecord {
 // 	}
     /**
      * 
-     * @param type $userId
+     * @param number $userId
+     * @param mixed(bool,float) $simplifyValue
      * @return type
      */
-    private static function loadAsFeaturesByUserId($userId, $simplified) {
+    private static function loadAsFeaturesByUserId($userId, $simplifyValue) {
 
-        if ($simplified) {
+        if ($simplifyValue === true) {
             $m = self::model()->simplified();
+        } elseif (!empty($simplifyValue)) {
+            $m = self::model()->simplifiedBy($simplifyValue);
         } else {
             $m = self::model();
         }
         $lands = $m->findAllByAttributes(array('userId' => $userId * 1));
         $res = array();
-        if (count($lands) > 0)
+        if (count($lands) > 0) {
             foreach ($lands as $land) {
                 $res[] = $land->toFeature();
             }
+        }
         return $res;
     }
 
     /**
      * 
      * @param type $userId
-     * @param boolean $simplified : get the simplified features or acurate features?
+     * @param mixed(boolean,float) $simplifyValue : get the simplified features or acurate features?
      * @return type
      */
-    public static function loadAsGeoJsonByUserId($userId, $simplified = false) {
-        $features = self::loadAsFeaturesByUserId($userId, $simplified);
+    public static function loadAsGeoJsonByUserId($userId, $simplifyValue = false) {
+        if ($simplifyValue === true) {
+            foreach (self::$simplifyValues as $val) {
+                /* @var $features FeatureArray, @see $this->toFeature() */
+                $features = self::loadAsFeaturesByUserId($userId, $val);
+                $hasEmptyCoord = self::hasEmptyCoordinates($features);
+                if (!$hasEmptyCoord) { // it is good features
+                    break;
+                }
+            }
+        } else {
+            $features = self::loadAsFeaturesByUserId($userId, $simplifyValue);
+        }
         return Gis::makeGeoJson2($features);
+    }
+
+    /**
+     * some of features simplified by ST_Simplify had empty coordinates []. so we decided to use this functions
+     * @param FeatureArray $features
+     */
+    private static function hasEmptyCoordinates($features) {
+        $hasEmptyCoord = false;
+        foreach ($features as $f) {
+            $geom = json_decode($f['geometry']);
+            if (empty($geom->coordinates)) {
+                $hasEmptyCoord = true;
+                break;
+            }
+        }
+        return $hasEmptyCoord;
     }
 
     /**
