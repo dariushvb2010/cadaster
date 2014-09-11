@@ -10,11 +10,7 @@
 	<p>
 		<?php echo Rights::t('core', 'Here you can view which permissions has been assigned to each user.'); ?>
 	</p>
-        <p>
-            role:نقش <br/>
-            task: تکلیف<br/>
-            operation: عمل<br/>
-        </p>
+        
 
 	<?php $this->widget('zii.widgets.grid.CGridView', array(
 	    'dataProvider'=>$dataProvider,
@@ -53,4 +49,13 @@
 	    )
 	)); ?>
 
+        <hr/>
+        <p>
+            <table style="width:50%;">
+                <thead><caption>عبارات تخصصی به صورت زیر ترجمه شده است.</caption></thead>
+                <tr><td>role=نقش </td><td>task= تکلیف</td>
+                <tr><td>operation= عمل</td><td>permission= مجوز</td></tr>
+                
+            </table>
+        </p>
 </div>
