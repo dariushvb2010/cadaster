@@ -9,10 +9,10 @@ $this->breadcrumbs=array(
 );
 
 $this->menu=array(
-	array('label'=>'List Land', 'url'=>array('index')),
-	array('label'=>'Create Land', 'url'=>array('create')),
-	array('label'=>'View Land', 'url'=>array('view', 'id'=>$model->PlatCode)),
-	array('label'=>'Manage Land', 'url'=>array('admin')),
+	array('label'=>'List Land', 'url'=>array('index'),'linkOptions'=>array('class'=>'item')),
+	array('label'=>'Create Land', 'url'=>array('create'),'linkOptions'=>array('class'=>'item')),
+	array('label'=>'View Land', 'url'=>array('view', 'id'=>$model->PlatCode),'linkOptions'=>array('class'=>'item')),
+	array('label'=>'Manage Land', 'url'=>array('admin'),'linkOptions'=>array('class'=>'item')),
 );
 ?>
 

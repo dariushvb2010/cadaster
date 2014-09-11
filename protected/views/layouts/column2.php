@@ -6,16 +6,14 @@
 	</div><!-- content -->
 </div>
 <div class="span-5 last">
-	<div id="sidebar">
+    <div id="sidebar" class="ui inverted menu active"<!-- semantic-ui class-->>
 	<?php
-		$this->beginWidget('zii.widgets.CPortlet', array(
-			'title'=>'منو',
-		));
+		
 		$this->widget('zii.widgets.CMenu', array(
 			'items'=>$this->menu,
 			'htmlOptions'=>array('class'=>'operations'),
 		));
-		$this->endWidget();
+		
 	?>
 	</div><!-- sidebar -->
 </div>

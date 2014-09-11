@@ -7,8 +7,8 @@ $this->breadcrumbs=array(
 );
 
 $this->menu=array(
-	array('label'=>'Create Landlord', 'url'=>array('create')),
-	array('label'=>'Manage Landlord', 'url'=>array('admin')),
+	array('label'=>'Create Landlord', 'url'=>array('create'),'linkOptions'=>array('class'=>'item')),
+	array('label'=>'Manage Landlord', 'url'=>array('admin'),'linkOptions'=>array('class'=>'item')),
 );
 ?>
 

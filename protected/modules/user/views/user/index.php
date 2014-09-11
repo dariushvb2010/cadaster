@@ -5,8 +5,8 @@ $this->breadcrumbs=array(
 if(UserModule::isAdmin()) {
 	$this->layout='//layouts/column2';
 	$this->menu=array(
-	    array('label'=>UserModule::t('Manage Users'), 'url'=>array('/user/admin')),
-	    array('label'=>UserModule::t('Manage Profile Field'), 'url'=>array('profileField/admin')),
+	    array('label'=>UserModule::t('Manage Users'), 'url'=>array('/user/admin'),'linkOptions'=>array('class'=>'item')),
+	    array('label'=>UserModule::t('Manage Profile Field'), 'url'=>array('profileField/admin'),'linkOptions'=>array('class'=>'item')),
 	);
 }
 ?>

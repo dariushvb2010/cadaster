@@ -9,10 +9,10 @@ $this->breadcrumbs=array(
 );
 
 $this->menu=array(
-	array('label'=>'List Landlord', 'url'=>array('index')),
-	array('label'=>'Create Landlord', 'url'=>array('create')),
-	array('label'=>'View Landlord', 'url'=>array('view', 'id'=>$model->LinkCode)),
-	array('label'=>'Manage Landlord', 'url'=>array('admin')),
+	array('label'=>'List Landlord', 'url'=>array('index'),'linkOptions'=>array('class'=>'item')),
+	array('label'=>'Create Landlord', 'url'=>array('create'),'linkOptions'=>array('class'=>'item')),
+	array('label'=>'View Landlord', 'url'=>array('view', 'id'=>$model->LinkCode),'linkOptions'=>array('class'=>'item')),
+	array('label'=>'Manage Landlord', 'url'=>array('admin'),'linkOptions'=>array('class'=>'item')),
 );
 ?>
 

@@ -8,11 +8,11 @@ $this->breadcrumbs=array(
 );
 
 $this->menu=array(
-	array('label'=>'List Land', 'url'=>array('index')),
-	array('label'=>'Create Land', 'url'=>array('create')),
-	array('label'=>'Update Land', 'url'=>array('update', 'id'=>$model->PlatCode)),
-	array('label'=>'Delete Land', 'url'=>'#', 'linkOptions'=>array('submit'=>array('delete','id'=>$model->PlatCode),'confirm'=>'Are you sure you want to delete this item?')),
-	array('label'=>'Manage Land', 'url'=>array('admin')),
+	array('label'=>'List Land', 'url'=>array('index'),'linkOptions'=>array('class'=>'item')),
+	array('label'=>'Create Land', 'url'=>array('create'),'linkOptions'=>array('class'=>'item')),
+	array('label'=>'Update Land', 'url'=>array('update', 'id'=>$model->PlatCode),'linkOptions'=>array('class'=>'item')),
+	array('label'=>'Delete Land', 'url'=>'#', 'linkOptions'=>array('class'=>'item','submit'=>array('delete','id'=>$model->PlatCode),'confirm'=>'Are you sure you want to delete this item?')),
+	array('label'=>'Manage Land', 'url'=>array('admin'),'linkOptions'=>array('class'=>'item')),
 );
 ?>
 

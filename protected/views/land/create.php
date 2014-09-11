@@ -8,8 +8,8 @@ $this->breadcrumbs=array(
 );
 
 $this->menu=array(
-	array('label'=>'List Land', 'url'=>array('index')),
-	array('label'=>'Manage Land', 'url'=>array('admin')),
+	array('label'=>'List Land', 'url'=>array('index'),'linkOptions'=>array('class'=>'item')),
+	array('label'=>'Manage Land', 'url'=>array('admin'),'linkOptions'=>array('class'=>'item')),
 );
 ?>
 

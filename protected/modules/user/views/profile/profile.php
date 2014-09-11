@@ -4,12 +4,12 @@ $this->breadcrumbs=array(
 );
 $this->menu=array(
 	((UserModule::isAdmin())
-		?array('label'=>UserModule::t('Manage Users'), 'url'=>array('/user/admin'))
+		?array('label'=>UserModule::t('Manage Users'), 'url'=>array('/user/admin'),'linkOptions'=>array('class'=>'item'))
 		:array()),
-    array('label'=>UserModule::t('List User'), 'url'=>array('/user')),
-    array('label'=>UserModule::t('Edit'), 'url'=>array('edit')),
-    array('label'=>UserModule::t('Change password'), 'url'=>array('changepassword')),
-    array('label'=>UserModule::t('Logout'), 'url'=>array('/user/logout')),
+    array('label'=>UserModule::t('List User'), 'url'=>array('/user'),'linkOptions'=>array('class'=>'item')),
+    array('label'=>UserModule::t('Edit'), 'url'=>array('edit'),'linkOptions'=>array('class'=>'item')),
+    array('label'=>UserModule::t('Change password'), 'url'=>array('changepassword'),'linkOptions'=>array('class'=>'item')),
+    array('label'=>UserModule::t('Logout'), 'url'=>array('/user/logout'),'linkOptions'=>array('class'=>'item')),
 );
 ?><h1><?php echo UserModule::t('Your profile'); ?></h1>
 

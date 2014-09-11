@@ -8,11 +8,11 @@ $this->breadcrumbs=array(
 );
 
 $this->menu=array(
-	array('label'=>'List Landlord', 'url'=>array('index')),
-	array('label'=>'Create Landlord', 'url'=>array('create')),
-	array('label'=>'Update Landlord', 'url'=>array('update', 'id'=>$model->LinkCode)),
-	array('label'=>'Delete Landlord', 'url'=>'#', 'linkOptions'=>array('submit'=>array('delete','id'=>$model->LinkCode),'confirm'=>'Are you sure you want to delete this item?')),
-	array('label'=>'Manage Landlord', 'url'=>array('admin')),
+	array('label'=>'List Landlord', 'url'=>array('index'),'linkOptions'=>array('class'=>'item')),
+	array('label'=>'Create Landlord', 'url'=>array('create'),'linkOptions'=>array('class'=>'item')),
+	array('label'=>'Update Landlord', 'url'=>array('update', 'id'=>$model->LinkCode),'linkOptions'=>array('class'=>'item')),
+	array('label'=>'Delete Landlord', 'url'=>'#', 'linkOptions'=>array('class'=>'item','submit'=>array('delete','id'=>$model->LinkCode),'confirm'=>'Are you sure you want to delete this item?')),
+	array('label'=>'Manage Landlord', 'url'=>array('admin'),'linkOptions'=>array('class'=>'item')),
 );
 ?>
 

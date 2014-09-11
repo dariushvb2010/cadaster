@@ -4,9 +4,9 @@ $this->breadcrumbs=array(
 	UserModule::t('Manage'),
 );
 $this->menu=array(
-    array('label'=>UserModule::t('Create Profile Field'), 'url'=>array('create')),
-    array('label'=>UserModule::t('Manage Profile Field'), 'url'=>array('admin')),
-    array('label'=>UserModule::t('Manage Users'), 'url'=>array('/user/admin')),
+    array('label'=>UserModule::t('Create Profile Field'), 'url'=>array('create'),'linkOptions'=>array('class'=>'item')),
+    array('label'=>UserModule::t('Manage Profile Field'), 'url'=>array('admin'),'linkOptions'=>array('class'=>'item')),
+    array('label'=>UserModule::t('Manage Users'), 'url'=>array('/user/admin'),'linkOptions'=>array('class'=>'item')),
 );
 
 Yii::app()->clientScript->registerScript('search', "
