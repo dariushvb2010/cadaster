@@ -19,6 +19,7 @@ $cs = Yii::app()->clientScript;
         $cs->registerCssFile("css/form.css");
         $cs->registerCssFile("semantic/packaged/css/semantic.css");
 
+        $cs->registerCoreScript('jquery');
         $cs->registerScriptFile('semantic/packaged/javascript/semantic.js');
         ?>
 
@@ -47,16 +48,6 @@ $cs = Yii::app()->clientScript;
 
                 <div id="mainmenu" class="inverted secondary pointing ui menu right">
                     <?php
-//                $this->widget('zii.widgets.CMenu', array(
-//                    'items' => array(
-//                        array('label' => Yii::t('global', 'home'), 'url' => array('/site/index')),
-//                        array('label' => Yii::t('global', 'about'), 'url' => array('/site/page', 'view' => 'about')),
-//                        array('label' => Yii::t('global', 'contact'), 'url' => array('/site/contact')),
-//                        array('label' => Yii::t('global', 'login'), 'url' => array('/user/login'), 'visible' => Yii::app()->user->isGuest),
-//                        array('label' => 'دسترسی کاربران', 'url' => array('/rights')),
-//                        array('label' => Yii::t('global', 'logout') . ' ' . Yii::app()->user->name, 'url' => array('/user/logout'), 'visible' => !Yii::app()->user->isGuest)
-//                    ),
-//                ));
                     ?>
                     <div class="menu">
                         <a class="item" href="<?php echo Yii::app()->createUrl('site/index');?>"><?php echo Yii::t('global','home') ?></a>

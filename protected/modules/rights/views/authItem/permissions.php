@@ -16,9 +16,9 @@
 		)); ?>
 	</p>
 
-	<p><?php echo CHtml::link(Rights::t('core', 'Generate items for controller actions'), array('authItem/generate'), array(
+	<p class="ui button small icon labeld"><?php echo CHtml::link(Rights::t('core', 'Generate items for controller actions'), array('authItem/generate'), array(
 	   	'class'=>'generator-link',
-	)); ?></p>
+            )); ?></p>
 
 	<?php $this->widget('zii.widgets.grid.CGridView', array(
 		'dataProvider'=>$dataProvider,

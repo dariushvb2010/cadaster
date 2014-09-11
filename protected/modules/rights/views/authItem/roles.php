@@ -12,8 +12,8 @@
 		<?php echo Rights::t('core', 'Roles exist at the top of the authorization hierarchy and can therefore inherit from other roles, tasks and/or operations.'); ?>
 	</p>
 
-	<p><?php echo CHtml::link(Rights::t('core', 'Create a new role'), array('authItem/create', 'type'=>CAuthItem::TYPE_ROLE), array(
-	   	'class'=>'add-role-link',
+	<p class="ui button small"><?php echo CHtml::link(Rights::t('core', 'Create a new role'), array('authItem/create', 'type'=>CAuthItem::TYPE_ROLE), array(
+	   	'class'=>'',
 	)); ?></p>
 
 	<?php $this->widget('zii.widgets.grid.CGridView', array(

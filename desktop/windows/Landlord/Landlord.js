@@ -303,7 +303,7 @@ Ext.define('MyDesktop.Landlord.Landlord', {
         map.addLayers([globalImagery, layer]);
         
         var panel = Ext.create('GeoExt.panel.Map', {
-            title: 'سلام بر مهدی',
+            title: 'نقشه',
             map: map,
             rtl: false,
             collapsible: true,
