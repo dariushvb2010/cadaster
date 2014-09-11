@@ -1,5 +1,6 @@
 body
 {
+    text-align: right;
     margin: 0;
     padding: 0;
     color: #555;
@@ -9,6 +10,15 @@ body
 }
 .txtright{
     text-align: right !important;
+}
+.maroon{
+    background-color:maroon;
+}
+.red{
+    background-color:red;
+}
+.orange{
+    background-color:orange;
 }
 #page
 {

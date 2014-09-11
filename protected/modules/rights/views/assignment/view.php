@@ -10,6 +10,11 @@
 	<p>
 		<?php echo Rights::t('core', 'Here you can view which permissions has been assigned to each user.'); ?>
 	</p>
+        <p>
+            role:نقش <br/>
+            task: تکلیف<br/>
+            operation: عمل<br/>
+        </p>
 
 	<?php $this->widget('zii.widgets.grid.CGridView', array(
 	    'dataProvider'=>$dataProvider,

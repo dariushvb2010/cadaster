@@ -27,7 +27,7 @@
 	font-size:12px;
 	text-decoration:none;
 	padding:8px 12px;
-	background:#666699;
+	//background:#666699;
 	-moz-border-radius:6px;
 	-webkit-border-radius:6px;
 }
@@ -62,7 +62,7 @@
 	color:#404040;
 	font-weight:bold;
 	font-size:13px;
-	text-align:left;
+	text-align:right;
 }
 #rights .grid-view table.items thead th { background:#ffffff; }
 #rights .grid-view table.items th,

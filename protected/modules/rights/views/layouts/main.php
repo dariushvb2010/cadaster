@@ -6,7 +6,7 @@
 
 		<?php if( $this->id!=='install' ): ?>
 
-			<div id="menu">
+			<div id="menu" class="ui menu inverted">
 
 				<?php $this->renderPartial('/_menu'); ?>
 
