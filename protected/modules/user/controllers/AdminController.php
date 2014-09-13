@@ -74,6 +74,9 @@ class AdminController extends Controller {
      * If creation is successful, the browser will be redirected to the 'view' page.
      */
     public function actionCreate() {
+        $this->layout = 'user.views.layouts.main';
+        Yii::app()->clientScript->registerCssFile('css/rights-default.css');
+        
         $model = new User;
         $profile = new Profile;
         $this->performAjaxValidation(array($model, $profile));

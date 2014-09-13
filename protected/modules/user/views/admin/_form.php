@@ -1,4 +1,4 @@
-<div class="form">
+<div id="rights" class="form span-12 first"  style="float:none;">
 
 <?php $form=$this->beginWidget('CActiveForm', array(
 	'id'=>'user-form',

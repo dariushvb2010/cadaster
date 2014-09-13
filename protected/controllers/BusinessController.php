@@ -34,13 +34,13 @@ class BusinessController extends Controller {
     public function actionBuy() {
 
         if (isset($_REQUEST['gid'])) {
-            $m['suggestPrice'] = $_REQUEST['suggestPrice'];
-            $m['finalPrice'] = $_REQUEST['finalPrice'];
+            $m['suggestPrice'] = $_REQUEST['suggestPrice']*1;
+            $m['finalPrice'] = $_REQUEST['finalPrice']*1;
             $m['landId'] = (int) $_REQUEST['gid'];
             $m['state'] = $_REQUEST['state'];
             $m['suggestDate'] = $_REQUEST['buyDate'];
             $m['description'] = $_REQUEST['description'];
-
+            
             $land = Land::model()->findByPk($m['landId']);
             $m['sellerUserId'] = $land->lord->id;
             $m['buyerUserId'] = 1;

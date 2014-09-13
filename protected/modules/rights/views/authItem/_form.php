@@ -1,4 +1,4 @@
-<div class="form span-12 first">
+<div class="form span-12 first" style="float:none;">
 
 <?php if( $model->scenario==='update' ): ?>
 
