@@ -325,13 +325,6 @@ Ext.define('MyDesktop.Landlord.Landlord', {
         var mobayeDate = getTextField('', 'mobayeDate', true);
         var committeeNo = getTextField('', 'committeeNo', true);
         var committeeDate = getTextField('', 'committeeDate', true);
-        var hasEsteshhad = getTextField('', 'hasEsteshhad', true);
-        var hasMap = getTextField('', 'hasMap', true);
-        var hasEstelam = getTextField('', 'hasEstelam', true);
-        var hasMadarek = getTextField('', 'hasMadarek', true);
-        var hasSanad = getTextField('', 'hasSanad', true);
-        var hasTayeediyeShura = getTextField('', 'hasTayeediyeShura', true);
-        var hasQabz = getTextField('', 'hasQabz', true);
         var description = getTextField('توضیحات', 'description', true);
         
         var panel = Ext.widget('form', {
@@ -370,27 +363,6 @@ Ext.define('MyDesktop.Landlord.Landlord', {
                 }, {
                     xtype: 'fieldcontainer',
                     items: [committeeDate]
-                }, {
-                    xtype: 'fieldcontainer',
-                    items: [hasEsteshhad]
-                }, {
-                    xtype: 'fieldcontainer',
-                    items: [hasMap]
-                }, {
-                    xtype: 'fieldcontainer',
-                    items: [hasEstelam]
-                }, {
-                    xtype: 'fieldcontainer',
-                    items: [hasMadarek]
-                }, {
-                    xtype: 'fieldcontainer',
-                    items: [hasSanad]
-                }, {
-                    xtype: 'fieldcontainer',
-                    items: [hasTayeediyeShura]
-                }, {
-                    xtype: 'fieldcontainer',
-                    items: [hasQabz]
                 }, {
                     xtype: 'fieldcontainer',
                     items: [description]
