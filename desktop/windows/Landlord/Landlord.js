@@ -318,13 +318,20 @@ Ext.define('MyDesktop.Landlord.Landlord', {
                 allowBlank: allowBlank
             });
         };
+        var getDateField = function (fieldLabel, name){
+            return Ext.create('Ext.form.field.Date', {
+                anchor: '100%',
+                fieldLabel: fieldLabel,
+                name: name
+            });
+        };
         var mobayeNo = getTextField('شماره مبایعه نامه', 'mobayeNo', true);
         var area = getTextField('مساحت', 'area', true);
-        var pricePerMeter = getTextField('', 'pricePerMeter', true);
-        var finalPrice = getTextField('', 'finalPrice', true);
-        var mobayeDate = getTextField('', 'mobayeDate', true);
-        var committeeNo = getTextField('', 'committeeNo', true);
-        var committeeDate = getTextField('', 'committeeDate', true);
+        var pricePerMeter = getTextField('قیمت هر متر', 'pricePerMeter', true);
+        var finalPrice = getTextField('قیمت نهایی', 'finalPrice', true);
+        var mobayeDate = getDateField('تاریخ مبایعه نامه', 'mobayeDate');
+        var committeeNo = getTextField('شماره کمیته تملک اراضی', 'committeeNo', true);
+        var committeeDate = getDateField('تاریخ کمیته تملک اراضی', 'committeeDate');
         var description = getTextField('توضیحات', 'description', true);
         
         var panel = Ext.widget('form', {
@@ -439,7 +446,7 @@ Ext.define('MyDesktop.Landlord.Landlord', {
                 title:'ثبت خرید',
                 width:1300,
                 rtl: true,
-                height:300,
+                height:400,
                 iconCls: 'icon-grid',
                 collapsible: true,
                 constrainHeader:false,
