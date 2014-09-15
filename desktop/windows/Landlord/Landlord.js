@@ -308,8 +308,7 @@ Ext.define('MyDesktop.Landlord.Landlord', {
             return panel;
         }
     },
-    shopping: function(region, land){
-        
+    shopping: function(region, land, that){
         var getTextField = function(fieldLabel, name, allowBlank){
             return Ext.create('Ext.form.TextField', {
                 width: 250,
@@ -375,12 +374,101 @@ Ext.define('MyDesktop.Landlord.Landlord', {
                     items: [description]
                 }],
             buttons: [{
-                text: 'ارسال',
+                text: 'ثبت اطلاعات',
+                //disabled: true,
+                formBind: true,
+                handler: function(){
+                    alert("gid: " + land.getLastSelectedSegmentId());
+                    console.log("gid: " + land.getLastSelectedSegmentId());
+                    this.up('form').getForm().submit({
+                        url: 'index.php?r=business/buy',
+                        params: {gid: land.getLastSelectedSegmentId()},
+                        submitEmptyText: false,
+                        waitMsg: 'Saving Data...',
+                        success: function(form, action) {
+                           that.setVisible(false, false, false, false, true);
+                        },
+                        failure: function(form, action) {
+                            
+                        }
+                    });
+                }
+            }]
+        }).setVisible(false);
+        
+        this.getPanel = function(){
+            return panel;
+        };
+        this.setVisible = function(flag){
+            panel.setVisible(flag);
+        };
+    },
+    uploading: function(region, land){
+        
+        var getFileField = function(fieldLabel, emptyText, name){
+            return Ext.create('Ext.form.field.File', {
+                fieldLabel: fieldLabel,
+                emptyText: emptyText,
+                name: name,
+                buttonText: 'انتخاب',
+                buttonConfig: {
+                    iconCls: 'upload-icon'
+                }
+            });
+        };
+        
+        var esteshhad = getFileField('esteshhad', 'esteshhad', 'esteshhad');
+        var map = getFileField('map', 'map', 'map');
+        var estelam = getFileField('estelam', 'estelam', 'estelam');
+        var madarek = getFileField('madarek', 'madarek', 'madarek');
+        var sanad = getFileField('madarek', 'madarek', 'madarek');
+        var tayeediyeShura = getFileField('tayeediyeShura', 'tayeediyeShura', 'tayeediyeShura');
+        var qabz = getFileField('qabz', 'qabz', 'qabz');
+        
+        var panel = Ext.widget('form', {
+            region: region,
+            layout: {
+                type: 'vbox',
+                align: 'stretch'
+            },
+            border: false,
+            bodyPadding: 4,
+
+            fieldDefaults: {
+                labelAlign: 'top',
+                labelWidth: 100,
+                labelStyle: 'font-weight:bold'
+            },
+            items: [
+                {
+                    xtype: 'fieldcontainer', 
+                    items: [esteshhad]
+                }, {
+                    xtype: 'fieldcontainer', 
+                    items: [map]
+                }, {
+                    xtype: 'fieldcontainer', 
+                    items: [estelam]
+                }, {
+                    xtype: 'fieldcontainer', 
+                    items: [madarek]
+                }, {
+                    xtype: 'fieldcontainer', 
+                    items: [sanad]
+                }, {
+                    xtype: 'fieldcontainer', 
+                    items: [tayeediyeShura]
+                }, {
+                    xtype: 'fieldcontainer', 
+                    items: [qabz]
+                }],
+            buttons: [{
+                text: 'آپلود اسناد و مدارک',
                 //disabled: true,
                 formBind: true,
                 handler: function(){
                     this.up('form').getForm().submit({
-                        url: 'index.php?r=business/buy',
+                        url: 'index.php?r=business/upload',
                         params: {gid: land.getLastSelectedSegmentId()},
                         submitEmptyText: false,
                         waitMsg: 'Saving Data...',
@@ -409,22 +497,23 @@ Ext.define('MyDesktop.Landlord.Landlord', {
         /////////////////////////////////////////////////////////////////////////////////
         
         var land = new rootThis.land("south", this);
-        var shoppingPanel = new rootThis.shopping('north', land);
+        var shoppingPanel = new rootThis.shopping('north', land, this);
         var landLord = new rootThis.landLord("center", land);
-        
         var map = new rootThis.map("west");
+        var uploading = new rootThis.uploading('north', land);
         
         map.addLayer2Map(land.getLayer());
         
-        this.setVisible = function(landLordVisible, landVisible, mapVisible, shoppingVisible){
+        this.setVisible = function(landLordVisible, landVisible, mapVisible, shoppingVisible, uploadVisible){
             landLord.setVisible(landLordVisible);
             land.setVisible(landVisible);
             map.setVisible(mapVisible);
             shoppingPanel.setVisible(shoppingVisible);
+            uploading.setVisible(uploadVisible);
         };
         this.panel = Ext.create('Ext.Panel', {
             layout: 'border',
-            items: [ landLord.getPanel(), land.getPanel(), map.getPanel(), shoppingPanel.getPanel()]
+            items: [ landLord.getPanel(), land.getPanel(), map.getPanel(), shoppingPanel.getPanel(), uploading.getPanel()]
         });
     },
 
@@ -438,7 +527,8 @@ Ext.define('MyDesktop.Landlord.Landlord', {
                 text: 'ثبت خرید جدید',
                 iconCls: 'landLord-add',
                 handler : function(){
-                    allDataGridPanel.setVisible(false, false, false, true );
+                    allDataGridPanel.setVisible(false, false, false, true, false);
+                    addToShopBtn.setVisible(false);
                 }
             });
             win = desktop.createWindow({
