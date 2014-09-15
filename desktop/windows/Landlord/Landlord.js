@@ -46,7 +46,7 @@ Ext.define('MyDesktop.Landlord.Landlord', {
 
     init : function(){
         this.launcher = {
-            text: 'همه داده ها',
+            text: 'ثبت خرید',
             iconCls:'icon-grid'
         };
     },
@@ -186,21 +186,6 @@ Ext.define('MyDesktop.Landlord.Landlord', {
         segmentsLayer.styleMap = styleMap;
         
         segmentsLayer.events.register('loadend', this, loadEnd);
-        var addToShopBtn = Ext.create('Ext.Button', {
-            text: 'افزودن به لیست خرید',
-            iconCls: 'landLord-add',
-            handler : function(){
-                allData.setVisible(false, false, false, true );
-                //console.log('');
-                /*lordRowEditing.cancelEdit();
-                // Create a model instance
-                
-                var r = Ext.create('lordModel');
-                
-                lordDetailStore.insert(0, r);
-                lordRowEditing.startEdit(0, 0);*/
-            }
-        });
         var store = Ext.create('GeoExt.data.FeatureStore', {
             layer: segmentsLayer,
             fields: [
@@ -248,8 +233,7 @@ Ext.define('MyDesktop.Landlord.Landlord', {
                 { text: 'وضعیت زمین', dataIndex: 'docStatus', flex: 1, field: {xtype: 'textfield'}, sortable: false, menuDisabled: true, align: 'center' },                
 			],
             //plugins: [landRowEditing],
-            selType: 'featuremodel',
-            bbar: [addToShopBtn]
+            selType: 'featuremodel'
         });
         segmentGridPanel.getSelectionModel().on('selectionchange', function(sm, selectedRecord) {
             if (selectedRecord.length) {
@@ -324,36 +308,34 @@ Ext.define('MyDesktop.Landlord.Landlord', {
             return panel;
         }
     },
-    shopping: function(land){
-        var suggestPriceField = Ext.create('Ext.form.TextField', {
-            width: 250,
-            name: 'suggestPrice',
-            fieldLabel: 'قیمت پیشنهادی(به ریال)',
-            allowBlank: false
-        });
-        var description = Ext.create('Ext.form.field.TextArea', {
-            width: 400,
-            name: 'description',
-            fieldLabel: 'توضیحات'
-        });
-        var finalPrice = Ext.create('Ext.form.field.TextArea', {
-            width: 400,
-            name: 'finalPrice',
-            fieldLabel: 'قیمت نهایی'
-        });
-        var state = Ext.create('Ext.form.field.TextArea', {
-            width: 400,
-            name: 'state',
-            fieldLabel: 'وضعیت قطعه زمین'
-        });
-        var buyDate = Ext.create('Ext.form.field.TextArea', {
-            width: 400,
-            name: 'buyDate',
-            fieldLabel: 'تاریخ خرید'
-        });
+    shopping: function(region, land){
+        
+        var getTextField = function(fieldLabel, name, allowBlank){
+            return Ext.create('Ext.form.TextField', {
+                width: 250,
+                name: name,
+                fieldLabel: fieldLabel,
+                allowBlank: allowBlank
+            });
+        };
+        var mobayeNo = getTextField('شماره مبایعه نامه', 'mobayeNo', true);
+        var area = getTextField('مساحت', 'area', true);
+        var pricePerMeter = getTextField('', 'pricePerMeter', true);
+        var finalPrice = getTextField('', 'finalPrice', true);
+        var mobayeDate = getTextField('', 'mobayeDate', true);
+        var committeeNo = getTextField('', 'committeeNo', true);
+        var committeeDate = getTextField('', 'committeeDate', true);
+        var hasEsteshhad = getTextField('', 'hasEsteshhad', true);
+        var hasMap = getTextField('', 'hasMap', true);
+        var hasEstelam = getTextField('', 'hasEstelam', true);
+        var hasMadarek = getTextField('', 'hasMadarek', true);
+        var hasSanad = getTextField('', 'hasSanad', true);
+        var hasTayeediyeShura = getTextField('', 'hasTayeediyeShura', true);
+        var hasQabz = getTextField('', 'hasQabz', true);
+        var description = getTextField('توضیحات', 'description', true);
+        
         var panel = Ext.widget('form', {
-            region: "south",
-            title: "افزودن به لیست خرید",
+            region: region,
             layout: {
                 type: 'vbox',
                 align: 'stretch'
@@ -369,28 +351,51 @@ Ext.define('MyDesktop.Landlord.Landlord', {
             items: [
                 {
                     xtype: 'fieldcontainer', 
-                    items: [suggestPriceField]
+                    items: [mobayeNo]
                 }, {
                     xtype: 'fieldcontainer',
-                    items: [description]
+                    items: [area]
+                }, {
+                    xtype: 'fieldcontainer',
+                    items: [pricePerMeter]
                 }, {
                     xtype: 'fieldcontainer',
                     items: [finalPrice]
                 }, {
                     xtype: 'fieldcontainer',
-                    items: [state]
+                    items: [mobayeDate]
                 }, {
                     xtype: 'fieldcontainer',
-                    items: [buyDate]
+                    items: [committeeNo]
+                }, {
+                    xtype: 'fieldcontainer',
+                    items: [committeeDate]
+                }, {
+                    xtype: 'fieldcontainer',
+                    items: [hasEsteshhad]
+                }, {
+                    xtype: 'fieldcontainer',
+                    items: [hasMap]
+                }, {
+                    xtype: 'fieldcontainer',
+                    items: [hasEstelam]
+                }, {
+                    xtype: 'fieldcontainer',
+                    items: [hasMadarek]
+                }, {
+                    xtype: 'fieldcontainer',
+                    items: [hasSanad]
+                }, {
+                    xtype: 'fieldcontainer',
+                    items: [hasTayeediyeShura]
+                }, {
+                    xtype: 'fieldcontainer',
+                    items: [hasQabz]
+                }, {
+                    xtype: 'fieldcontainer',
+                    items: [description]
                 }],
             buttons: [{
-                text: 'بی خیال',
-                handler: function(){
-                    //pricePanel.setVisible(false);
-                    //segmentGridPanel.setVisible(true);
-                    
-                }
-            }, {
                 text: 'ارسال',
                 //disabled: true,
                 formBind: true,
@@ -402,12 +407,12 @@ Ext.define('MyDesktop.Landlord.Landlord', {
                         waitMsg: 'Saving Data...',
                         success: function(form, action) {
                            Ext.Msg.alert('success', action.result.success);
-                           win.close();
+                           //win.close();
                         },
                         failure: function(form, action) {
                             a = form;
                             b = action;
-                            Ext.Msg.alert('Failed', action.result.failure);
+                            //Ext.Msg.alert('Failed', action.result.failure);
                         }
                     });
                 }
@@ -425,7 +430,7 @@ Ext.define('MyDesktop.Landlord.Landlord', {
         /////////////////////////////////////////////////////////////////////////////////
         
         var land = new rootThis.land("south", this);
-        var shoppingPanel = new rootThis.shopping(land);
+        var shoppingPanel = new rootThis.shopping('north', land);
         var landLord = new rootThis.landLord("center", land);
         
         var map = new rootThis.map("west");
@@ -450,10 +455,16 @@ Ext.define('MyDesktop.Landlord.Landlord', {
         var win = desktop.getWindow('Landlord-win');
         if(!win){
             var allDataGridPanel = new me.allData(me);
-            
+            var addToShopBtn = Ext.create('Ext.Button', {
+                text: 'ثبت خرید جدید',
+                iconCls: 'landLord-add',
+                handler : function(){
+                    allDataGridPanel.setVisible(false, false, false, true );
+                }
+            });
             win = desktop.createWindow({
                 id: 'Landlord-win',
-                title:'همه داده ها',
+                title:'ثبت خرید',
                 width:1300,
                 rtl: true,
                 height:300,
@@ -462,18 +473,10 @@ Ext.define('MyDesktop.Landlord.Landlord', {
                 constrainHeader:false,
                 align: 'right',
                 layout: 'fit',
-                items: [allDataGridPanel.panel]
+                items: [allDataGridPanel.panel],
+                bbar: [addToShopBtn]
             });
         }
         return win;
     }
 });
-
-function myFunc(a, aa , aaa){
-    b = a;
-    bb = aa;
-    bbb = aaa;
-    a.object.map.zoomToExtent(a.object.getDataExtent());
-    console.log("in the name of Allah");
-    //alert("help me ya Allah");
-}

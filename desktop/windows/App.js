@@ -64,7 +64,7 @@ Ext.define('MyDesktop.App', {
                 model: 'Ext.ux.desktop.ShortcutModel',
                 data: [
                     { name:  "افزدون قطعه", iconCls: 'addUser-48x48',  module: 'addSegment-win'},// module: 'addSegment-win'},
-                    { name: 'همه داده ها', iconCls: 'grid-shortcut', module: 'landlord-win' },               
+                    { name: 'ثبت خرید', iconCls: 'grid-shortcut', module: 'landlord-win' },               
                     //{ name: 'ویرایش مشخصات', iconCls: 'editProfile-48x48', module: 'editProfile-win' },
                     { name: 'مدیریت کاربران', iconCls: 'userManagement-48x48', module: 'userManagement-win' },
                     //{ name: 'افزودن کاربر جدید', iconCls: 'addUser-48x48', module: 'addUser-win' },
