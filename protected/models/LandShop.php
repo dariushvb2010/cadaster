@@ -40,14 +40,17 @@ class LandShop extends CActiveRecord {
         // NOTE: you should only define rules for those attributes that
         // will receive user inputs.
         return array(
-            array('sellerUserId, landId', 'required'),
-            array('sellerUserId, buyerUserId', 'numerical', 'integerOnly' => true),
-            array('state', 'length', 'max' => 50),
+            array('createrUserId,createDate', 'required'),
+            array('createrUserId', 'numerical', 'integerOnly' => true),
+            array('area, pricePerMeter', 'numerical'),
+            array('state,mobayeNo,committeeNo', 'length', 'max' => 50),
             array('description', 'length', 'max' => 1000),
-            array('suggestPrice, finalPrice, buyDate', 'safe'),
+            array('finalPrice', 'safe'),
             // The following rule is used by search().
             // @todo Please remove those attributes that should not be searched.
-            array('id, sellerUserId, plateCode, state, suggestPrice, finalPrice, buyerUserId, buyDate, suggestDate', 'safe', 'on' => 'search'),
+            array('id, state, finalPrice', 'safe', 'on' => 'search'),
+            //array('committeeDate,mobayeDate', 'type', 'type' => 'date', 'message' => '{attribute}: is not a date!')
+            array('committeeDate,mobayeDate', 'safe')
         );
     }
 
@@ -60,8 +63,7 @@ class LandShop extends CActiveRecord {
         return array(
             'suggestShops' => array(self::HAS_MANY, 'SuggestShop', 'landShopId'),
             'sellerUser' => array(self::BELONGS_TO, 'MyUser', 'sellerUserId'),
-            'buyerUser' => array(self::BELONGS_TO, 'MyUser', 'buyerUserId'),
-            'land' => array(self::BELONGS_TO, 'Land', 'landId'),
+            'createrUser'=>array(self::BELONGS_TO,'User','createrUserId'),
         );
     }
 

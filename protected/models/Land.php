@@ -96,6 +96,7 @@ class Land extends CActiveRecord {
         // class name for the relations automatically generated below.
         return array(
             'lord' => array(self::BELONGS_TO, 'MyUser', 'userId'),
+            'shop' => array(self::BELONGS_TO, 'LandShop', 'shopId'),
         );
     }
 

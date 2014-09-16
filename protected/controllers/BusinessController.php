@@ -14,7 +14,7 @@ class BusinessController extends Controller {
     public function accessRules() {
         return array(
             array('allow', // allow all users to perform 'index' and 'view' actions
-                'actions' => array('index', 'landbuy', 'salelist','buy'),
+                'actions' => array('index', 'landbuy', 'salelist', 'buy'),
                 'users' => array('*'),
             ),
             array('allow', // allow authenticated user to perform 'create' and 'update' actions
@@ -22,7 +22,7 @@ class BusinessController extends Controller {
                 'users' => array('@'),
             ),
             array('allow', // allow admin user to perform 'admin' and 'delete' actions
-                'actions' => array('landsell','buy'),
+                'actions' => array('landsell', 'buy'),
                 'roles' => array('lord')
             ),
             array('deny', // deny all users
@@ -34,22 +34,35 @@ class BusinessController extends Controller {
     public function actionBuy() {
 
         if (isset($_REQUEST['gid'])) {
-            $m['suggestPrice'] = $_REQUEST['suggestPrice']*1;
-            $m['finalPrice'] = $_REQUEST['finalPrice']*1;
-            $m['landId'] = (int) $_REQUEST['gid'];
-            $m['state'] = $_REQUEST['state'];
-            $m['suggestDate'] = $_REQUEST['buyDate'];
-            $m['description'] = $_REQUEST['description'];
+            $landId = (int) $_REQUEST['gid'];
             
-            $land = Land::model()->findByPk($m['landId']);
-            $m['sellerUserId'] = $land->lord->id;
-            $m['buyerUserId'] = 1;
+            $m['finalPrice'] = $_REQUEST['finalPrice'];
+            $m['pricePerMeter'] = $_REQUEST['pricePerMeter'];
+            $m['area'] = $_REQUEST['area'];
+            $m['mobayeNo'] = $_REQUEST['mobayeNo'];
+            $m['mobayeDate'] = $_REQUEST['mobayeDate'];
+            $m['committeeNo'] = $_REQUEST['committeeNo'];
+            $m['committeeDate'] = $_REQUEST['committeeDate'];
+            $m['description'] = $_REQUEST['description'];
+            $m['createDate']=new CDbExpression('NOW()');
+            $m['createrUserId']=Yii::app()->user->id;
+            
+            $land = Land::model()->findByPk($landId);
+            //$m['sellerUserId'] = $land->lord->id;
+
             $landShop = new LandShop;
             $landShop->attributes = $m;
-            if ($landShop->save())
-                $res = array('success' => 'خرید زمین ثبت شد');
-            else
-                $res = array('failure' => Msg::fail_add);
+            if ($landShop->save()) {
+                
+                $land->shopId = $landShop->id;
+                if($land->save()){
+                    $res = array('success' => 'خرید زمین ثبت شد');
+                }else{
+                    $res = array('failure' => CHtml::errorSummary($landShop));
+                }
+                
+            } else
+                $res = array('failure' => CHtml::errorSummary($landShop));
         } else
             $res = array('failure' => Msg::fail_params);
         echo json_encode($res);
