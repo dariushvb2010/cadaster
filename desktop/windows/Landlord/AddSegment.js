@@ -143,6 +143,50 @@ Ext.define('MyDesktop.Landlord.AddSegment', {
     },
     
     mapPanel: function(win){
+        var intersectionTestCallBack = function(){
+            //alert("in the name of Allah - Help me ya Allah");
+            var createText2SendServer = function(){
+                
+            };
+            Ext.Ajax.request({
+                url: '?r=land/Intersection',
+                params: {
+                    geoText: geoText
+                },
+                success: function(response){
+                    text = response.responseText;
+                    text = eval('(' + text + ')');
+                    if(text.features.length<1){
+                        alert("سلام بر حسین");
+                    }else{
+                        alert("قطعه شما با قطعات دیگر تداخل دارد.");
+                        
+                        var features = text.features;
+                        var i = 0;
+                        
+                        intersectionLayer.removeAllFeatures();
+                        while(i<features.length){
+                            var points = features[i].geometry.coordinates[0][0];
+                            var geoPoints = [];
+                            var j = 0;
+                            while(j<points.length){
+                                geoPoints.push(new OpenLayers.Geometry.Point(points[j][0], points[j][1]));
+                                j++;
+                            }
+                            i++;
+                            intersectionLayer.addFeatures([
+                                new OpenLayers.Feature.Vector(
+                                    new OpenLayers.Geometry.Polygon(
+                                        new OpenLayers.Geometry.LinearRing(geoPoints)
+                                    )
+                                )
+                            ]);
+                            intersectionLayer.redraw();
+                        }
+                    }
+                }
+            });
+        };
         var stylePanel = function(){
             var intersectionStyle = new OpenLayers.Style();
             var intersectionRule = new OpenLayers.Rule({
@@ -351,13 +395,11 @@ Ext.define('MyDesktop.Landlord.AddSegment', {
             }
         });
         toolbarItems.push(addPolygon);
-        var intersectionTest = Ext.create('Ext.Button', {
+        var intersectionTestBtn = Ext.create('Ext.Button', {
             text: 'آزمایش تداخل',
-            handler: function() {
-                
-            }
+            handler: intersectionTestCallBack
         });
-        toolbarItems.push(intersectionTest);
+        toolbarItems.push(intersectionTestBtn);
         var mapPanel = Ext.create('GeoExt.panel.Map', {
             //title: 'افزودن با استفاده از نقشه',
             map: map,

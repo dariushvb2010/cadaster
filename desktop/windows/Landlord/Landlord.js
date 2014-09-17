@@ -322,7 +322,8 @@ Ext.define('MyDesktop.Landlord.Landlord', {
             return Ext.create('Ext.form.field.Date', {
                 anchor: '100%',
                 fieldLabel: fieldLabel,
-                name: name
+                name: name, 
+                value: new Date()
             });
         };
         var mobayeNo = getTextField('شماره مبایعه نامه', 'mobayeNo', 123, true);
