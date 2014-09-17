@@ -3,8 +3,7 @@
 class LandController extends Controller {
 
     public $layout = '//layouts/column2';
-    
-    
+
     public function filters() {
         return array(
             'accessControl', // perform access control for CRUD operations
@@ -19,7 +18,7 @@ class LandController extends Controller {
                 'users' => array('*'),
             ),
             array('allow', // allow authenticated user to perform 'create' and 'update' actions
-                'actions' => array('create', 'update','search'),
+                'actions' => array('create', 'update', 'search'),
                 'roles' => array('admin'),
             ),
             array('allow', // allow admin user to perform 'admin' and 'delete' actions
@@ -42,14 +41,36 @@ class LandController extends Controller {
             echo $this->makeGeoJson($lands);
         }
     }
-    
-    public function actionSearch(){
+
+    public function actionSearch() {
+
+        $paramName = 'hasEsteshhad';
+        $paramValue = "true";
+        $operator = 'eq';
         
-        $paramName='x';
-        $paramValue="23";
-        $operator="<";
-        $lands = Land::model()->byCondition($paramName, $paramValue, $operator)->findAll();
-        var_dump($lands);
+        $page = $_REQUEST['page'];
+        $start = $_REQUEST['start'];
+        $limit = $_REQUEST['limit'];
+
+        $filters = array();
+        if (isset($_GET['filter']))
+            $filters = json_decode($_REQUEST['filter']);
+        $crit = new CDbCriteria();
+        $crit->limit = $limit;
+        $crit->offset = $start;
+        $landScope = Land::model();
+        foreach ($filters as $filter) {
+            $landScope = $landScope->byCondition($filter->property, $filter->value, $filter->operator);
+        }
+        $lands = $landScope->findAll($crit);
+        $count = $landScope->count();
+        $main = array(
+            'totalCount' => $count,
+            'landDetail' => Land::buildArray($lands, true)
+        );
+        echo json_encode($main);
+        //var_dump($lands);
+        Yii::app()->end();
     }
 
     public function actionIntersection() {
@@ -86,11 +107,11 @@ class LandController extends Controller {
         $crit = new CDbCriteria();
     }
 
-    protected function makeGeoJson($lands) {
+    protected function makeGeoJson($lands, $selectAll = false) {
         $features = array();
         if (count($lands))
             foreach ($lands as $land) {
-                $features[] = $land->toFeature();
+                $features[] = $land->toFeature($selectAll);
             }
         return Gis::makeGeoJson2($features);
     }

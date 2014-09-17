@@ -118,7 +118,7 @@ class BusinessController extends Controller {
         }
         ob_end_clean();
         echo json_encode($ret);
-        
+        Yii::app()->end();
     }
 
     /**

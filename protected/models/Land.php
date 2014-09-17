@@ -54,6 +54,14 @@ class Land extends CActiveRecord {
      * @var type 
      */
     private static $simplifyValues = array(2, 1, 0.2);
+    private static $operatorMap = array(
+        'eq' => '',
+        'ne' => '<>',
+        'gt' => '>',
+        'lt' => '<',
+        'gte' => '>=',
+        'lte' => '<=',
+    );
 
     const DEFAULT_SIMPLIFY_VALUE = 1;
 
@@ -169,9 +177,11 @@ class Land extends CActiveRecord {
     }
 
     public function byCondition($paramName, $paramValue, $operator) {
+        $operator = self::$operatorMap[$operator];
         $crit = new CDbCriteria();
         $column = self::paramAlternative($paramName);
-        $crit->Compare($column, $operator . $paramValue); // see compare documentation
+        $crit->with = array('shop');
+        $crit->Compare(Yii::app()->db->quoteColumnName($column), $operator . $paramValue); // see compare documentation
         $this->getDbCriteria()->mergeWith($crit);
         return $this;
     }
@@ -181,17 +191,36 @@ class Land extends CActiveRecord {
      * @param type $param
      */
     private static function paramAlternative($param) {
-        $searchAliases = array(
+        $paramMap = array(
             'area' => 'ST_Area(geom)',
-            'x' => 'ST_XMin(ST_Transform(geom,'.self::SRID_4326.'))',
-            'y' => 'ST_YMin(ST_Transform(geom,'.self::SRID_4326.'))',
+            'x' => 'ST_XMin(ST_Transform(geom,' . self::SRID_4326 . '))',
+            'y' => 'ST_YMin(ST_Transform(geom,' . self::SRID_4326 . '))',
             'villageCode' => 'villageCode',
             'villageName' => 'villageName',
+            'sheetNo' => 'sheetNo',
+            'plantType'=>'plantType',
+            'usingType'=>'usingType',
+            'waterType'=>'waterType',
+            'position'=>'position',
+            'numAdjacent' => 'numAdjacent',
+            'finalPrcie' => 'shop.finalPrice',
+            'pricePerMeter' => 'shop.pricePerMeter',
+            'mobayeNo' => 'shop.mobayeNo',
+            'mobayeDate' => 'shop.mobayeDate',
+            'committeeNo' => 'shop.committeeNo',
+            'committeeDate' => 'shop.committeeDate',
+            'hasEsteshhad' => 'shop.hasEsteshhad',
+            'hasMap' => 'shop.hasMap',
+            'hasEstelam' => 'shop.hasEstelam',
+            'hasSanad' => 'shop.hasMadarek',
+            'hasEsteshhad' => 'shop.hasEsteshhad',
+            'hasTayeediyeShura' => 'shop.hasTayeediyeShura',
+            'hasQabz' => 'shop.hasQabz',
         );
-        if (!array_key_exists($paramName, $searchAliases)) {
-            throw new CHttpException(400, 'bad request');
+        if (!array_key_exists($param, $paramMap)) {
+            throw new CHttpException(400, 'bad request for: ' . $param);
         }
-        return self::$searchAliases[$paramName];
+        return $paramMap[$param];
     }
 
     /**
@@ -268,12 +297,42 @@ class Land extends CActiveRecord {
         ));
     }
 
-    public function toFeature() {
+    public function toFeature($selectShopColumns = false) {
+        if ($selectShopColumns) {
+            return $this->toFeatureShop();
+        } else {
+            return array(
+                'geometry' => $this->geojson,
+                'properties' => array_merge(
+                        $this->attributes, array('area' => $this->area, 'perimeter' => $this->perimeter)
+                )
+            );
+        }
+    }
+
+    /**
+     * contains more attributes, landShop attributes
+     */
+    public function toFeatureShop() {
         return array(
             'geometry' => $this->geojson,
-            'properties' => array_merge(
-                    $this->attributes, array('area' => $this->area, 'perimeter' => $this->perimeter)
-            )
+            'properties' => array_merge($this->attributes, array(
+                'area' => $this->area,
+                'perimeter' => $this->perimeter,
+                'finalPrcie' => $this->shop->finalPrice,
+                'pricePerMeter' => $this->shop->pricePerMeter,
+                'mobayeNo' => $this->shop->mobayeNo,
+                'mobayeDate' => $this->shop->mobayeDate,
+                'committeeNo' => $this->shop->committeeNo,
+                'committeeDate' => $this->shop->committeeDate,
+                'hasEsteshhad' => $this->shop->hasEsteshhad,
+                'hasMap' => $this->shop->hasMap,
+                'hasEstelam' => $this->shop->hasEstelam,
+                'hasSanad' => $this->shop->hasMadarek,
+                'hasEsteshhad' => $this->shop->hasEsteshhad,
+                'hasTayeediyeShura' => $this->shop->hasTayeediyeShura,
+                'hasQabz' => $this->shop->hasQabz,
+            ))
         );
     }
 
@@ -378,6 +437,35 @@ class Land extends CActiveRecord {
             return $dataReader['npoints'];
         else
             return null;
+    }
+
+    public static function buildGeoArray($lands, $selectShopColumns = false) {
+        $main = array('type' => 'FeatureCollection');
+        $all = array();
+        if (count($lands)) {
+            foreach ($lands as $land) {
+                $f = $land->toFeature($selectShopColumns);
+                $properties = $f['properties'];
+                $geom = $f['geometry'];
+                $fnew = array('type' => 'feature');
+                $fnew['properties'] = $properties;
+                $fnew['geometry'] = json_decode($geom);
+                $all[] = $fnew;
+            }
+        }
+        $main['features'] = $all;
+        return $main;
+    }
+    public static function buildArray($lands, $selectShopColumns = false){
+        $all = array();
+        if (count($lands)) {
+            foreach ($lands as $land) {
+                $f = $land->toFeature($selectShopColumns);
+                
+                $all[] = $f['properties'];
+            }
+        }
+        return $all;
     }
 
 }
