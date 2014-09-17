@@ -480,9 +480,8 @@ Ext.define('MyDesktop.Landlord.Landlord', {
                            //win.close();
                         },
                         failure: function(form, action) {
-                            a = form;
-                            b = action;
-                            Ext.Msg.alert('Failed', action.response.responseText);
+                            var text = eval('(' + action.response.responseText + ')');
+                            Ext.Msg.alert('failure', text.failure);
                         }
                     });
                 }

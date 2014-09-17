@@ -107,6 +107,11 @@ Ext.define('MyDesktop.Landlord.AddSegment', {
             fieldLabel: 'قیمت'
         });
         
+        var sheetNo = Ext.create('Ext.form.field.Text',{
+            name: 'sheetNo',
+            fieldLabel: 'شماره شیت'
+        });
+        
         var numAdjacent = Ext.create('Ext.form.field.Text',{
             name: 'numAdjacent',
             fieldLabel: 'تعداد مجاورت'
@@ -127,19 +132,54 @@ Ext.define('MyDesktop.Landlord.AddSegment', {
             valueField: 'type'
         });
         
-        var filterPanel = Ext.create('Ext.panel.Panel', {
+        var panel = Ext.widget('form', {
+            region: 'south',
+            layout: {
+                type: 'vbox',
+                //align: 'stretch'
+            },
+            border: false,
+            bodyPadding: 4,
+            height: 300,
+            fieldDefaults: {
+                labelAlign: 'top',
+                labelWidth: 100,
+                labelStyle: 'font-weight:bold'
+            },
+            items: [usingType,sheetNo, numAdjacent, position, plantType, waterType],
+            buttons: [{
+                text: 'ثبت قطعه زمین',
+                formBind: true,
+                handler: function(){
+                    this.up('form').getForm().submit({
+                        url: 'index.php?r=land/create',
+                        params: {geoText: win.getGeoText()},
+                        submitEmptyText: false,
+                        waitMsg: 'Saving Data...',
+                        success: function(form, action) {
+                           Ext.Msg.alert('success', action.result.success);
+                        },
+                        failure: function(form, action) {
+                            Ext.Msg.alert('Failed', action.response.responseText);
+                        }
+                    });
+                }
+            }]
+        })
+        
+        /*var formPanel = Ext.create('Ext.panel.Panel', {
             bodyPadding: 5,  // Don't want content to crunch against the borders
             region: 'south',
             title: 'ویژگیهای قطعه زمین',
             titleAlign: 'right',
             items: [usingType, numAdjacent, position, plantType, waterType]
-        });
+        });*/
         
         this.setVisible = function(flag){
-            filterPanel.setVisible(flag);
+            panel.setVisible(flag);
         };
         
-        return filterPanel;
+        return panel;
     },
     
     mapPanel: function(win){
@@ -160,11 +200,11 @@ Ext.define('MyDesktop.Landlord.AddSegment', {
                 geoText += ')))';
                 return geoText;
             };
-            
+            win.setGeoText(createText2SendServer());
             Ext.Ajax.request({
                 url: '?r=land/Intersection',
                 params: {
-                    geoText: createText2SendServer()
+                    geoText: win.getGeoText()
                 },
                 success: function(response){
                     text = response.responseText;
