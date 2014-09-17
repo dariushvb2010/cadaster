@@ -19,7 +19,7 @@ class BusinessController extends Controller {
     public function accessRules() {
         return array(
             array('allow', // allow all users to perform 'index' and 'view' actions
-                'actions' => array('index', 'landbuy', 'salelist', 'buy'),
+                'actions' => array('index', 'landbuy', 'salelist', 'buy','upload'),
                 'users' => array('*'),
             ),
             array('allow', // allow authenticated user to perform 'create' and 'update' actions
@@ -89,8 +89,8 @@ class BusinessController extends Controller {
 
         $gid = $_REQUEST['gid'];
         $land = Land::model()->findByPk($gid * 1);
-         
-        $folder = self::UPLOAD_FOLDER . '/' . $land->lord->id . '/' . $land->shop->id;
+        
+        $folder = Yii::app()->basePath. DIRECTORY_SEPARATOR .self::UPLOAD_FOLDER . DIRECTORY_SEPARATOR . $land->lord->id . DIRECTORY_SEPARATOR . $land->shop->id;
         $msg = '';
         $allSuccess = true;
         foreach ($_FILES as $fKey => $file) {
