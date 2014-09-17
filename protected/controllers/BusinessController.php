@@ -19,7 +19,7 @@ class BusinessController extends Controller {
     public function accessRules() {
         return array(
             array('allow', // allow all users to perform 'index' and 'view' actions
-                'actions' => array('index', 'landbuy', 'salelist', 'buy','upload'),
+                'actions' => array('index', 'landbuy', 'salelist', 'buy', 'upload'),
                 'users' => array('*'),
             ),
             array('allow', // allow authenticated user to perform 'create' and 'update' actions
@@ -87,17 +87,20 @@ class BusinessController extends Controller {
 
     public function actionUpload() {
 
+        ob_start();
         $gid = $_REQUEST['gid'];
-        $land = Land::model()->findByPk($gid * 1);
-        
-        $folder = Yii::app()->basePath. DIRECTORY_SEPARATOR .self::UPLOAD_FOLDER . DIRECTORY_SEPARATOR . $land->lord->id . DIRECTORY_SEPARATOR . $land->shop->id;
+        $land = Land::model()->with('shop')->findByPk($gid * 1);
+
+        $folder = Yii::app()->params['upload.folder'] . DIRECTORY_SEPARATOR . $land->lord->id ;
         $msg = '';
         $allSuccess = true;
         foreach ($_FILES as $fKey => $file) {
             //--$fKey = name of the input, like 'qabz','committee','sanad'
             $res = $this->saveFile($file, $folder);
             if ($res === true) {
-                $land->shop->has{ucfirst($fKey)} =true;  //uppercase the first letter of $fKey
+                var_dump($fKey);
+                $property = 'has'.ucfirst($fKey);////uppercase the first letter of $fKey
+                $land->shop->$property = true;  
                 $land->shop->save();
                 $msg.=Yii::t('global', 'file {file} has been uploaded.', array('{file}' => $file['name'])) . '<br/>';
             } else {
@@ -110,7 +113,9 @@ class BusinessController extends Controller {
         } else {
             $ret = array('failure' => $msg);
         }
+        ob_end_clean();
         echo json_encode($ret);
+        
     }
 
     /**
@@ -129,10 +134,12 @@ class BusinessController extends Controller {
 //                    echo "Type: " . $_FILES["file"]["type"] . "<br>";
 //                    echo "Size: " . ($_FILES["file"]["size"] / 1024) . " kB<br>";
 //                    echo "Temp file: " . $_FILES["file"]["tmp_name"] . "<br>";
-                $filePath = $folder . '/' . $file["name"];
+                $filePath = $folder . DIRECTORY_SEPARATOR . $file["name"];
+                var_dump($filePath);
                 if (file_exists($filePath)) {
                     return Yii::t('global', '{file} already exists.', array('{file}' => $file['name']));
                 } else {
+                    mkdir($folder, 0700, true);
                     move_uploaded_file($file["tmp_name"], $filePath);
                     return true;
                 }

@@ -63,6 +63,7 @@ class LandShop extends CActiveRecord {
         return array(
             'sellerUser' => array(self::BELONGS_TO, 'MyUser', 'sellerUserId'),
             'createrUser'=>array(self::BELONGS_TO,'User','createrUserId'),
+            
         );
     }
 
