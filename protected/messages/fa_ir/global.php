@@ -14,5 +14,7 @@ return array(
     'logout'=>'خروج',
     'user access'=>'دسترسی کاربران',
     'user management'=>'مدیریت کاربران',
-    
+    'file {file} has been uploaded.'=>'فایل {file} بارگذاری شد.',
+    'file format not supported.'=>'فایل هایی با این فرمت مورد قبول نیست.',
+    '{file} already exists.'=>'{file} وجود دارد.',
 );
