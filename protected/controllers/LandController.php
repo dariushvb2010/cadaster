@@ -60,13 +60,13 @@ class LandController extends Controller {
         $crit->offset = $start;
         $landScope = Land::model();
         foreach ($filters as $filter) {
-            $landScope = $landScope->byCondition($filter->property, $filter->value, $filter->operator);
+            $landScope = $landScope->byFilter($filter);
         }
         $lands = $landScope->findAll($crit);
         $count = $landScope->count();
         $main = array(
             'totalCount' => $count,
-            'landDetail' => Land::buildArray($lands, true)
+            'landDetail' => Land::buildGeoArray($lands, true)
         );
         echo json_encode($main);
         //var_dump($lands);

@@ -176,12 +176,23 @@ class Land extends CActiveRecord {
         return $this;
     }
 
-    public function byCondition($paramName, $paramValue, $operator) {
-        $operator = self::$operatorMap[$operator];
+    
+    /**
+     * 
+     * @param stdClass $filter
+     * filter->property
+     * filter->type
+     * filter->value
+     * @return \Land
+     */
+    public function byFilter($filter) {
+        
+        //---------    -------------------------
+        $operator = self::$operatorMap[$filter->operator];
         $crit = new CDbCriteria();
-        $column = self::paramAlternative($paramName);
+        $column = self::paramAlternative($filter->property);
         $crit->with = array('shop');
-        $crit->Compare(Yii::app()->db->quoteColumnName($column), $operator . $paramValue); // see compare documentation
+        $crit->Compare(Yii::app()->db->quoteColumnName($column), $operator . $filter->value); // see compare documentation
         $this->getDbCriteria()->mergeWith($crit);
         return $this;
     }
