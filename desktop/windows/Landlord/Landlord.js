@@ -309,12 +309,13 @@ Ext.define('MyDesktop.Landlord.Landlord', {
         }
     },
     shopping: function(region, land, that){
-        var getTextField = function(fieldLabel, name, allowBlank){
+        var getTextField = function(fieldLabel, name, value, allowBlank){
             return Ext.create('Ext.form.TextField', {
                 width: 250,
                 name: name,
                 fieldLabel: fieldLabel,
-                allowBlank: allowBlank
+                allowBlank: allowBlank,
+                value: value
             });
         };
         var getDateField = function (fieldLabel, name){
@@ -324,14 +325,14 @@ Ext.define('MyDesktop.Landlord.Landlord', {
                 name: name
             });
         };
-        var mobayeNo = getTextField('شماره مبایعه نامه', 'mobayeNo', true);
-        var area = getTextField('مساحت', 'area', true);
-        var pricePerMeter = getTextField('قیمت هر متر', 'pricePerMeter', true);
-        var finalPrice = getTextField('قیمت نهایی', 'finalPrice', true);
+        var mobayeNo = getTextField('شماره مبایعه نامه', 'mobayeNo', 123, true);
+        var area = getTextField('مساحت', 'area', 1234, true);
+        var pricePerMeter = getTextField('قیمت هر متر', 'pricePerMeter', 123, true);
+        var finalPrice = getTextField('قیمت نهایی', 'finalPrice', 123*1234, true);
         var mobayeDate = getDateField('تاریخ مبایعه نامه', 'mobayeDate');
-        var committeeNo = getTextField('شماره کمیته تملک اراضی', 'committeeNo', true);
+        var committeeNo = getTextField('شماره کمیته تملک اراضی', 'committeeNo', '123123', true);
         var committeeDate = getDateField('تاریخ کمیته تملک اراضی', 'committeeDate');
-        var description = getTextField('توضیحات', 'description', true);
+        var description = getTextField('توضیحات', 'description', 'این قسمت توضیحات میباشد.', true);
         
         var panel = Ext.widget('form', {
             region: region,
@@ -378,18 +379,19 @@ Ext.define('MyDesktop.Landlord.Landlord', {
                 //disabled: true,
                 formBind: true,
                 handler: function(){
-                    alert("gid: " + land.getLastSelectedSegmentId());
-                    console.log("gid: " + land.getLastSelectedSegmentId());
                     this.up('form').getForm().submit({
                         url: 'index.php?r=business/buy',
                         params: {gid: land.getLastSelectedSegmentId()},
                         submitEmptyText: false,
                         waitMsg: 'Saving Data...',
                         success: function(form, action) {
-                           that.setVisible(false, false, false, false, true);
+                            Ext.Msg.alert('success', action.result.success);
+                            that.setVisible(false, false, false, false, true);
                         },
                         failure: function(form, action) {
-                            
+                            f = form;
+                            a = action;
+                            Ext.Msg.alert('Failed', action.response.responseText);
                         }
                     });
                 }

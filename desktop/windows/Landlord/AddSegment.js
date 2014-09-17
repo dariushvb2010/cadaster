@@ -56,77 +56,6 @@ Ext.define('MyDesktop.Landlord.AddSegment', {
     getFieldForm: function(win){
         var required = '<span style="color:red;font-weight:bold" data-qtip="این فیلد ضروری می باشد">*</span>';
         
-        var userID = {userId: 0};
-        var landLordModel = Ext.define('LandLordModel', {
-            extend: 'Ext.data.Model',
-            fields: [
-                //{name: 'LinkCode', type: 'int'},
-                {name: 'FirstName', type: 'string'},
-                {name: 'LastName',  type: 'string'},
-                {name: 'DadName',       type: 'string'}
-            ]
-        });
-        var landLordStore = Ext.create('Ext.data.Store', {
-            model: 'LandLordModel',
-            pageSize: 10,
-            proxy: {
-                type: 'ajax',
-                url: 'index.php?r=landlord/AllLandlord',
-                //url: 'index.php?r=business/shoppingLand',
-                reader: {
-                    type: 'json',
-                    root: 'LandLordsDetail',
-                    totalProperty: 'totalCount'
-                }
-            },
-            filterParam: 'query',
-            
-            encodeFilters: function(filters) {
-                return filters[0].value;
-            },
-            remoteFilter: true,
-            autoLoad: true
-        });
-        
-        var pagingToolbar = Ext.create('Ext.PagingToolbar', {
-            store: landLordStore,
-            displayInfo: true,
-            displayMsg: 'نمایش رکورد {0} تا {1} از {2} رکورد',
-            emptyMsg: "داده ای یافت نشد.",
-        });
-        var filterBar = Ext.create('Ext.ux.grid.FilterBar',{renderHidden: false});
-        var gridPanel = Ext.create('Ext.grid.Panel', {
-            store: landLordStore,
-            title: 'لطفا نام مالک را انتخاب کنید',
-            titleAlign: 'right',
-            bodyStyle: {direction: 'ltr'},
-            plugins: [filterBar],
-            //width: 540,
-            //height: 200,
-            border: false,
-            cls: 'landLordGrid',
-            region: 'center',
-            columns: {
-                plugins: [{
-                        ptype: 'gridautoresizer'
-                }],
-                items: [
-                    { text: 'نام پدر', dataIndex: 'DadName', width: 150, field: {xtype: 'textfield'}, align: 'center', filter: true },
-                    { text: 'نام خانوادگی', dataIndex: 'LastName', width: 150, field: {xtype: 'textfield'}, align: 'center', filter: true },
-                    { text: 'نام', dataIndex: 'FirstName', width: 150, field: {xtype: 'textfield'}, align: 'center', filter: true },
-                    { text: 'ردیف',xtype: 'rownumberer', width: 40, align: 'center',height: 20 },
-                ]},
-            viewConfig: {
-                stripeRows: true
-            },
-            bbar: [pagingToolbar]
-        });
-        gridPanel.getSelectionModel().on('selectionchange', function(sm, selectedRecord) {
-            if (selectedRecord.length) {
-                userID.userId = parseInt(selectedRecord[0].raw.id);
-            }
-        });
-        
         var waterTypeStore = Ext.create('Ext.data.Store', {
             fields: ['type'],
             data : [{"type":"آبی"},{"type":"دیم"}]
@@ -200,84 +129,78 @@ Ext.define('MyDesktop.Landlord.AddSegment', {
         
         var filterPanel = Ext.create('Ext.panel.Panel', {
             bodyPadding: 5,  // Don't want content to crunch against the borders
-            region: 'west',
+            region: 'south',
             title: 'ویژگیهای قطعه زمین',
             titleAlign: 'right',
             items: [usingType, numAdjacent, position, plantType, waterType]
         });
         
-        var form = Ext.create('Ext.form.Panel', {
-            //width: 200,
-            region: 'center',
-            items: [gridPanel, filterPanel],
-            layout: {
-                type: 'hbox',       // Arrange child items vertically
-                align: 'stretch',    // Each takes up full width
-                padding: 5
-            },
-            //title: 'افزودن با استفاده از نقاط',
-            bodyStyle: {background: '#ffc',padding: '10px',direction: 'rtl'},
-            buttons: [{
-                text: 'تغییر',
-                disabled: true,
-                formBind: true,
-                handler: function(){
-                    userID.geoText = win.getGeoText();
-                    this.up('form').getForm().submit({
-                        url: 'index.php?r=land/create',
-                        params: userID,
-                        submitEmptyText: false,
-                        //geoText
-                        waitMsg: 'در حال ارسال داده ها ...',
-                        success: function(form, action) {
-                           Ext.MessageBox.alert('Status', 'قطعه زمین مورد نظر با موفقیت ثبت شد.', function(){win.closeWin();});
-                        },
-                        failure: function(form, action) {
-                            Ext.MessageBox.alert('Status', 'متاسفانه مشکلی در ثبت قطعه زمین رخ داده است.');
-                        }
-                    });
-                }
-            },{
-                text: 'بی خیال',
-                handler: function(){win.close();}
-            }]
-        }).setVisible(false);
-        
         this.setVisible = function(flag){
-            form.setVisible(flag);
+            filterPanel.setVisible(flag);
         };
         
-        return form;
+        return filterPanel;
     },
     
     mapPanel: function(win){
-        var layer = new OpenLayers.Layer.Vector("لایه استان", {
-            projection: new OpenLayers.Projection("EPSG:4326"),
-            strategies: [new OpenLayers.Strategy.Fixed()],
-            protocol: new OpenLayers.Protocol.HTTP({
-                readWithPOST: true,
-                url: "index.php?r=land/features",
-                format: new OpenLayers.Format.GeoJSON({})
-            })
-        });
-        
-        var map = new OpenLayers.Map('Our map');
-
-        var open_streetMap_wms = new OpenLayers.Layer.WMS(
-            "OpenStreetMap WMS",
-            "http://ows.terrestris.de/osm/service?",
-            {layers: 'OSM-WMS'}
-        );
-        var drawVector = new OpenLayers.Layer.Vector("لایه ای که میخواهیم با استفاده از آن یک پلی گن رسم کنیم.");
-        
-        map.addLayers([open_streetMap_wms, layer, drawVector]);
-        
-        var toolbarItems = [];
-        
-        var doneHandler = function (e){
+        var stylePanel = function(){
+            var intersectionStyle = new OpenLayers.Style();
+            var intersectionRule = new OpenLayers.Rule({
+                symbolizer: {
+                    fillColor: '#ffdcb9', fillOpacity:.8,
+                    pointRadius:5, strokeColor: '#f0bd95',
+                    strokeWidth:2
+                }
+            });
+            intersectionStyle.addRules([intersectionRule]); 
+            var intersectionStyleMap = new OpenLayers.StyleMap({
+                'default': intersectionStyle
+            });
+            
+            var layerStyle = new OpenLayers.Style();
+            var layerRule = new OpenLayers.Rule({
+                symbolizer: {
+                    fillColor: '#7AFF00', fillOpacity:.3,
+                    pointRadius:5, strokeColor: '#00FFFF',
+                    strokeWidth:2
+                }
+            });
+            layerStyle.addRules([layerRule]); 
+            var layerStyleMap = new OpenLayers.StyleMap({
+                'default': layerStyle
+            });
+            
+            var allSegmentsStyle = new OpenLayers.Style();
+            var allSegmentsRule = new OpenLayers.Rule({
+                symbolizer: {
+                    fillColor: '#00FF1F', fillOpacity:.3,
+                    pointRadius:5, strokeColor: '#0000FF',
+                    strokeWidth:2
+                }
+            });
+            allSegmentsStyle.addRules([allSegmentsRule]); 
+            var allSegmentsStyleMap = new OpenLayers.StyleMap({
+                'default': allSegmentsStyle
+            });
+            
+            this.getIntersectionStyleMap = function(){
+                return intersectionStyleMap;
+            };
+            this.allSegmentsStyleMap = function(){
+                return allSegmentsStyleMap;
+            };
+            this.layerStyleMap = function(){
+                return layerStyleMap;
+            };
+        };
+        var loadEnd = function(e){
+            if(e.response.features.length<1) return;
+            map.zoomToExtent(segmentLayer.getDataExtent());
+        };
+        var drawLayerFeatureAdded = function(e){
             var geoText = "MULTIPOLYGON(((";
-            for(var i=0; i<e.components[0].components.length; i++){
-                geoText +=  e.components[0].components[i].x + ' ' + e.components[0].components[i].y + ',' ;
+            for(var i=0; i<e.feature.geometry.components[0].components.length; i++){
+                geoText += e.feature.geometry.components[0].components[i].x + ' ' + e.feature.geometry.components[0].components[i].y + ',' ;
             }
             geoText = geoText.slice(0, geoText.length-1);
             geoText += ')))';
@@ -292,40 +215,157 @@ Ext.define('MyDesktop.Landlord.AddSegment', {
                     text = response.responseText;
                     text = eval('(' + text + ')');
                     if(text.features.length<1){
-                        win.setPanelVisible(false, false, true);
-                        //panel.setVisible(false);
-                        //win.setFieldFormPanelVisible(true);
-                    }else
+                        alert("سلام بر حسین");
+                    }else{
                         alert("قطعه شما با قطعات دیگر تداخل دارد.");
+                        
+                        var features = text.features;
+                        var i = 0;
+                        
+                        intersectionLayer.removeAllFeatures();
+                        while(i<features.length){
+                            var points = features[i].geometry.coordinates[0][0];
+                            var geoPoints = [];
+                            var j = 0;
+                            while(j<points.length){
+                                geoPoints.push(new OpenLayers.Geometry.Point(points[j][0], points[j][1]));
+                                j++;
+                            }
+                            i++;
+                            intersectionLayer.addFeatures([
+                                new OpenLayers.Feature.Vector(
+                                    new OpenLayers.Geometry.Polygon(
+                                        new OpenLayers.Geometry.LinearRing(geoPoints)
+                                    )
+                                )
+                            ]);
+                            intersectionLayer.redraw();
+                        }
+                    }
                 }
             });
         };
+        var geoText = '';
+        var st = new stylePanel();
+        var userId = {userId: 0};
+        var map = new OpenLayers.Map('Our map', {numZoomLevels:21});
+        var mousePositionCtrl = new OpenLayers.Control.MousePosition();
+        map.addControl(mousePositionCtrl);
         
-        var drawOptions = {
-            callbacks: {
-                "done": doneHandler
-            }
-        };
+        var open_streetMap_wms = new OpenLayers.Layer.WMS(
+            "OpenStreetMap WMS",
+            "http://ows.terrestris.de/osm/service?",
+            {layers: 'OSM-WMS'}
+        );
+        layer = new OpenLayers.Layer.Vector("لایه استان", {
+            projection: new OpenLayers.Projection("EPSG:4326"),
+            strategies: [new OpenLayers.Strategy.Fixed()],
+            protocol: new OpenLayers.Protocol.HTTP({
+                readWithPOST: true,
+                url: "index.php?r=land/features",
+                format: new OpenLayers.Format.GeoJSON({})
+            })
+        });
         
-        var action = Ext.create('GeoExt.Action', {
+        drawLayer = new OpenLayers.Layer.Vector("از این لایه برای رسم پلی گن ها استفاده می کنیم");
+        drawLayer.events.register('featureadded', this, drawLayerFeatureAdded);
+
+        segmentLayer = new OpenLayers.Layer.Vector("لایه قطعات یک زمین", {
+            projection: new OpenLayers.Projection("EPSG:4326"),
+            strategies: [new OpenLayers.Strategy.Fixed()],
+            protocol: new OpenLayers.Protocol.HTTP({
+                params: userId,
+                readWithPOST: true,
+                url: "index.php?r=land/features",
+                format: new OpenLayers.Format.GeoJSON({})
+            })
+        });
+        segmentLayer.events.register('loadend', this, loadEnd);
+        intersectionLayer = new OpenLayers.Layer.Vector("لایه ی تداخل");
+        layer.styleMap = st.layerStyleMap();
+        segmentLayer.styleMap = st.allSegmentsStyleMap();
+        intersectionLayer.styleMap = st.getIntersectionStyleMap();
+        map.addLayers([open_streetMap_wms, layer, drawLayer, segmentLayer, intersectionLayer]);
+        var toolbarItems = [];
+        
+        var drawPolygon = Ext.create('GeoExt.Action', {
             text: "رسم پلی گن",
-            control: new OpenLayers.Control.DrawFeature(drawVector, OpenLayers.Handler.Polygon, drawOptions),
+            control: new OpenLayers.Control.DrawFeature(drawLayer, OpenLayers.Handler.Polygon),
+            handler: function (btn){
+                if(btn.pressed){
+                    drawLayer.removeAllFeatures();
+                    intersectionLayer.removeAllFeatures();
+                }
+            },
             map: map,
             toggleGroup: "draw",
-            allowDepress: false,
+            allowDepress: true,
             tooltip: "draw line",
             group: "draw"
         });
-        toolbarItems.push(Ext.create('Ext.button.Button', action));
-        
-        var panel = Ext.create('GeoExt.panel.Map', {
-            title: 'افزودن با استفاده از نقشه',
+        toolbarItems.push(Ext.create('Ext.button.Button', drawPolygon));
+        var modifyAction = Ext.create('GeoExt.Action', {
+            text: "ویرایش نقاط",
+            control: new OpenLayers.Control.ModifyFeature(drawLayer),
+            map: map,
+            toggleGroup: "draw",
+            allowDepress: true,
+            tooltip: "ویرایش نقاط افزوده شده به نقشه",
+            group: "draw"
+        });
+        toolbarItems.push(Ext.create('Ext.button.Button', modifyAction));
+        var addPolygon = Ext.create('Ext.Button', {
+            text: 'افزودن با استفاده از نقاط',
+            handler: function() {
+                Ext.Msg.prompt('افزودن یک قطعه با استفاده از نقاط موجود',
+                               'لطفا نقاط خود را مانند مثال درون کادر زیر وارد نمایید<br>"x1,y1 x2,y2 x3,y3, ..." :فرمت ورود اطلاعات', 
+                               function(btn, text){
+                                    if (btn == 'ok'){
+                                        drawLayer.removeAllFeatures();
+                                        intersectionLayer.removeAllFeatures();
+                                        var geoPoints = [];
+                                        var points = text.split(" ");
+                                        var i = 0;
+                                        while(i<points.length){
+                                            var point = points[i].split(",");
+                                            geoPoints.push(
+                                                    new OpenLayers.Geometry.Point(parseFloat(point[0]), parseFloat(point[1]))
+                                            );
+                                            i++;
+                                        };
+                                        
+                                        drawLayer.addFeatures([
+                                            new OpenLayers.Feature.Vector(
+                                                new OpenLayers.Geometry.Polygon(
+                                                    new OpenLayers.Geometry.LinearRing(geoPoints)
+                                                )
+                                            )
+                                        ]);
+                                        drawLayer.redraw();
+                                    }
+                                }, 
+                                this,
+                                80,
+                                '55.803161797162,28.227430945601 55.804197129842,28.226508265699 55.804701385136,28.227414852346 55.803161797162,28.227430945601'
+                );
+            }
+        });
+        toolbarItems.push(addPolygon);
+        var intersectionTest = Ext.create('Ext.Button', {
+            text: 'آزمایش تداخل',
+            handler: function() {
+                
+            }
+        });
+        toolbarItems.push(intersectionTest);
+        var mapPanel = Ext.create('GeoExt.panel.Map', {
+            //title: 'افزودن با استفاده از نقشه',
             map: map,
             rtl: false,
-            collapsible: true,
-            region: "west",
-            //height: 550,
-            width: 300,
+            //resizable: true,
+            //collapsible: true,
+            region: "center",
+            width: 400,
             zoom: 5,
             center: [55,32.2],
             dockedItems: [{
@@ -335,69 +375,91 @@ Ext.define('MyDesktop.Landlord.AddSegment', {
             }]
         }).setVisible(true);
         
-        this.setVisible = function(flag){
-            panel.setVisible(flag);
+        this.setUserId = function(id){
+            userId.userId = id;
+            segmentLayer.refresh();
         };
         this.getPanel = function(){
-            return panel;
+            return mapPanel;
         };
     },
     
-    PolygonFieldForm: function(win){
-        
-        var required = '<span style="color:red;font-weight:bold" data-qtip="این فیلد ضروری می باشد">*</span>';
-        
-        var polygonTextArea = Ext.create('Ext.form.field.TextArea', {
-            rows: 20,
-            cols: 50,
-            name: 'geoText',
-            fieldLabel: 'مختصات polygon',
-            allowBlank: false,
-            value: 'MULTIPOLYGON(((30.232520055 40.36352647,31.83 41.84,32.318623035 40.13173294,33.232520055 33.36352647, 30.232520055 40.36352647)))',
-            afterLabelTextTpl: required
+    landLord: function(win){
+        var landLordModel = Ext.define('LandLordModel', {
+            extend: 'Ext.data.Model',
+            fields: [
+                //{name: 'LinkCode', type: 'int'},
+                {name: 'FirstName', type: 'string'},
+                {name: 'LastName',  type: 'string'},
+                {name: 'DadName',       type: 'string'}
+            ]
         });
-
-        var panel = Ext.create('Ext.form.Panel', {
-            width: 500,
-            region: 'east',
-            items: [polygonTextArea],
-            //collapsible: true,
-            title: 'افزودن با استفاده از نقاط',
-            bodyStyle: {background: '#ffc',padding: '10px',direction: 'rtl'},
-            buttons: [{
-                text: 'تغییر',
-                disabled: true,
-                formBind: true,
-                handler: function(){
-                    var geoText = polygonTextArea.getValue();
-                    win.setGeoText(geoText);
-                    Ext.Ajax.request({
-                        url: '?r=land/Intersection',
-                        params: {
-                            geoText: geoText
-                        },
-                        success: function(response){
-                            var text = response.responseText;
-                            form.setVisible(false);
-                            win.setFieldFormPanelVisible(true);
-                        },
-                        failure: function(response){
-                            console.log('infortuanetly has an error');
-                        }
-                    });
+        var landLordStore = Ext.create('Ext.data.Store', {
+            model: 'LandLordModel',
+            pageSize: 10,
+            proxy: {
+                type: 'ajax',
+                url: 'index.php?r=landlord/AllLandlord',
+                //url: 'index.php?r=business/shoppingLand',
+                reader: {
+                    type: 'json',
+                    root: 'LandLordsDetail',
+                    totalProperty: 'totalCount'
                 }
-            },{
-                text: 'بی خیال',
-                handler: function(){win.close();}
-            }]
-        }).setVisible(true);
+            },
+            filterParam: 'query',
+            
+            encodeFilters: function(filters) {
+                return filters[0].value;
+            },
+            remoteFilter: true,
+            autoLoad: true
+        });
         
-        this.setVisible = function(flag){
-            panel.setVisible(flag);
-        };
+        var pagingToolbar = Ext.create('Ext.PagingToolbar', {
+            store: landLordStore,
+            displayInfo: true,
+            displayMsg: 'نمایش رکورد {0} تا {1} از {2} رکورد',
+            emptyMsg: "داده ای یافت نشد.",
+        });
+        var filterBar = Ext.create('Ext.ux.grid.FilterBar',{renderHidden: false, showShowHideButton: true,showClearAllButton: true});
+        var gridPanel = Ext.create('Ext.grid.Panel', {
+            store: landLordStore,
+            title: 'لطفا نام مالک را انتخاب کنید',
+            titleAlign: 'right',
+            bodyStyle: {direction: 'ltr'},
+            plugins: [filterBar],
+            resizable: true,
+            width: 400,
+            //height: 200,
+            border: false,
+            cls: 'landLordGrid',
+            region: 'east',
+            columns: {
+                plugins: [{
+                        ptype: 'gridautoresizer'
+                }],
+                items: [
+                    { text: 'نام پدر', dataIndex: 'DadName', flex: 1, field: {xtype: 'textfield'}, align: 'center', filter: true },
+                    { text: 'نام خانوادگی', dataIndex: 'LastName', flex: 1, field: {xtype: 'textfield'}, align: 'center', filter: true },
+                    { text: 'نام', dataIndex: 'FirstName', flex: 1, field: {xtype: 'textfield'}, align: 'center', filter: true },
+                    { text: 'ردیف',xtype: 'rownumberer', width: 40, align: 'center',height: 20 },
+                ]},
+            viewConfig: {
+                stripeRows: true
+            },
+            bbar: [pagingToolbar]
+        });
+        gridPanel.getSelectionModel().on('selectionchange', function(sm, selectedRecord) {
+            if (selectedRecord.length) {
+                win.setUserId(parseInt(selectedRecord[0].raw.id));
+            }
+        });
+        
         this.getPanel = function(){
-            return panel;
+            return gridPanel;
         };
+        
     },
     
     window: function(myThis){
@@ -409,27 +471,27 @@ Ext.define('MyDesktop.Landlord.AddSegment', {
         var win = desktop.getWindow('addSegment-win');
         
         var myMapPanel = new me.mapPanel(this);
-        var myPolygonPanel = new me.PolygonFieldForm(this);
+        var landLord = new me.landLord(this);
         var fieldFormPanel = new me.getFieldForm(this);
+        
         
         this.setPanelVisible = function(mapPanelVisible, polygonPanelVisible, fieldFormPanelVisible){
             myMapPanel.setVisible(mapPanelVisible);
-            myPolygonPanel.setVisible(polygonPanelVisible);
+            landLord.setVisible(polygonPanelVisible);
             fieldFormPanel.setVisible(fieldFormPanelVisible);
         };
 
         if(!win){
-
             var panel = Ext.create('Ext.Panel', {
                 layout: 'border',
-                items: [myMapPanel.getPanel(), myPolygonPanel.getPanel(), fieldFormPanel]
+                items: [myMapPanel.getPanel(), landLord.getPanel(), fieldFormPanel]
             });
             win = desktop.createWindow({
                 id: 'addSegment-win',
                 title:'افزودن قطعه زمین',
                 width:900,
                 rtl: true,
-                height:200,
+                height:500,
                 iconCls: 'changePassword-16x16',
                 collapsible: true,
                 constrainHeader:false,
@@ -461,6 +523,10 @@ Ext.define('MyDesktop.Landlord.AddSegment', {
         this.closeWin = function (){
             win.close();
         };
+        
+        this.setUserId = function(id){
+            myMapPanel.setUserId(id);
+        };
     },
     
     
@@ -471,4 +537,3 @@ Ext.define('MyDesktop.Landlord.AddSegment', {
         return window1.getWin();
     }
 });
-
