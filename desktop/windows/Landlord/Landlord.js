@@ -482,7 +482,7 @@ Ext.define('MyDesktop.Landlord.Landlord', {
                         failure: function(form, action) {
                             a = form;
                             b = action;
-                            //Ext.Msg.alert('Failed', action.result.failure);
+                            Ext.Msg.alert('Failed', action.response.responseText);
                         }
                     });
                 }

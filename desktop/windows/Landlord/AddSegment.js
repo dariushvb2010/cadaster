@@ -143,21 +143,34 @@ Ext.define('MyDesktop.Landlord.AddSegment', {
     },
     
     mapPanel: function(win){
+        var beforefeatureadded = function(e, ee, eee){
+            drawLayer.removeAllFeatures();
+            intersectionLayer.removeAllFeatures();
+        };
         var intersectionTestCallBack = function(){
             //alert("in the name of Allah - Help me ya Allah");
             var createText2SendServer = function(){
+                alert("salam bar mahdi");
+                var components = drawLayer.features[0].geometry.components[0].components;
+                var geoText = "MULTIPOLYGON(((";
+                for(var i=0; i<components.length; i++)
+                    geoText += components[i].x + ' ' + components[i].y + ',';
                 
+                geoText = geoText.slice(0, geoText.length-1);
+                geoText += ')))';
+                return geoText;
             };
+            
             Ext.Ajax.request({
                 url: '?r=land/Intersection',
                 params: {
-                    geoText: geoText
+                    geoText: createText2SendServer()
                 },
                 success: function(response){
                     text = response.responseText;
                     text = eval('(' + text + ')');
                     if(text.features.length<1){
-                        alert("سلام بر حسین");
+                        alert("السلام علیک یا سیدالشهدا - سلام بر لب تشنه ات یا حسین(علیه السلام) - هیچ گونه تداخلی صورت نگرفته است");
                     }else{
                         alert("قطعه شما با قطعات دیگر تداخل دارد.");
                         
@@ -241,54 +254,6 @@ Ext.define('MyDesktop.Landlord.AddSegment', {
             if(e.response.features.length<1) return;
             map.zoomToExtent(segmentLayer.getDataExtent());
         };
-        var drawLayerFeatureAdded = function(e){
-            var geoText = "MULTIPOLYGON(((";
-            for(var i=0; i<e.feature.geometry.components[0].components.length; i++){
-                geoText += e.feature.geometry.components[0].components[i].x + ' ' + e.feature.geometry.components[0].components[i].y + ',' ;
-            }
-            geoText = geoText.slice(0, geoText.length-1);
-            geoText += ')))';
-            win.setGeoText(geoText);
-            
-            Ext.Ajax.request({
-                url: '?r=land/Intersection',
-                params: {
-                    geoText: geoText
-                },
-                success: function(response){
-                    text = response.responseText;
-                    text = eval('(' + text + ')');
-                    if(text.features.length<1){
-                        alert("سلام بر حسین");
-                    }else{
-                        alert("قطعه شما با قطعات دیگر تداخل دارد.");
-                        
-                        var features = text.features;
-                        var i = 0;
-                        
-                        intersectionLayer.removeAllFeatures();
-                        while(i<features.length){
-                            var points = features[i].geometry.coordinates[0][0];
-                            var geoPoints = [];
-                            var j = 0;
-                            while(j<points.length){
-                                geoPoints.push(new OpenLayers.Geometry.Point(points[j][0], points[j][1]));
-                                j++;
-                            }
-                            i++;
-                            intersectionLayer.addFeatures([
-                                new OpenLayers.Feature.Vector(
-                                    new OpenLayers.Geometry.Polygon(
-                                        new OpenLayers.Geometry.LinearRing(geoPoints)
-                                    )
-                                )
-                            ]);
-                            intersectionLayer.redraw();
-                        }
-                    }
-                }
-            });
-        };
         var geoText = '';
         var st = new stylePanel();
         var userId = {userId: 0};
@@ -312,7 +277,8 @@ Ext.define('MyDesktop.Landlord.AddSegment', {
         });
         
         drawLayer = new OpenLayers.Layer.Vector("از این لایه برای رسم پلی گن ها استفاده می کنیم");
-        drawLayer.events.register('featureadded', this, drawLayerFeatureAdded);
+        drawLayer.events.register('featureadded', this, intersectionTestCallBack);
+        drawLayer.events.register('beforefeatureadded', this, beforefeatureadded);
 
         segmentLayer = new OpenLayers.Layer.Vector("لایه قطعات یک زمین", {
             projection: new OpenLayers.Projection("EPSG:4326"),
@@ -337,8 +303,6 @@ Ext.define('MyDesktop.Landlord.AddSegment', {
             control: new OpenLayers.Control.DrawFeature(drawLayer, OpenLayers.Handler.Polygon),
             handler: function (btn){
                 if(btn.pressed){
-                    drawLayer.removeAllFeatures();
-                    intersectionLayer.removeAllFeatures();
                 }
             },
             map: map,
