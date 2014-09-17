@@ -91,12 +91,15 @@ class BusinessController extends Controller {
         $gid = $_REQUEST['gid'];
         $land = Land::model()->with('shop')->findByPk($gid * 1);
 
-        $folder = Yii::app()->params['upload.folder'] . DIRECTORY_SEPARATOR . $land->lord->id ;
+        $folder = Yii::app()->params['upload.folder'] . DIRECTORY_SEPARATOR . $land->lord->id . DIRECTORY_SEPARATOR . $land->shop->id ;
         $msg = '';
         $allSuccess = true;
         foreach ($_FILES as $fKey => $file) {
             //--$fKey = name of the input, like 'qabz','committee','sanad'
-            $res = $this->saveFile($file, $folder);
+            if($file['error']==4){ // empty file
+                continue;
+            }
+            $res = $this->saveFile($file, $folder,$fKey);
             if ($res === true) {
                 var_dump($fKey);
                 $property = 'has'.ucfirst($fKey);////uppercase the first letter of $fKey
@@ -123,7 +126,7 @@ class BusinessController extends Controller {
      * @param array $file ==$_FILES[$fKey]
      * @param string $folder
      */
-    private function saveFile($file, $folder) {
+    private function saveFile($file, $folder,$fileName) {
         $temp = explode(".", $file["name"]);
         $extension = end($temp);
         if ((($file["type"] == "image/gif") || ($file["type"] == "image/jpeg") || ($file["type"] == "image/jpg") || ($file["type"] == "image/pjpeg") || ($file["type"] == "image/x-png") || ($file["type"] == "image/png")) && ($file["size"] < 200000) && in_array($extension, self::$allowedExts)) {
@@ -134,12 +137,14 @@ class BusinessController extends Controller {
 //                    echo "Type: " . $_FILES["file"]["type"] . "<br>";
 //                    echo "Size: " . ($_FILES["file"]["size"] / 1024) . " kB<br>";
 //                    echo "Temp file: " . $_FILES["file"]["tmp_name"] . "<br>";
-                $filePath = $folder . DIRECTORY_SEPARATOR . $file["name"];
+                $filePath = $folder . DIRECTORY_SEPARATOR . $fileName.'.'.$extension;
                 var_dump($filePath);
+                if(!file_exists($folder)){
+                    mkdir($folder, 0700, true);
+                }
                 if (file_exists($filePath)) {
                     return Yii::t('global', '{file} already exists.', array('{file}' => $file['name']));
-                } else {
-                    mkdir($folder, 0700, true);
+                } else{
                     move_uploaded_file($file["tmp_name"], $filePath);
                     return true;
                 }
