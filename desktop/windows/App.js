@@ -29,6 +29,7 @@ Ext.define('MyDesktop.App', {
         'MyDesktop.Landlord.UserManagement',
         'MyDesktop.Landlord.AddUser',
         'MyDesktop.Landlord.AddSegment',
+        'MyDesktop.Landlord.Search',
         'MyDesktop.Settings'
     ],
 
@@ -49,7 +50,8 @@ Ext.define('MyDesktop.App', {
             new MyDesktop.Landlord.ChangePass(),
             new MyDesktop.Landlord.UserManagement(),
             //new MyDesktop.Landlord.AddUser(),
-            new MyDesktop.Landlord.AddSegment()
+            new MyDesktop.Landlord.AddSegment(),
+            new MyDesktop.Landlord.Search()
         ];
     },
 
@@ -64,6 +66,7 @@ Ext.define('MyDesktop.App', {
                 model: 'Ext.ux.desktop.ShortcutModel',
                 data: [
                     { name:  "افزدون قطعه", iconCls: 'addUser-48x48',  module: 'addSegment-win'},// module: 'addSegment-win'},
+                    { name:  "تحلیل", iconCls: 'addUser-48x48',  module: 'search-win'},
                     { name: 'ثبت خرید', iconCls: 'grid-shortcut', module: 'landlord-win' },               
                     //{ name: 'ویرایش مشخصات', iconCls: 'editProfile-48x48', module: 'editProfile-win' },
                     { name: 'مدیریت کاربران', iconCls: 'userManagement-48x48', module: 'userManagement-win' },
