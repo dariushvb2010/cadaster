@@ -66,7 +66,7 @@ class LandController extends Controller {
         $count = $landScope->count();
         $main = array(
             'totalCount' => $count,
-            'landDetail' => Land::buildGeoArray($lands, true)
+            'landDetail' => Land::buildArray($lands, true)
         );
         echo json_encode($main);
         //var_dump($lands);
