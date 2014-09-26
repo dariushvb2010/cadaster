@@ -52,6 +52,33 @@ Ext.define('MyDesktop.Landlord.Search', {
     },
     
     landLord: function(region, land){
+        getCheckBox = function(name, boxLabel, checked){
+            var that = Ext.create('Ext.form.field.Checkbox', {
+                name: name,
+                boxLabel: boxLabel,
+                checked: checked, 
+                listeners: {
+                    click: {
+                        element: 'el', //bind to the underlying el property on the panel
+                        fn: function(){ 
+                            landLordStore.proxy.extraParams[name] = that.checked;
+                            landLordStore.reload();
+                        }
+                    }
+                }
+            });
+            
+            return that;
+        };
+        var hasEsteshhad = getCheckBox('hasEsteshhad', 'استشهادنامه', true);
+        var hasMap = getCheckBox('hasMap', 'نقشه', true);
+        var hasEstelam = getCheckBox('hasEstelam', 'استعلام', true);
+        var hasMadarek = getCheckBox('hasMadarek', 'مدارک', true);
+        var hasSanad = getCheckBox('hasSanad', 'سند', true);
+        var hasTayeediyeShura = getCheckBox('hasTayeediyeShura', 'تاییدیه شورا', true);
+        var hasQabz = getCheckBox('hasQabz', 'قبض', true);
+        
+        //myparams = getParams();
         var landLordModel = Ext.define('LandLordModel', {
             extend: 'Ext.data.Model',
             fields: [
@@ -73,7 +100,7 @@ Ext.define('MyDesktop.Landlord.Search', {
                 
             ]
         });
-        var landLordStore = Ext.create('Ext.data.Store', {
+        landLordStore = Ext.create('Ext.data.Store', {
             model: 'LandLordModel',
             pageSize: 15,
             proxy: {
@@ -83,10 +110,18 @@ Ext.define('MyDesktop.Landlord.Search', {
                     type: 'json',
                     root: 'landDetail',
                     totalProperty: 'totalCount'
+                },
+                extraParams: {
+                    hasEsteshhad: hasEsteshhad.checked,
+                    hasMap: hasMap.checked,
+                    hasEstelam: hasEstelam.checked,
+                    hasMadarek: hasMadarek.checked,
+                    hasSanad: hasSanad.checked,
+                    hasTayeediyeShura: hasTayeediyeShura.checked,
+                    hasQabz: hasQabz.checked
                 }
             },
             filterParam: 'query',
-            
             encodeFilters: function(filters) {
                 return filters[0].value;
             },
@@ -122,9 +157,9 @@ Ext.define('MyDesktop.Landlord.Search', {
                         ptype: 'gridautoresizer'
                 }],
                 items: [
-                    { text: 'ردیف',xtype: 'rownumberer', width: 60, align: 'center',height: 20 },
-                    { text: 'شماره شیت', dataIndex: 'sheetNo', width: 150, field: {xtype: 'textfield'}, align: 'center', filter: {type: 'int'} },
-                    { text: 'نوع آبیاری', dataIndex: 'waterType', width: 150, field: {xtype: 'textfield'}, align: 'center', filter: 'combo' },
+                    { text: 'ردیف',xtype: 'rownumberer', width: 40, align: 'center',height: 20 },
+                    { text: 'شماره شیت', dataIndex: 'sheetNo', width: 80, field: {xtype: 'textfield'}, align: 'center', filter: true },
+                    { text: 'نوع آبیاری', dataIndex: 'waterType', width: 150, field: {xtype: 'textfield'}, align: 'center', filter: true },
                     { text: 'نوع کشت', dataIndex: 'plantType', width: 150, field: {xtype: 'textfield'}, align: 'center', filter: true },
                     { text: 'موقعیت', dataIndex: 'position', width: 220, field: {xtype: 'textfield'}, align: 'center', filter: true },
                     { text: 'نوع کاربری', dataIndex: 'usingType', flex: 1, field: {xtype: 'textfield'}, align: 'center', filter: true },
@@ -135,7 +170,8 @@ Ext.define('MyDesktop.Landlord.Search', {
             viewConfig: {
                 stripeRows: true
             },
-            bbar: [pagingToolbar]
+            bbar: [pagingToolbar],
+            tbar: [hasEsteshhad, hasMap, hasEstelam, hasMadarek, hasSanad, hasTayeediyeShura, hasQabz]
         });
         
         gridPanel.getSelectionModel().on('selectionchange', function(sm, selectedRecord) {
