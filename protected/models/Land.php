@@ -55,13 +55,15 @@ class Land extends CActiveRecord {
      */
     private static $simplifyValues = array(2, 1, 0.2);
     private static $operatorMap = array(
-        'eq' => '',
+        'eq' => '=',
         'ne' => '<>',
         'gt' => '>',
         'lt' => '<',
         'gte' => '>=',
         'lte' => '<=',
+        'like' => 'like'
     );
+    public static $paramsForHas = array('hasEsteshhad','hasMap','hasEstelam','hasSanad','hasTayeediyeShura','hasQabz');
 
     const DEFAULT_SIMPLIFY_VALUE = 1;
 
@@ -176,7 +178,6 @@ class Land extends CActiveRecord {
         return $this;
     }
 
-    
     /**
      * 
      * @param stdClass $filter
@@ -186,13 +187,17 @@ class Land extends CActiveRecord {
      * @return \Land
      */
     public function byFilter($filter) {
-        
+
         //---------    -------------------------
         $operator = self::$operatorMap[$filter->operator];
         $crit = new CDbCriteria();
         $column = self::paramAlternative($filter->property);
         $crit->with = array('shop');
-        $crit->Compare(Yii::app()->db->quoteColumnName($column), $operator . $filter->value); // see compare documentation
+        if ($operator == 'like') { // string search
+            $crit->addSearchCondition(Yii::app()->db->quoteColumnName($column), $filter->value); // see compare documentation
+        } else { //other operators = < > ...
+            $crit->Compare(Yii::app()->db->quoteColumnName($column), $operator . $filter->value); // see compare documentation
+        }
         $this->getDbCriteria()->mergeWith($crit);
         return $this;
     }
@@ -209,10 +214,10 @@ class Land extends CActiveRecord {
             'villageCode' => 'villageCode',
             'villageName' => 'villageName',
             'sheetNo' => 'sheetNo',
-            'plantType'=>'plantType',
-            'usingType'=>'usingType',
-            'waterType'=>'waterType',
-            'position'=>'position',
+            'plantType' => 'plantType',
+            'usingType' => 'usingType',
+            'waterType' => 'waterType',
+            'position' => 'position',
             'numAdjacent' => 'numAdjacent',
             'finalPrcie' => 'shop.finalPrice',
             'pricePerMeter' => 'shop.pricePerMeter',
@@ -223,8 +228,7 @@ class Land extends CActiveRecord {
             'hasEsteshhad' => 'shop.hasEsteshhad',
             'hasMap' => 'shop.hasMap',
             'hasEstelam' => 'shop.hasEstelam',
-            'hasSanad' => 'shop.hasMadarek',
-            'hasEsteshhad' => 'shop.hasEsteshhad',
+            'hasSanad' => 'shop.hasSanad',
             'hasTayeediyeShura' => 'shop.hasTayeediyeShura',
             'hasQabz' => 'shop.hasQabz',
         );
@@ -233,6 +237,7 @@ class Land extends CActiveRecord {
         }
         return $paramMap[$param];
     }
+    
 
     /**
      * @return array customized attribute labels (name=>label)
@@ -266,48 +271,6 @@ class Land extends CActiveRecord {
         );
     }
 
-    /**
-     * Retrieves a list of models based on the current search/filter conditions.
-     *
-     * Typical usecase:
-     * - Initialize the model fields with values from filter form.
-     * - Execute this method to get CActiveDataProvider instance which will filter
-     * models according to data in model fields.
-     * - Pass data provider to CGridView, CListView or any similar widget.
-     *
-     * @return CActiveDataProvider the data provider that can return the models
-     * based on the search/filter conditions.
-     */
-    public function search() {
-        // @todo Please modify the following code to remove attributes that should not be searched.
-
-        $criteria = new CDbCriteria;
-
-        $criteria->compare('ID', $this->ID);
-        $criteria->compare('LordCode', $this->LordCode);
-        $criteria->compare('PlatCode', $this->PlatCode, true);
-        $criteria->compare('RegistrationNO', $this->RegistrationNO, true);
-        $criteria->compare('AreaPlat', $this->AreaPlat);
-        $criteria->compare('WithDocument', $this->WithDocument);
-        $criteria->compare('WithoutDocument', $this->WithoutDocument);
-        $criteria->compare('NasaghiAcre', $this->NasaghiAcre, true);
-        $criteria->compare('HeaatiAcre', $this->HeaatiAcre, true);
-        $criteria->compare('PublicSource', $this->PublicSource, true);
-        $criteria->compare('VillageName', $this->VillageName, true);
-        $criteria->compare('VillageCode', $this->VillageCode, true);
-        $criteria->compare('WaterType', $this->WaterType, true);
-        $criteria->compare('PlantType', $this->PlantType, true);
-        $criteria->compare('X', $this->X, true);
-        $criteria->compare('Y', $this->Y, true);
-        $criteria->compare('SheetNO', $this->SheetNO, true);
-        $criteria->compare('Price', $this->Price);
-        $criteria->compare('CodeEvent', $this->CodeEvent);
-
-        return new CActiveDataProvider($this, array(
-            'criteria' => $criteria,
-        ));
-    }
-
     public function toFeature($selectShopColumns = false) {
         if ($selectShopColumns) {
             return $this->toFeatureShop();
@@ -324,7 +287,7 @@ class Land extends CActiveRecord {
     /**
      * contains more attributes, landShop attributes
      */
-    public function toFeatureShop() {
+    private function toFeatureShop() {
         return array(
             'geometry' => $this->geojson,
             'properties' => array_merge($this->attributes, array(
@@ -339,8 +302,8 @@ class Land extends CActiveRecord {
                 'hasEsteshhad' => $this->shop->hasEsteshhad,
                 'hasMap' => $this->shop->hasMap,
                 'hasEstelam' => $this->shop->hasEstelam,
-                'hasSanad' => $this->shop->hasMadarek,
-                'hasEsteshhad' => $this->shop->hasEsteshhad,
+                'hasSanad' => $this->shop->hasSanad,
+                'hasMadarek' => $this->shop->hasMadarek,
                 'hasTayeediyeShura' => $this->shop->hasTayeediyeShura,
                 'hasQabz' => $this->shop->hasQabz,
             ))
@@ -467,12 +430,13 @@ class Land extends CActiveRecord {
         $main['features'] = $all;
         return $main;
     }
-    public static function buildArray($lands, $selectShopColumns = false){
+
+    public static function buildArray($lands, $selectShopColumns = false) {
         $all = array();
         if (count($lands)) {
             foreach ($lands as $land) {
                 $f = $land->toFeature($selectShopColumns);
-                
+
                 $all[] = $f['properties'];
             }
         }

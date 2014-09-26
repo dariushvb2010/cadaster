@@ -52,22 +52,7 @@ class Gis {
         return $main;
     }
 
-    public static function buildGeoArray($lands,$selectShopColumns=false) {
-        $main = array('type' => 'FeatureCollection');
-        $all = array();
-        if (count($lands)) {
-            foreach ($lands as $land) {
-                $f = $land->toFeature($selectShopColumns);
-                $properties = $f['properties'];
-                $geom = $f['geometry'];
-                $fnew = array('type' => 'feature');
-                $fnew['properties'] = $properties;
-                $fnew['geometry'] = json_decode($geom);
-                $all[] = $fnew;
-            }
-        }
-        $main['features'] = $all;
-        return $main;
-    }
+    
+    
 
 }

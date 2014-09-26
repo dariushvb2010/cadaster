@@ -47,7 +47,7 @@ class LandController extends Controller {
         $paramName = 'hasEsteshhad';
         $paramValue = "true";
         $operator = 'eq';
-        
+
         $page = $_REQUEST['page'];
         $start = $_REQUEST['start'];
         $limit = $_REQUEST['limit'];
@@ -58,19 +58,35 @@ class LandController extends Controller {
         $crit = new CDbCriteria();
         $crit->limit = $limit;
         $crit->offset = $start;
+        //-----------has...--------------
+        foreach (Land::$paramsForHas as $hasParam) {
+            $hasValue = Yii::app()->request->getParam($hasParam);
+            if (!empty($hasValue) && $hasValue!='false') {
+                $filter = new stdClass();
+                $filter->property = $hasParam;
+                $filter->operator = 'eq';
+                $filter->value = $hasValue;
+                $filters[] = $filter;
+            }
+        }
+        //echo json_encode($filters);die();
         $landScope = Land::model();
         foreach ($filters as $filter) {
             $landScope = $landScope->byFilter($filter);
         }
-        $lands = $landScope->findAll($crit);
         $count = $landScope->count();
+        foreach ($filters as $filter) {
+            $landScope = $landScope->byFilter($filter);
+        }
+        $lands = $landScope->findAll($crit);
+        
         $main = array(
             'totalCount' => $count,
             'landDetail' => Land::buildArray($lands, true)
         );
         echo json_encode($main);
         //var_dump($lands);
-        Yii::app()->end();
+        //Yii::app()->end();
     }
 
     public function actionIntersection() {
@@ -101,10 +117,6 @@ class LandController extends Controller {
     public function actionTest($id) {
         $a = Land::model()->findByPk($id);
         var_dump($a->attributes);
-    }
-
-    public function getCount($id) {
-        $crit = new CDbCriteria();
     }
 
     protected function makeGeoJson($lands, $selectAll = false) {
