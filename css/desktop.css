@@ -365,3 +365,7 @@
 .print-icon-16x16 {
     background-image: url('images/Printer-icon-16x16.png') !important;
 }
+
+.analyze-48x48 {
+    background-image: url('images/Analyze-48x48.png') !important;
+}

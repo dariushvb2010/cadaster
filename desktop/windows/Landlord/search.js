@@ -10,6 +10,11 @@ Ext.define('MyDesktop.Landlord.Search', {
 
     requires: [
         'Ext.data.ArrayStore',
+        'Ext.data.*',
+        'Ext.util.*',
+        'Ext.view.View',
+        'Ext.ux.DataView.DragSelector',
+        'Ext.ux.DataView.LabelEditor',
         'Ext.grid.RowNumberer',
         'Ext.util.*',
         'Ext.util.Format',
@@ -188,6 +193,79 @@ Ext.define('MyDesktop.Landlord.Search', {
     },
     land: function(region, allData){
     },
+    images: function(region){
+        var ImageModel = Ext.define('ImageModel', {
+            extend: 'Ext.data.Model',
+            fields: [
+               {name: 'name'},
+               {name: 'url'},
+               {name: 'size', type: 'float'},
+               {name:'lastmod', type:'date', dateFormat:'timestamp'}
+            ]
+        });
+
+        var store = Ext.create('Ext.data.Store', {
+            model: 'ImageModel',
+            proxy: {
+                type: 'ajax',
+                url: 'get-images.php',
+                reader: {
+                    type: 'json',
+                    root: 'images'
+                }
+            }
+        });
+        store.load();
+
+        var panel =  Ext.create('Ext.Panel', {
+            id: 'images-view',
+            frame: true,
+            collapsible: true,
+            width: 535,
+            renderTo: 'dataview-example',
+            title: 'Simple DataView (0 items selected)',
+            items: Ext.create('Ext.view.View', {
+                store: store,
+                tpl: [
+                    '<tpl for=".">',
+                        '<div class="thumb-wrap" id="{name}">',
+                        '<div class="thumb"><img src="{url}" title="{name}"></div>',
+                        '<span class="x-editable">{shortName}</span></div>',
+                    '</tpl>',
+                    '<div class="x-clear"></div>'
+                ],
+                multiSelect: true,
+                height: 310,
+                trackOver: true,
+                overItemCls: 'x-item-over',
+                itemSelector: 'div.thumb-wrap',
+                emptyText: 'No images to display',
+                plugins: [
+                    Ext.create('Ext.ux.DataView.DragSelector', {}),
+                    Ext.create('Ext.ux.DataView.LabelEditor', {dataIndex: 'name'})
+                ],
+                prepareData: function(data) {
+                    Ext.apply(data, {
+                        shortName: Ext.util.Format.ellipsis(data.name, 15),
+                        sizeString: Ext.util.Format.fileSize(data.size),
+                        dateString: Ext.util.Format.date(data.lastmod, "m/d/Y g:i a")
+                    });
+                    return data;
+                },
+                listeners: {
+                    selectionchange: function(dv, nodes ){
+                        var l = nodes.length,
+                            s = l !== 1 ? 's' : '';
+                        this.up('panel').setTitle('Simple DataView (' + l + ' item' + s + ' selected)');
+                    }
+                }
+            })
+        });
+        
+        this.getPanel = function(){
+            return panel;
+        };
+    },
     
     map: function (region){
         map = new OpenLayers.Map('Our map',{numZoomLevels:21});
@@ -243,7 +321,7 @@ Ext.define('MyDesktop.Landlord.Search', {
         var land = new rootThis.land("south", this);
         var landLord = new rootThis.landLord("center", land);
         var map = new rootThis.map("west");
-        
+        var imagePanel = new rootThis.images('south');
         //map.addLayer2Map(land.getLayer());
         
         this.setVisible = function(landLordVisible, landVisible, mapVisible, shoppingVisible, uploadVisible){
@@ -253,7 +331,7 @@ Ext.define('MyDesktop.Landlord.Search', {
         };
         this.panel = Ext.create('Ext.Panel', {
             layout: 'border',
-            items: [ landLord.getPanel(), map.getPanel()]
+            items: [ landLord.getPanel(), map.getPanel(), imagePanel.getPanel()]
         });
     },
 
