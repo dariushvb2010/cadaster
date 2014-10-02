@@ -52,11 +52,11 @@ Ext.define('MyDesktop.Landlord.Search', {
     init : function(){
         this.launcher = {
             text: 'جستجو',
-            iconCls:'icon-grid'
+            iconCls:'analyze-16x16'
         };
     },
     
-    landLord: function(region, land){
+    landLord: function(region, imagePanel){
         getCheckBox = function(name, boxLabel, checked){
             var that = Ext.create('Ext.form.field.Checkbox', {
                 name: name,
@@ -76,13 +76,15 @@ Ext.define('MyDesktop.Landlord.Search', {
             return that;
         };
         var hasEsteshhad = getCheckBox('hasEsteshhad', 'استشهادنامه', true);
-        var hasMap = getCheckBox('hasMap', 'نقشه', true);
-        var hasEstelam = getCheckBox('hasEstelam', 'استعلام', true);
-        var hasMadarek = getCheckBox('hasMadarek', 'مدارک', true);
-        var hasSanad = getCheckBox('hasSanad', 'سند', true);
-        var hasTayeediyeShura = getCheckBox('hasTayeediyeShura', 'تاییدیه شورا', true);
-        var hasQabz = getCheckBox('hasQabz', 'قبض', true);
+        var hasMap = getCheckBox('hasMap', 'نقشه', false);
+        var hasEstelam = getCheckBox('hasEstelam', 'استعلام', false);
+        var hasMadarek = getCheckBox('hasMadarek', 'مدارک', false);
+        var hasSanad = getCheckBox('hasSanad', 'سند', false);
+        var hasTayeediyeShura = getCheckBox('hasTayeediyeShura', 'تاییدیه شورا', false);
+        var hasQabz = getCheckBox('hasQabz', 'قبض', false);
         
+        var userSelectedId;
+        var userSelectedGid;
         //myparams = getParams();
         var landLordModel = Ext.define('LandLordModel', {
             extend: 'Ext.data.Model',
@@ -156,31 +158,35 @@ Ext.define('MyDesktop.Landlord.Search', {
             plugins: [filterBar, rowEditing],
             border: false,
             cls: 'landLordGrid',
+            split: true,
             region: region,
             columns: {
                 plugins: [{
                         ptype: 'gridautoresizer'
                 }],
                 items: [
-                    { text: 'ردیف',xtype: 'rownumberer', width: 40, align: 'center',height: 20 },
-                    { text: 'شماره شیت', dataIndex: 'sheetNo', width: 80, field: {xtype: 'textfield'}, align: 'center', filter: true },
-                    { text: 'نوع آبیاری', dataIndex: 'waterType', width: 150, field: {xtype: 'textfield'}, align: 'center', filter: true },
-                    { text: 'نوع کشت', dataIndex: 'plantType', width: 150, field: {xtype: 'textfield'}, align: 'center', filter: true },
-                    { text: 'موقعیت', dataIndex: 'position', width: 220, field: {xtype: 'textfield'}, align: 'center', filter: true },
-                    { text: 'نوع کاربری', dataIndex: 'usingType', flex: 1, field: {xtype: 'textfield'}, align: 'center', filter: true },
-                    { text: 'تعداد مجاورت', dataIndex: 'numAdjacent', flex: 1, field: {xtype: 'textfield'}, align: 'center', filter: true },
-                    { text: 'روستا', dataIndex: 'villageName', flex: 1, field: {xtype: 'textfield'}, align: 'center', filter: true },
-                    { text: 'مساحت', dataIndex: 'area', flex: 1, field: {xtype: 'textfield'}, align: 'center', filter: true }
+                    { text: 'ردیف',xtype: 'rownumberer', width: 35, align: 'center',height: 20, sortable: false, menuDisabled: true },
+                    { text: 'شماره شیت', dataIndex: 'sheetNo', width: 80, field: {xtype: 'textfield'}, align: 'center', filter: true, sortable: false, menuDisabled: true },
+                    { text: 'نوع آبیاری', dataIndex: 'waterType', width: 80, field: {xtype: 'textfield'}, align: 'center', filter: true, sortable: false, menuDisabled: true },
+                    { text: 'نوع کشت', dataIndex: 'plantType', width: 80, field: {xtype: 'textfield'}, align: 'center', filter: true, sortable: false, menuDisabled: true },
+                    { text: 'موقعیت', dataIndex: 'position', width: 130, field: {xtype: 'textfield'}, align: 'center', filter: true, sortable: false, menuDisabled: true },
+                    { text: 'نوع کاربری', dataIndex: 'usingType', width: 100, field: {xtype: 'textfield'}, align: 'center', filter: true, sortable: false, menuDisabled: true },
+                    { text: 'تعداد مجاورت', dataIndex: 'numAdjacent', width: 80, field: {xtype: 'textfield'}, align: 'center', filter: true, sortable: false, menuDisabled: true },
+                    { text: 'روستا', dataIndex: 'villageName', flex: 1, field: {xtype: 'textfield'}, align: 'center', filter: true, sortable: false, menuDisabled: true },
+                    { text: 'مساحت', dataIndex: 'area', flex: 1, field: {xtype: 'textfield'}, align: 'center', filter: true, sortable: false, menuDisabled: true }
                 ]},
             viewConfig: {
                 stripeRows: true
             },
             bbar: [pagingToolbar],
-            tbar: [hasEsteshhad, hasMap, hasEstelam, hasMadarek, hasSanad, hasTayeediyeShura, hasQabz]
+            tbar: ['->', hasEsteshhad, '', '', '', '', '', '', '', hasMap, '', '', '', '', '', '', '', hasEstelam, '', '', '', '', '', '', '', hasMadarek, '', '', '', '', '', '', '', hasSanad, '', '', '', '', '', '', '', hasTayeediyeShura, '', '', '', '', '', '', '', hasQabz]
         });
         
         gridPanel.getSelectionModel().on('selectionchange', function(sm, selectedRecord) {
             if (selectedRecord.length) {
+                userSelectedGid = selectedRecord[0].raw.gid;
+                userSelectedId = selectedRecord[0].raw.userId;
+                imagePanel.loadStore(selectedRecord[0].raw.gid, selectedRecord[0].raw.userId);
             }
         });
         
@@ -195,73 +201,88 @@ Ext.define('MyDesktop.Landlord.Search', {
     },
     images: function(region){
         var ImageModel = ImageModel = Ext.define('ImageModel', {
-        extend: 'Ext.data.Model',
-        fields: [
-           {name: 'name'},
-           {name: 'url'},
-           {name: 'size', type: 'float'},
-           {name:'lastmod', type:'date', dateFormat:'timestamp'}
-        ]
-    });
-
-    var store = Ext.create('Ext.data.Store', {
-        model: 'ImageModel',
-        proxy: {
-            type: 'ajax',
-            url: 'get-images.php',
-            reader: {
-                type: 'json',
-                root: 'images'
-            }
-        }
-    });
-    store.load();
-
-    var panel = Ext.create('Ext.Panel', {
-        id: 'images-view',
-        region: region,
-        frame: true,
-        collapsible: true,
-        width: 535,
-        //renderTo: 'dataview-example',
-        title: 'Simple DataView (0 items selected)',
-        items: Ext.create('Ext.view.View', {
-            store: store,
-            tpl: [
-                '<tpl for=".">',
-                    '<div class="thumb-wrap" id="{name}">',
-                    '<div class="thumb"><img src="{url}" title="{name}"></div>',
-                    '<span class="x-editable">{shortName}</span></div>',
-                '</tpl>',
-                '<div class="x-clear"></div>'
-            ],
-            multiSelect: true,
-            height: 310,
-            trackOver: true,
-            overItemCls: 'x-item-over',
-            itemSelector: 'div.thumb-wrap',
-            emptyText: 'No images to display',
-            plugins: [
-                Ext.create('Ext.ux.DataView.DragSelector', {}),
-                Ext.create('Ext.ux.DataView.LabelEditor', {dataIndex: 'name'})
-            ],
-            prepareData: function(data) {
-                Ext.apply(data, {
-                    shortName: Ext.util.Format.ellipsis(data.name, 15),
-                    sizeString: Ext.util.Format.fileSize(data.size),
-                    dateString: Ext.util.Format.date(data.lastmod, "m/d/Y g:i a")
-                });
-                return data;
-            },
-            listeners: {
-                selectionchange: function(dv, nodes ){
-                    var l = nodes.length,
-                        s = l !== 1 ? 's' : '';
-                    this.up('panel').setTitle('Simple DataView (' + l + ' item' + s + ' selected)');
+            extend: 'Ext.data.Model',
+            fields: [
+               {name: 'name'},
+               {name: 'url'},
+               {name: 'size', type: 'float'},
+               {name:'lastmod', type:'date', dateFormat:'timestamp'}
+            ]
+        });
+        
+        store = Ext.create('Ext.data.Store', {
+            model: 'ImageModel',
+            proxy: {
+                type: 'ajax',
+                url: 'get-images.php',
+                //extraParams: {help: help},
+                reader: {
+                    type: 'json',
+                    root: 'images'
                 }
             }
-        })
-    });
+        });
+        //store.load();
+        this.loadStore = function(gid, userId){
+            store.load({
+                params: {
+                    gid: gid,
+                    userId: userId
+                },
+                callback: function(records, operation, success) {
+                    r = records;
+                    o = operation;
+                    s = success;
+                    // do something after the load finishes
+                },
+                scope: this
+            });
+        };
+        var panel = Ext.create('Ext.Panel', {
+            id: 'images-view',
+            region: region,
+            frame: true,
+            collapsible: true,
+            //width: 535,
+            //renderTo: 'dataview-example',
+            title: 'نمایش مدارک موجود ',
+            items: Ext.create('Ext.view.View', {
+                store: store,
+                tpl: [
+                    '<tpl for=".">',
+                        '<div class="thumb-wrap" id="{name}">',
+                        '<div class="thumb"><a href={url} target="_attribute"><img src="{url}" title="{name}"></a></div>',
+                        '<span class="x-editable">{shortName}</span></div>',
+                    '</tpl>',
+                    '<div class="x-clear"></div>'
+                ],
+                multiSelect: true,
+                //height: 310,
+                trackOver: true,
+                overItemCls: 'x-item-over',
+                itemSelector: 'div.thumb-wrap',
+                emptyText: 'No images to display',
+                plugins: [
+                    Ext.create('Ext.ux.DataView.DragSelector', {}),
+                    Ext.create('Ext.ux.DataView.LabelEditor', {dataIndex: 'name'})
+                ],
+                prepareData: function(data) {
+                    Ext.apply(data, {
+                        shortName: Ext.util.Format.ellipsis(data.name, 15),
+                        sizeString: Ext.util.Format.fileSize(data.size),
+                        dateString: Ext.util.Format.date(data.lastmod, "m/d/Y g:i a")
+                    });
+                    return data;
+                },
+                listeners: {
+                    selectionchange: function(dv, nodes ){
+                        //var l = nodes.length,
+                            //s = l !== 1 ? 's' : '';
+                        //this.up('panel').setTitle('Simple DataView (' + l + ' item' + s + ' selected)');
+                    }
+                }
+            })
+        });
 
         this.getPanel = function(){
             return panel;
@@ -319,17 +340,12 @@ Ext.define('MyDesktop.Landlord.Search', {
     allData: function(rootThis){
         /////////////////////////////////////////////////////////////////////////////////
         
-        var land = new rootThis.land("south", this);
-        var landLord = new rootThis.landLord("center", land);
-        var map = new rootThis.map("west");
+        //var land = new rootThis.land("south", this);
         var imagePanel = new rootThis.images('south');
+        var landLord = new rootThis.landLord("center", imagePanel);
+        var map = new rootThis.map("west");
         //map.addLayer2Map(land.getLayer());
         
-        this.setVisible = function(landLordVisible, landVisible, mapVisible, shoppingVisible, uploadVisible){
-            landLord.setVisible(landLordVisible);
-            land.setVisible(landVisible);
-            map.setVisible(mapVisible);
-        };
         this.panel = Ext.create('Ext.Panel', {
             layout: 'border',
             items: [ landLord.getPanel(), map.getPanel(), imagePanel.getPanel()]
@@ -342,27 +358,18 @@ Ext.define('MyDesktop.Landlord.Search', {
         var win = desktop.getWindow('search-win');
         if(!win){
             var allDataGridPanel = new me.allData(me);
-            var addToShopBtn = Ext.create('Ext.Button', {
-                text: 'ثبت خرید جدید',
-                iconCls: 'landLord-add',
-                handler : function(){
-                    allDataGridPanel.setVisible(false, false, false, true, false);
-                    addToShopBtn.setVisible(false);
-                }
-            });
             win = desktop.createWindow({
                 id: 'search-win',
                 title:'ثبت خرید',
                 width:1300,
                 rtl: true,
                 height:400,
-                iconCls: 'icon-grid',
+                iconCls: 'analyze-16x16',
                 collapsible: true,
                 constrainHeader:false,
                 align: 'right',
                 layout: 'fit',
-                items: [allDataGridPanel.panel],
-                bbar: [addToShopBtn]
+                items: [allDataGridPanel.panel]
             });
         }
         return win;

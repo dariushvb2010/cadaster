@@ -132,10 +132,10 @@ Ext.define('MyDesktop.Landlord.AddSegment', {
             valueField: 'type'
         });
         
-        var panel = Ext.widget('form', {
+        /*var panel = Ext.widget('form', {
             region: 'south',
             layout: {
-                type: 'vbox',
+                type: 'vbox'
                 //align: 'stretch'
             },
             border: false,
@@ -165,15 +165,45 @@ Ext.define('MyDesktop.Landlord.AddSegment', {
                     });
                 }
             }]
-        })
-        
-        /*var formPanel = Ext.create('Ext.panel.Panel', {
-            bodyPadding: 5,  // Don't want content to crunch against the borders
+        });
+        */
+       
+        var panel = Ext.create('Ext.form.Panel', {
+            //renderTo: Ext.getBody(),
             region: 'south',
-            title: 'ویژگیهای قطعه زمین',
-            titleAlign: 'right',
-            items: [usingType, numAdjacent, position, plantType, waterType]
-        });*/
+            title: 'اطلاعات زمین',
+            //bodyStyle: 'padding:5px 5px 5px 5px;direction: rtl',
+            bodyStyle: {background: '#ffc',padding: '10px',direction: 'rtl'},
+            //width: 600,
+            fieldDefaults: {
+                labelAlign: 'top',
+                msgTarget: 'side'
+            },
+            titleAlign: 'rigth',
+            defaults: {
+                border: false,
+                xtype: 'panel',
+                flex: 1,
+                layout: 'anchor'
+            },
+
+            layout: 'hbox',
+            items: [{
+                items: [usingType, sheetNo],
+                bodyStyle: {background: '#ffc',padding: '10px',direction: 'rtl'}
+            }, {
+                items: [numAdjacent, position, plantType, waterType],
+                bodyStyle: {background: '#ffc',padding: '10px',direction: 'rtl'},
+            }, {
+                items: [plantType, waterType],
+                bodyStyle: {background: '#ffc',padding: '10px',direction: 'rtl'},
+            }],
+            buttons: ['->', {
+                text: 'Save'
+            }, {
+                text: 'Cancel'
+            }]
+        });
         
         this.setVisible = function(flag){
             panel.setVisible(flag);

@@ -30,6 +30,7 @@ Ext.define('MyDesktop.App', {
         'MyDesktop.Landlord.AddUser',
         'MyDesktop.Landlord.AddSegment',
         'MyDesktop.Landlord.Search',
+        'MyDesktop.Landlord.Test',
         'MyDesktop.Settings'
     ],
 
@@ -51,7 +52,8 @@ Ext.define('MyDesktop.App', {
             new MyDesktop.Landlord.UserManagement(),
             //new MyDesktop.Landlord.AddUser(),
             new MyDesktop.Landlord.AddSegment(),
-            new MyDesktop.Landlord.Search()
+            new MyDesktop.Landlord.Search(),
+            new MyDesktop.Landlord.Test()
         ];
     },
 
@@ -65,8 +67,9 @@ Ext.define('MyDesktop.App', {
             shortcuts: Ext.create('Ext.data.Store', {
                 model: 'Ext.ux.desktop.ShortcutModel',
                 data: [
+                    { name:  "آزمایشی", iconCls: 'addUser-48x48',  module: 'test-win'},
                     { name:  "افزدون قطعه", iconCls: 'addUser-48x48',  module: 'addSegment-win'},// module: 'addSegment-win'},
-                    { name:  "تحلیل", iconCls: 'analyze-48x48',  module: 'search-win'},
+                    { name:  "جستجو", iconCls: 'analyze-48x48',  module: 'search-win'},
                     { name: 'ثبت خرید', iconCls: 'grid-shortcut', module: 'landlord-win' },               
                     //{ name: 'ویرایش مشخصات', iconCls: 'editProfile-48x48', module: 'editProfile-win' },
                     { name: 'مدیریت کاربران', iconCls: 'userManagement-48x48', module: 'userManagement-win' },
