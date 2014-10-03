@@ -399,7 +399,7 @@ Ext.define('MyDesktop.Landlord.Landlord', {
             return true;
         };
     },
-    uploading: function(){
+    uploading: function(gid){
         
         var getFileField = function(fieldLabel, emptyText, name){
             return Ext.create('Ext.form.field.File', {
@@ -421,82 +421,25 @@ Ext.define('MyDesktop.Landlord.Landlord', {
         var tayeediyeShura = getFileField('tayeediyeShura', 'tayeediyeShura', 'tayeediyeShura');
         var qabz = getFileField('qabz', 'qabz', 'qabz');
         
-        /*var panel = Ext.widget('form', {
-            region: region,
-            layout: {
-                type: 'vbox',
-                align: 'stretch'
-            },
-            border: false,
-            bodyPadding: 4,
-
-            fieldDefaults: {
-                labelAlign: 'top',
-                labelWidth: 100,
-                labelStyle: 'font-weight:bold'
-            },
-            items: [
-                {
-                    xtype: 'fieldcontainer', 
-                    items: [esteshhad]
-                }, {
-                    xtype: 'fieldcontainer', 
-                    items: [map]
-                }, {
-                    xtype: 'fieldcontainer', 
-                    items: [estelam]
-                }, {
-                    xtype: 'fieldcontainer', 
-                    items: [madarek]
-                }, {
-                    xtype: 'fieldcontainer', 
-                    items: [sanad]
-                }, {
-                    xtype: 'fieldcontainer', 
-                    items: [tayeediyeShura]
-                }, {
-                    xtype: 'fieldcontainer', 
-                    items: [qabz]
-                }],
-            buttons: [{
-                text: 'آپلود اسناد و مدارک',
-                //disabled: true,
-                formBind: true,
-                handler: function(){
-                    this.up('form').getForm().submit({
-                        url: 'index.php?r=business/upload',
-                        params: {gid: land.getLastSelectedSegmentId()},
-                        submitEmptyText: false,
-                        waitMsg: 'Saving Data...',
-                        success: function(form, action) {
-                           Ext.Msg.alert('success', action.result.success);
-                           //win.close();
-                        },
-                        failure: function(form, action) {
-                            var text = eval('(' + action.response.responseText + ')');
-                            Ext.Msg.alert('failure', text.failure);
-                        }
-                    });
-                }
-            }]
-        }).setVisible(false);*/
-        var gid = 123;
-        var userId = 123;
         var panel = Ext.create('Ext.ux.upload.Panel', {
             width: 400,
             uploader: 'Ext.ux.upload.uploader.FormDataUploader',
             uploaderOptions: {
-                url: 'index.php?r=business/upload&gid='+gid+'&userId='+userId,
+                url: 'index.php?r=business/upload&gid='+gid,
+                //url: 'index.php?r=business/upload',
                 //params: {gid: gid, userId: userId},
                 timeout: 120*100
             }
-        }).setVisible(false);
+        }).setVisible(true);
         
         this.getPanel = function(){
             return panel;
         };
         this.setPanelVisible = function(flag){
             panel.setVisible(flag);
+        };
+        this.setGid = function(gid_){
+            gid = gid_;
         };
     },
     chooseLand: function(rootThis){
@@ -549,14 +492,12 @@ Ext.define('MyDesktop.Landlord.Landlord', {
     createWindow : function(){
         var desktop = this.app.getDesktop();
         var me = this;
-        var win = desktop.getWindow('Landlord-win');
+        win = desktop.getWindow('Landlord-win');
         if(!win){
             //var allDataGridPanel = new me.allData(me);
             var gid = '';
             var chooseLandPanel = new me.chooseLand(me);
             var shoppingPanel = new me.shopping()
-            mmform = shoppingPanel.getPanel();
-            var uploadPanel = new me.uploading();
             var addToShopBtn = Ext.create('Ext.Button', {
                 text: 'ثبت خرید جدید',
                 iconCls: 'landLord-add',
@@ -569,7 +510,7 @@ Ext.define('MyDesktop.Landlord.Landlord', {
                     }
                     chooseLandPanel.setPanelVisible(false);
                     shoppingPanel.setPanelVisible(true);
-                    uploadPanel.setPanelVisible(false);
+                    //uploadPanel.setPanelVisible(false);
                     addToShopBtn.setVisible(false);
                     regInfoBtn.setVisible(true);
                 }
@@ -587,9 +528,13 @@ Ext.define('MyDesktop.Landlord.Landlord', {
                         submitEmptyText: false,
                         waitMsg: 'درد حال ذخیره اطلاعات ...',
                         success: function(form, action) {
+                            uploadPanel = new me.uploading(gid);
+                            win.items.items.push(uploadPanel.getPanel());
+                            win.items.items[1].setVisible(false);
+                            //win.items.items[2].setVisible(true);
                             Ext.Msg.alert('success', action.result.success);
                             regInfoBtn.setVisible(false);
-                            uploadPanel.setPanelVisible(true);
+                            //uploadPanel.setPanelVisible(true);
                             hasEstelam.setVisible(true);
                             hasEsteshhad.setVisible(true);
                             hasMadarek.setVisible(true);
@@ -597,6 +542,7 @@ Ext.define('MyDesktop.Landlord.Landlord', {
                             hasQabz.setVisible(true);
                             hasSanad.setVisible(true);
                             hasTayeediyeShura.setVisible(true);
+                            uploadPanel.setGid(gid);
                         },
                         failure: function(form, action) {
                             f = form;
@@ -665,7 +611,7 @@ Ext.define('MyDesktop.Landlord.Landlord', {
                 align: 'right',
                 layout: 'fit',
                 //items: [allDataGridPanel.panel],
-                items: [uploadPanel.getPanel(), chooseLandPanel.getPanel(), shoppingPanel.getPanel()],
+                items: [ chooseLandPanel.getPanel(), shoppingPanel.getPanel()],
                 bbar: [addToShopBtn, regInfoBtn],
                 rbar: [hasEsteshhad, hasMap, hasEstelam, hasMadarek, hasSanad, hasTayeediyeShura, hasQabz]
             });

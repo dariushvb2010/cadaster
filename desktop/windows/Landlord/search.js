@@ -186,7 +186,7 @@ Ext.define('MyDesktop.Landlord.Search', {
             if (selectedRecord.length) {
                 userSelectedGid = selectedRecord[0].raw.gid;
                 userSelectedId = selectedRecord[0].raw.userId;
-                imagePanel.loadStore(selectedRecord[0].raw.gid, selectedRecord[0].raw.userId);
+                imagePanel.loadStore(selectedRecord[0].raw.gid);
             }
         });
         
@@ -200,7 +200,8 @@ Ext.define('MyDesktop.Landlord.Search', {
     land: function(region, allData){
     },
     images: function(region){
-        var ImageModel = ImageModel = Ext.define('ImageModel', {
+        var gid = {gid: ''};
+        var ImageModel = Ext.define('ImageModel', {
             extend: 'Ext.data.Model',
             fields: [
                {name: 'name'},
@@ -210,12 +211,12 @@ Ext.define('MyDesktop.Landlord.Search', {
             ]
         });
         
-        store = Ext.create('Ext.data.Store', {
+        var store = Ext.create('Ext.data.Store', {
             model: 'ImageModel',
             proxy: {
                 type: 'ajax',
-                url: 'get-images.php',
-                //extraParams: {help: help},
+                url: 'index.php?r=business/imginfo',
+                extraParams: gid,
                 reader: {
                     type: 'json',
                     root: 'images'
@@ -223,16 +224,16 @@ Ext.define('MyDesktop.Landlord.Search', {
             }
         });
         //store.load();
-        this.loadStore = function(gid, userId){
+        this.loadStore = function(gid){
             store.load({
                 params: {
-                    gid: gid,
-                    userId: userId
+                    gid: gid
                 },
                 callback: function(records, operation, success) {
                     r = records;
                     o = operation;
                     s = success;
+                    console.log("In the name of Allah - help me ya Allah");
                     // do something after the load finishes
                 },
                 scope: this
@@ -286,6 +287,10 @@ Ext.define('MyDesktop.Landlord.Search', {
 
         this.getPanel = function(){
             return panel;
+        };
+        
+        this.setGid = function(gid_){
+            gid.gid = gid_;
         };
     },
     
