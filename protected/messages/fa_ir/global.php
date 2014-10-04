@@ -17,4 +17,5 @@ return array(
     'file {file} has been uploaded.'=>'فایل {file} بارگذاری شد.',
     'file format not supported.'=>'فایل هایی با این فرمت مورد قبول نیست.',
     '{file} already exists.'=>'{file} وجود دارد.',
+    'land with id {id} not found!'=>'زمین با شناسه {id} یافت نشد!',
 );
