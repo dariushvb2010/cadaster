@@ -13,6 +13,14 @@ salam bar mahdi
     background-image: url('images/landlord_add.gif') !important;
 }
 
+.arrow-left-Btn{
+    background-image: url('images/arrow_left.png') !important;
+}
+
+.arrow-right-Btn{
+    background-image: url('images/arrow_right.png') !important;
+}
+
 .fieldset{
     border-width: 2px;
     direction: rtl;

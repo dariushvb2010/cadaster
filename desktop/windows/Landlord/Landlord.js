@@ -500,7 +500,8 @@ Ext.define('MyDesktop.Landlord.Landlord', {
             var shoppingPanel = new me.shopping()
             var addToShopBtn = Ext.create('Ext.Button', {
                 text: 'ثبت خرید جدید',
-                iconCls: 'landLord-add',
+                iconCls: 'arrow-right-Btn',
+                iconAlign: 'right',
                 handler : function(){
                     gid = chooseLandPanel.getGid();
                     console.log("gid: " + gid);
@@ -513,10 +514,13 @@ Ext.define('MyDesktop.Landlord.Landlord', {
                     //uploadPanel.setPanelVisible(false);
                     addToShopBtn.setVisible(false);
                     regInfoBtn.setVisible(true);
+                    regInfoBackBtn.setVisible(true);
                 }
             });
             var regInfoBtn = Ext.create('Ext.Button', {
                 text: 'ذخیره اطلاعات',
+                iconCls: 'arrow-right-Btn',
+                iconAlign: 'right',
                 handler : function(){
                     if(!shoppingPanel.formValidation()){
                         Ext.Msg.alert('Failed', 'لطفا در ورود اطلاعات دقت فرمایید');
@@ -534,8 +538,10 @@ Ext.define('MyDesktop.Landlord.Landlord', {
                             //win.items.items[2].setVisible(true);
                             Ext.Msg.alert('success', action.result.success);
                             regInfoBtn.setVisible(false);
+                            uploadBackBtn.setVisible(true);
                             //uploadPanel.setPanelVisible(true);
                             hasEstelam.setVisible(true);
+                            regInfoBackBtn.setVisible(false);
                             hasEsteshhad.setVisible(true);
                             hasMadarek.setVisible(true);
                             hasMap.setVisible(true);
@@ -552,6 +558,37 @@ Ext.define('MyDesktop.Landlord.Landlord', {
                     });
                 }
             }).setVisible(false);
+            var regInfoBackBtn = Ext.create('Ext.Button', {
+                text: 'بازگشت به انتخاب قطعه زمین',
+                iconCls: 'arrow-left-Btn',
+                handler : function(){
+                    
+                    chooseLandPanel.setPanelVisible(true);
+                    shoppingPanel.setPanelVisible(false);
+                    //uploadPanel.setPanelVisible(false);
+                    addToShopBtn.setVisible(true);
+                    regInfoBtn.setVisible(false);
+                    regInfoBackBtn.setVisible(false);
+                }
+            });
+            regInfoBackBtn.setVisible(false);
+            
+            var uploadBackBtn = Ext.create('Ext.Button', {
+                text: 'بازگشت به ویرایش اطلاعات',
+                iconCls: 'arrow-left-Btn',
+                handler : function(){
+                    deleteRegister(gid);
+                    regInfoBackBtn.setVisible(true);
+                    uploadBackBtn.setVisible(false);
+                    chooseLandPanel.setPanelVisible(false);
+                    shoppingPanel.setPanelVisible(true);
+                    addToShopBtn.setVisible(false);
+                    regInfoBtn.setVisible(true);
+                    regInfoBackBtn.setVisible(true);
+                }
+            });
+            uploadBackBtn.setVisible(false);
+            
             var refreshHasImages = function(){
                 Ext.Ajax.request({
                     url: 'refreshHasImages.php',
@@ -571,6 +608,18 @@ Ext.define('MyDesktop.Landlord.Landlord', {
                     }
                 });
             };
+            var deleteRegister = function(gid_){
+                Ext.Ajax.request({
+                    url: 'index.php?r=business/deleteRegister',
+                    params: {
+                        gid: gid
+                    },
+                    success: function(response){
+                        text = response;
+                    }
+                });
+            };
+            
             var getCheckBox = function(name, boxLabel, checked){
                 var that = Ext.create('Ext.form.field.Checkbox', {
                     name: name,
@@ -612,7 +661,7 @@ Ext.define('MyDesktop.Landlord.Landlord', {
                 layout: 'fit',
                 //items: [allDataGridPanel.panel],
                 items: [ chooseLandPanel.getPanel(), shoppingPanel.getPanel()],
-                bbar: [addToShopBtn, regInfoBtn],
+                bbar: [regInfoBackBtn, uploadBackBtn, '->', addToShopBtn, regInfoBtn],
                 rbar: [hasEsteshhad, hasMap, hasEstelam, hasMadarek, hasSanad, hasTayeediyeShura, hasQabz]
             });
         }
