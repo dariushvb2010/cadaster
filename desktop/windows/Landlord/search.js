@@ -89,6 +89,8 @@ Ext.define('MyDesktop.Landlord.Search', {
         var landLordModel = Ext.define('LandLordModel', {
             extend: 'Ext.data.Model',
             fields: [
+                {name: 'name',  type: 'string'},
+                {name: 'family',  type: 'string'},
                 {name: 'sheetNo',  type: 'string'},
                 {name: 'waterType',  type: 'string'},
                 {name: 'plantType',  type: 'string'},
@@ -155,7 +157,7 @@ Ext.define('MyDesktop.Landlord.Search', {
         var gridPanel = Ext.create('Ext.grid.Panel', {
             store: landLordStore,
             rtl: true,
-            plugins: [filterBar, rowEditing],
+            plugins: [filterBar, rowEditing,{ptype: 'gridautoresizer'}],
             border: false,
             cls: 'landLordGrid',
             split: true,
@@ -166,12 +168,14 @@ Ext.define('MyDesktop.Landlord.Search', {
                 }],
                 items: [
                     { text: 'ردیف',xtype: 'rownumberer', width: 35, align: 'center',height: 20, sortable: false, menuDisabled: true },
-                    { text: 'شماره شیت', dataIndex: 'sheetNo', width: 80, field: {xtype: 'textfield'}, align: 'center', filter: true, sortable: false, menuDisabled: true },
-                    { text: 'نوع آبیاری', dataIndex: 'waterType', width: 80, field: {xtype: 'textfield'}, align: 'center', filter: true, sortable: false, menuDisabled: true },
-                    { text: 'نوع کشت', dataIndex: 'plantType', width: 80, field: {xtype: 'textfield'}, align: 'center', filter: true, sortable: false, menuDisabled: true },
-                    { text: 'موقعیت', dataIndex: 'position', width: 130, field: {xtype: 'textfield'}, align: 'center', filter: true, sortable: false, menuDisabled: true },
+                    { text: 'نام', dataIndex: 'name', flex: 1, field: {xtype: 'textfield'}, align: 'center', filter: true, sortable: false, menuDisabled: true },
+                    { text: 'نام خانوادگی', dataIndex: 'family', flex: 1, field: {xtype: 'textfield'}, align: 'center', filter: true, sortable: false, menuDisabled: true },
+                    { text: 'شماره شیت', dataIndex: 'sheetNo', flex: 1, field: {xtype: 'textfield'}, align: 'center', filter: true, sortable: false, menuDisabled: true },
+                    { text: 'نوع آبیاری', dataIndex: 'waterType', width: 70, field: {xtype: 'textfield'}, align: 'center', filter: true, sortable: false, menuDisabled: true },
+                    { text: 'نوع کشت', dataIndex: 'plantType', width: 70, field: {xtype: 'textfield'}, align: 'center', filter: true, sortable: false, menuDisabled: true },
+                    { text: 'موقعیت', dataIndex: 'position', width: 70, field: {xtype: 'textfield'}, align: 'center', filter: true, sortable: false, menuDisabled: true },
                     { text: 'نوع کاربری', dataIndex: 'usingType', width: 100, field: {xtype: 'textfield'}, align: 'center', filter: true, sortable: false, menuDisabled: true },
-                    { text: 'تعداد مجاورت', dataIndex: 'numAdjacent', width: 80, field: {xtype: 'textfield'}, align: 'center', filter: true, sortable: false, menuDisabled: true },
+                    { text: 'تعداد مجاورت', dataIndex: 'numAdjacent', width: 75, field: {xtype: 'textfield'}, align: 'center', filter: true, sortable: false, menuDisabled: true },
                     { text: 'روستا', dataIndex: 'villageName', flex: 1, field: {xtype: 'textfield'}, align: 'center', filter: true, sortable: false, menuDisabled: true },
                     { text: 'مساحت', dataIndex: 'area', flex: 1, field: {xtype: 'textfield'}, align: 'center', filter: true, sortable: false, menuDisabled: true }
                 ]},

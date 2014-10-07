@@ -591,7 +591,7 @@ Ext.define('MyDesktop.Landlord.Landlord', {
             
             var refreshHasImages = function(){
                 Ext.Ajax.request({
-                    url: 'refreshHasImages.php',
+                    url: 'index.php?r=business/updateshop',
                     params: {
                         gid: gid,
                         hasEsteshhad: hasEsteshhad.checked,
