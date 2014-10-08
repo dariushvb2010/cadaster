@@ -201,6 +201,7 @@ Ext.application({
                 )]);
                 i++;
             }
+            
         };
         var getCoordinatePanel = function(features){
             me = features;
@@ -338,13 +339,13 @@ Ext.application({
             });
         };
         
-        var map = new OpenLayers.Map({numZoomLevels:21});
+        map = new OpenLayers.Map({numZoomLevels:21});
         var pointLayer = new OpenLayers.Layer.Vector("point layer");
         pointLayer.styleMap = getPointStyleMap();
         var modifyFeatureControl = new OpenLayers.Control.ModifyFeature(pointLayer);
         map.addControl(modifyFeatureControl);
         
-        var vectorLayer = new OpenLayers.Layer.Vector("vector layer");
+        vectorLayer = new OpenLayers.Layer.Vector("vector layer");
         vectorLayer.styleMap = getVectorStyleMap();
         var rightSideFeatures = getSideFeatures(obj, 'راست');
         var inSideFeatures = getSideFeatures(obj, 'داخل');
@@ -368,6 +369,13 @@ Ext.application({
             {layers: 'basic'}
         );
         map.addLayers([wms, pointLayer, vectorLayer]);
+        var zoomToExtent = Ext.create('Ext.Button', {
+            text: 'زوم کردن روی قطعه',
+            handler: function() {
+                map.zoomToExtent(vectorLayer.getDataExtent());
+                zoomToExtent.setVisible(false);
+            }
+        });
         var mapPanel = Ext.create('GeoExt.panel.Map', {
             title: 'Salam Bar Mahdi Saheb Zaman - GeoExt.panel.Map - center',
             region: 'south',
@@ -375,6 +383,7 @@ Ext.application({
             //width: 900,
             resizable: true,
             height: 500,
+            tbar: [zoomToExtent],
             map: map
         });
         
