@@ -83,9 +83,34 @@ Ext.define('MyDesktop.Landlord.Search', {
         var hasTayeediyeShura = getCheckBox('hasTayeediyeShura', 'تاییدیه شورا', false);
         var hasQabz = getCheckBox('hasQabz', 'قبض', false);
         
-        var userSelectedId;
         var userSelectedGid;
-        //myparams = getParams();
+        a = userSelectedGid;
+        
+        var deleteShopBtn = Ext.create('Ext.Button', {
+            text: 'حذف خرید',
+            handler : function(){
+                if(userSelectedGid == undefined){
+                    Ext.Msg.alert('Failed', 'لطفا یک قطعه زمین را انتخاب کنید');
+                    return;
+                }
+                Ext.Ajax.request({
+                    url: 'index.php?r=business/delete',
+                    params: {
+                        gid: userSelectedGid,
+                    },
+                    success: function(response){
+                        landLordStore.reload()
+                    },
+                    failure:function(response){
+                        //text = eval('('+ response + ')');
+                        text = response;
+                        Ext.Msg.alert('Failed', text.responseText);
+                        
+                    }
+                });
+            }
+        });
+        
         var landLordModel = Ext.define('LandLordModel', {
             extend: 'Ext.data.Model',
             fields: [
@@ -98,15 +123,14 @@ Ext.define('MyDesktop.Landlord.Search', {
                 {name: 'usingType',  type: 'string'},
                 {name: 'numAdjacent',  type: 'string'},
                 {name: 'villageName',  type: 'string'},
-                {name: 'area', type: 'string'},
-                {name: 'perimeter',  type: 'string'},
-                {name: 'finalPrice',       type: 'string'},
-                {name: 'pricePerMeter',  type: 'string'},
+                {name: 'area', type: 'float'},
+                {name: 'perimeter',  type: 'float'},
+                {name: 'finalPrice',       type: 'float'},
+                {name: 'pricePerMeter',  type: 'float'},
                 {name: 'mobayeNo',  type: 'string'},
                 {name: 'mobayeDate',  type: 'string'},
                 {name: 'committeeNo',  type: 'string'},
-                {name: 'committeeDate',  type: 'string'},
-                
+                {name: 'committeeDate',  type: 'string'}
             ]
         });
         landLordStore = Ext.create('Ext.data.Store', {
@@ -144,6 +168,16 @@ Ext.define('MyDesktop.Landlord.Search', {
                     }
                 },
                 edit: function(e, ee, eee){
+                    var params = ee.newValues;
+                    params.gid = ee.record.raw.gid;
+                    Ext.Ajax.request({
+                        url: 'index.php?r=land/update',
+                        params: params,
+                        success: function(response){
+                            text = response;
+                        }
+                    });
+                    
                 }
             }
         });
@@ -167,29 +201,36 @@ Ext.define('MyDesktop.Landlord.Search', {
                         ptype: 'gridautoresizer'
                 }],
                 items: [
-                    { text: 'ردیف',xtype: 'rownumberer', width: 35, align: 'center',height: 20, sortable: false, menuDisabled: true },
-                    { text: 'نام', dataIndex: 'name', flex: 1, field: {xtype: 'textfield'}, align: 'center', filter: true, sortable: false, menuDisabled: true },
-                    { text: 'نام خانوادگی', dataIndex: 'family', flex: 1, field: {xtype: 'textfield'}, align: 'center', filter: true, sortable: false, menuDisabled: true },
-                    { text: 'شماره شیت', dataIndex: 'sheetNo', flex: 1, field: {xtype: 'textfield'}, align: 'center', filter: true, sortable: false, menuDisabled: true },
-                    { text: 'نوع آبیاری', dataIndex: 'waterType', width: 70, field: {xtype: 'textfield'}, align: 'center', filter: true, sortable: false, menuDisabled: true },
-                    { text: 'نوع کشت', dataIndex: 'plantType', width: 70, field: {xtype: 'textfield'}, align: 'center', filter: true, sortable: false, menuDisabled: true },
-                    { text: 'موقعیت', dataIndex: 'position', width: 70, field: {xtype: 'textfield'}, align: 'center', filter: true, sortable: false, menuDisabled: true },
-                    { text: 'نوع کاربری', dataIndex: 'usingType', width: 100, field: {xtype: 'textfield'}, align: 'center', filter: true, sortable: false, menuDisabled: true },
-                    { text: 'تعداد مجاورت', dataIndex: 'numAdjacent', width: 75, field: {xtype: 'textfield'}, align: 'center', filter: true, sortable: false, menuDisabled: true },
-                    { text: 'روستا', dataIndex: 'villageName', flex: 1, field: {xtype: 'textfield'}, align: 'center', filter: true, sortable: false, menuDisabled: true },
-                    { text: 'مساحت', dataIndex: 'area', flex: 1, field: {xtype: 'textfield'}, align: 'center', filter: true, sortable: false, menuDisabled: true }
+                    { text: 'ردیف',xtype: 'rownumberer', width: 45, align: 'center',height: 20, sortable: false },
+                    { text: 'نام', dataIndex: 'name', flex: 1, align: 'center', filter: true, sortable: false, hideable: false },
+                    { text: 'نام خانوادگی', dataIndex: 'family', flex: 1, align: 'center', filter: true, sortable: false, menuDisabled: true },
+                    { text: 'شماره شیت', dataIndex: 'sheetNo', flex: 1, field: {xtype: 'textfield'}, align: 'center', filter: true, sortable: false, menuDisabled: true, hidden: true },
+                    { text: 'نوع آبیاری', dataIndex: 'waterType', width: 70, field: {xtype: 'textfield'}, align: 'center', filter: true, sortable: false, menuDisabled: true, hidden: true },
+                    { text: 'نوع کشت', dataIndex: 'plantType', width: 70, field: {xtype: 'textfield'}, align: 'center', filter: true, sortable: false, menuDisabled: true, hidden: true },
+                    { text: 'موقعیت', dataIndex: 'position', width: 70, field: {xtype: 'textfield'}, align: 'center', filter: true, sortable: false, menuDisabled: true, hidden: true },
+                    { text: 'نوع کاربری', dataIndex: 'usingType', width: 100, field: {xtype: 'textfield'}, align: 'center', filter: true, sortable: false, menuDisabled: true, hidden: true },
+                    { text: 'تعداد مجاورت', dataIndex: 'numAdjacent', width: 75, field: {xtype: 'textfield'}, align: 'center', filter: true, sortable: false, menuDisabled: true, hidden: true },
+                    { text: 'روستا', dataIndex: 'villageName', flex: 1, align: 'center', filter: true, sortable: false, menuDisabled: true },
+                    { text: 'مساحت', dataIndex: 'area', flex: 1, field: {xtype: 'textfield'}, align: 'center', filter: true, sortable: false, menuDisabled: true },
+                    { text: 'محیط', dataIndex: 'perimeter', flex: 1, field: {xtype: 'textfield'}, align: 'center', filter: true, sortable: false, menuDisabled: true },
+                    { text: 'قیمت کل', dataIndex: 'finalPrice', flex: 1, field: {xtype: 'textfield'}, align: 'center', filter: true, sortable: false, menuDisabled: true },
+                    { text: 'قیمت هر متر', dataIndex: 'pricePerMeter', flex: 1, field: {xtype: 'textfield'}, align: 'center', filter: true, sortable: false, menuDisabled: true },
+                    { text: 'شماره مبایعه نامه', dataIndex: 'mobayeNo', flex: 1, field: {xtype: 'textfield'}, align: 'center', filter: true, sortable: false, menuDisabled: true },
+                    { text: 'تاریخ مبایعه نامه', dataIndex: 'mobayeDate', flex: 1, field: {xtype: 'textfield'}, align: 'center', filter: {type: 'date'}, sortable: false, menuDisabled: true },
+                    { text: 'شماره کمیته', dataIndex: 'committeeNo', flex: 1, field: {xtype: 'textfield'}, align: 'center', filter: true, sortable: false, menuDisabled: true, hidden: true },
+                    { text: 'تاریخ کمیته', dataIndex: 'committeeDate', flex: 1, field: {xtype: 'textfield'}, align: 'center', filter: {type: 'date'}, sortable: false, menuDisabled: true, hidden: true }
+                    
                 ]},
             viewConfig: {
                 stripeRows: true
             },
-            bbar: [pagingToolbar],
+            bbar: [pagingToolbar, '->', deleteShopBtn],
             tbar: ['->', hasEsteshhad, '', '', '', '', '', '', '', hasMap, '', '', '', '', '', '', '', hasEstelam, '', '', '', '', '', '', '', hasMadarek, '', '', '', '', '', '', '', hasSanad, '', '', '', '', '', '', '', hasTayeediyeShura, '', '', '', '', '', '', '', hasQabz]
         });
         
         gridPanel.getSelectionModel().on('selectionchange', function(sm, selectedRecord) {
             if (selectedRecord.length) {
                 userSelectedGid = selectedRecord[0].raw.gid;
-                userSelectedId = selectedRecord[0].raw.userId;
                 imagePanel.loadStore(selectedRecord[0].raw.gid);
             }
         });
@@ -369,7 +410,7 @@ Ext.define('MyDesktop.Landlord.Search', {
             var allDataGridPanel = new me.allData(me);
             win = desktop.createWindow({
                 id: 'search-win',
-                title:'ثبت خرید',
+                title:'جستجو',
                 width:1300,
                 rtl: true,
                 height:400,

@@ -26,6 +26,8 @@ class LandShop extends CActiveRecord {
     const STATE_FIRST = 'پیشنهاد اولیه';
     const STATE_FINAL = 'فروخته شده';
 
+    public static $paramsForHas = array('hasEsteshhad', 'hasMap', 'hasEstelam', 'hasSanad', 'hasTayeediyeShura', 'hasQabz');
+
     /**
      * @return string the associated database table name
      */
@@ -62,8 +64,7 @@ class LandShop extends CActiveRecord {
         // class name for the relations automatically generated below.
         return array(
             'sellerUser' => array(self::BELONGS_TO, 'MyUser', 'sellerUserId'),
-            'createrUser'=>array(self::BELONGS_TO,'User','createrUserId'),
-            
+            'createrUser' => array(self::BELONGS_TO, 'User', 'createrUserId'),
         );
     }
 
@@ -73,16 +74,34 @@ class LandShop extends CActiveRecord {
     public function attributeLabels() {
         return array(
             'id' => 'ID',
-            'sellerUserId' => 'Seller User',
-            'plateCode' => 'Plate Code',
-            'state' => 'State',
             'suggestPrice' => 'Suggest Price',
             'finalPrice' => 'Final Price',
-            'buyerUserId' => 'Buyer User',
-            'buyDate' => 'Buy Date',
-            'suggestDate' => 'Suggest Date',
-            'description' => 'description'
+            'description' => 'description',
+            'state' => 'Buyer User',
+            'area' => 'Suggest Date',
+            'pricePerMeter' => 'ID',
+            'mobayeNo' => 'Buy Date',
+            'mobayeDate' => 'Suggest Price',
+            'committeeNo' => 'Final Price',
+            'committeeDate' => 'description',
+            'hasEsteshhad' => 'Buyer User',
+            'hasMap' => 'Buy Date',
+            'hasEstelam' => 'Suggest Date',
+            'hasMadarek' => 'kjdf',
+            'hasSanad' => 'description',
+            'hasTayeediyeShura' => 'Buyer User',
+            'hasQabz' => 'Buy Date',
+            'createDate' => 'Suggest Date',
+            'createUserId' => 'kjdf',
         );
+    }
+
+    public function set($request) {
+        foreach ($this->attributeLabels() as $key => $value) {
+            if (isset($request[$key])) {
+                $this->{$key} = $request[$key];
+            }
+        }
     }
 
     public static function states() {

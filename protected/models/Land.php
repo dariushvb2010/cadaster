@@ -63,7 +63,7 @@ class Land extends CActiveRecord {
         'lte' => '<=',
         'like' => 'like'
     );
-    public static $paramsForHas = array('hasEsteshhad','hasMap','hasEstelam','hasSanad','hasTayeediyeShura','hasQabz');
+    
 
     const DEFAULT_SIMPLIFY_VALUE = 1;
 
@@ -192,7 +192,7 @@ class Land extends CActiveRecord {
         $operator = self::$operatorMap[$filter->operator];
         $crit = new CDbCriteria();
         $column = self::paramAlternative($filter->property);
-        $crit->with = array('shop');
+        $crit->with = array('shop','lord');
         if ($operator == 'like') { // string search
             $crit->addSearchCondition(Yii::app()->db->quoteColumnName($column), $filter->value); // see compare documentation
         } else { //other operators = < > ...
@@ -208,7 +208,8 @@ class Land extends CActiveRecord {
      */
     private static function paramAlternative($param) {
         $paramMap = array(
-            'area' => 'ST_Area(geom)',
+//            'area' => 'ST_Area(geom)',
+            'area'=>'shop.area',
             'x' => 'ST_XMin(ST_Transform(geom,' . self::SRID_4326 . '))',
             'y' => 'ST_YMin(ST_Transform(geom,' . self::SRID_4326 . '))',
             'villageCode' => 'villageCode',
@@ -219,7 +220,11 @@ class Land extends CActiveRecord {
             'waterType' => 'waterType',
             'position' => 'position',
             'numAdjacent' => 'numAdjacent',
-            'finalPrcie' => 'shop.finalPrice',
+            
+            'name'=>'lord.FirstName',
+            'family'=>'lord.LastName',
+            
+            'finalPrice' => 'shop.finalPrice',
             'pricePerMeter' => 'shop.pricePerMeter',
             'mobayeNo' => 'shop.mobayeNo',
             'mobayeDate' => 'shop.mobayeDate',
@@ -245,14 +250,21 @@ class Land extends CActiveRecord {
     public function attributeLabels() {
         return array(
             'gid' => 'ID',
-            'userId' => 'user id',
-            'platCode' => 'Plat Code',
             'waterType' => 'Water Type',
             'plantType' => 'Plant Type',
             'sheetNO' => 'Sheet No',
-            'price' => 'Price',
-            'codeEvent' => 'Code Event',
+            'villageCode'=>'',
+            'position'=>'',
+            'numAdjacent'=>'',
+            'usingType'=>'',
         );
+    }
+    public function set($request){
+        foreach ($this->attributeLabels() as $key=>$value){
+            if(isset($request[$key])){
+                $this->{$key} = $request[$key];
+            }
+        }
     }
 
     /**
@@ -278,7 +290,7 @@ class Land extends CActiveRecord {
             return array(
                 'geometry' => $this->geojson,
                 'properties' => array_merge(
-                        $this->attributes, array('area' => $this->area, 'perimeter' => $this->perimeter)
+                        $this->attributes, array(/*'area' => $this->area,*/ 'perimeter' => $this->perimeter)
                 )
             );
         }
@@ -291,9 +303,12 @@ class Land extends CActiveRecord {
         return array(
             'geometry' => $this->geojson,
             'properties' => array_merge($this->attributes, array(
-                'area' => $this->area,
+//                'area' => $this->area,
+                'area'=>$this->shop->area,
                 'perimeter' => $this->perimeter,
-                'finalPrcie' => $this->shop->finalPrice,
+                'name'=>$this->lord->FirstName,
+                'family'=>$this->lord->LastName,
+                'finalPrice' => $this->shop->finalPrice,
                 'pricePerMeter' => $this->shop->pricePerMeter,
                 'mobayeNo' => $this->shop->mobayeNo,
                 'mobayeDate' => $this->shop->mobayeDate,

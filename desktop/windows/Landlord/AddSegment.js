@@ -336,7 +336,7 @@ Ext.define('MyDesktop.Landlord.AddSegment', {
             "http://ows.terrestris.de/osm/service?",
             {layers: 'OSM-WMS'}
         );
-        layer = new OpenLayers.Layer.Vector("لایه استان", {
+        var layer = new OpenLayers.Layer.Vector("لایه استان", {
             projection: new OpenLayers.Projection("EPSG:4326"),
             strategies: [new OpenLayers.Strategy.Fixed()],
             protocol: new OpenLayers.Protocol.HTTP({
@@ -346,11 +346,11 @@ Ext.define('MyDesktop.Landlord.AddSegment', {
             })
         });
         
-        drawLayer = new OpenLayers.Layer.Vector("از این لایه برای رسم پلی گن ها استفاده می کنیم");
+        var drawLayer = new OpenLayers.Layer.Vector("از این لایه برای رسم پلی گن ها استفاده می کنیم");
         drawLayer.events.register('featureadded', this, intersectionTestCallBack);
         drawLayer.events.register('beforefeatureadded', this, beforefeatureadded);
 
-        segmentLayer = new OpenLayers.Layer.Vector("لایه قطعات یک زمین", {
+        var segmentLayer = new OpenLayers.Layer.Vector("لایه قطعات یک زمین", {
             projection: new OpenLayers.Projection("EPSG:4326"),
             strategies: [new OpenLayers.Strategy.Fixed()],
             protocol: new OpenLayers.Protocol.HTTP({
@@ -361,7 +361,7 @@ Ext.define('MyDesktop.Landlord.AddSegment', {
             })
         });
         segmentLayer.events.register('loadend', this, loadEnd);
-        intersectionLayer = new OpenLayers.Layer.Vector("لایه ی تداخل");
+        var intersectionLayer = new OpenLayers.Layer.Vector("لایه ی تداخل");
         layer.styleMap = st.layerStyleMap();
         segmentLayer.styleMap = st.allSegmentsStyleMap();
         intersectionLayer.styleMap = st.getIntersectionStyleMap();

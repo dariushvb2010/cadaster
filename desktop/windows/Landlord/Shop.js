@@ -5,7 +5,7 @@
  */
 
 
-Ext.define('MyDesktop.Landlord.Landlord', {
+Ext.define('MyDesktop.Landlord.Shop', {
     extend: 'Ext.ux.desktop.Module',
 
     requires: [
@@ -42,11 +42,11 @@ Ext.define('MyDesktop.Landlord.Landlord', {
         'Ext.form.*'
 
     ],
-    id:'landlord-win',
+    id:'shop-win',
 
     init : function(){
         this.launcher = {
-            text: 'ثبت خرید',
+            text: 'ثبت خرید تستی',
             iconCls:'icon-grid'
         };
     },
@@ -259,54 +259,6 @@ Ext.define('MyDesktop.Landlord.Landlord', {
         };
     },
     
-    map: function (region){
-        map = new OpenLayers.Map('Our map',{numZoomLevels:21});
-
-        var open_streetMap_wms = new OpenLayers.Layer.WMS(
-            "OpenStreetMap WMS",
-            "http://ows.terrestris.de/osm/service?",
-            {layers: 'OSM-WMS'}
-        );
-        var globalImagery = new OpenLayers.Layer.WMS(
-            "Global Imagery",
-            "http://maps.opengeo.org/geowebcache/service/wms",
-            {layers: "bluemarble"}
-        );
-        layer = new OpenLayers.Layer.Vector("لایه استان", {
-            projection: new OpenLayers.Projection("EPSG:4326"),
-            strategies: [new OpenLayers.Strategy.Fixed()],
-            protocol: new OpenLayers.Protocol.HTTP({
-                readWithPOST: true,
-                url: "index.php?r=land/features",
-                format: new OpenLayers.Format.GeoJSON({})
-            })
-        });
-        mf = new OpenLayers.Control.SelectFeature(layer);
-        //map.addControls([mf]);
-        map.addLayers([globalImagery, layer]);
-        
-        var panel = Ext.create('GeoExt.panel.Map', {
-            title: 'نقشه',
-            map: map,
-            rtl: false,
-            collapsible: true,
-            region: region,
-            //height: 550,
-            width: 400,
-            zoom: 5,
-            center: [55,32.2]
-        });
-        
-        this.addLayer2Map = function(layer_){
-            map.addLayers([layer_]);
-        }
-        this.setVisible = function(flag){
-            panel.setVisible(flag);
-        }
-        this.getPanel = function(){
-            return panel;
-        }
-    },
     shopping: function(){
         var getTextField = function(fieldLabel, name, value, allowBlank){
             var required = '<span style="color:red;font-weight:bold" data-qtip="Required">*</span>';
@@ -444,14 +396,270 @@ Ext.define('MyDesktop.Landlord.Landlord', {
         };
     },
     chooseLand: function(rootThis){
-        var land = new rootThis.land("south", this);
-        var landLord = new rootThis.landLord("center", land);
-        var map = new rootThis.map("west");
-        map.addLayer2Map(land.getLayer());
+        map = new OpenLayers.Map('Our map',{numZoomLevels:21});
+        var gid, userId;
+        layer = new OpenLayers.Layer.Vector("لایه استان", {
+            projection: new OpenLayers.Projection("EPSG:4326"),
+            strategies: [new OpenLayers.Strategy.Fixed()],
+            protocol: new OpenLayers.Protocol.HTTP({
+                readWithPOST: true,
+                url: "index.php?r=land/features",
+                format: new OpenLayers.Format.GeoJSON({})
+            })
+        });
+        
+        var mapPanel = function (region){
+
+            var open_streetMap_wms = new OpenLayers.Layer.WMS(
+                "OpenStreetMap WMS",
+                "http://ows.terrestris.de/osm/service?",
+                {layers: 'OSM-WMS'}
+            );
+            var globalImagery = new OpenLayers.Layer.WMS(
+                "Global Imagery",
+                "http://maps.opengeo.org/geowebcache/service/wms",
+                {layers: "bluemarble"}
+            );
+            
+            //mf = new OpenLayers.Control.SelectFeature(layer);
+            //map.addControls([mf]);
+            map.addLayers([globalImagery, layer]);
+
+            var panel = Ext.create('GeoExt.panel.Map', {
+                title: 'نقشه',
+                map: map,
+                rtl: false,
+                collapsible: true,
+                region: region,
+                //height: 550,
+                width: 400,
+                zoom: 5,
+                center: [55,32.2]
+            });
+
+            this.setVisible = function(flag){
+                panel.setVisible(flag);
+            };
+            this.getPanel = function(){
+                return panel;
+            };
+        };
+        var landLordPanel = function(region){
+            var landLordModel = Ext.define('LandLordModel', {
+                extend: 'Ext.data.Model',
+                fields: [
+                    {name: 'id', type: 'int'},
+                    {name: 'FirstName', type: 'string'},
+                    {name: 'LastName',  type: 'string'},
+                    {name: 'DadName',       type: 'string'},
+                    {name: 'Address',  type: 'string'},
+                    {name: 'Description',  type: 'string'},
+                    {name: 'Sharers',  type: 'string'}
+                ]
+            });
+            landLordStore = Ext.create('Ext.data.Store', {
+                model: 'LandLordModel',
+                pageSize: 15,
+                proxy: {
+                    type: 'ajax',
+                    url: 'index.php?r=landlord/AllLandlord',
+                    reader: {
+                        type: 'json',
+                        root: 'LandLordsDetail',
+                        totalProperty: 'totalCount'
+                    },
+                    extraParams: {userId: userId}
+                },
+                filterParam: 'query',
+
+                encodeFilters: function(filters) {
+                    return filters[0].value;
+                },
+                remoteFilter: true,
+                autoLoad: true
+            });
+            var rowEditing = Ext.create('Ext.grid.plugin.RowEditing', {
+                listeners: {
+                    cancelEdit: function(rowEditing, context) {
+                        if (context.record.phantom) {
+                            landLordStore.remove(context.record);
+                        }
+                    },
+                    edit: function(e, ee, eee){
+                        console.log("Edit Row");
+                        e.grid.store.save();
+                    }
+                }
+            });
+            var pagingToolbar = Ext.create('Ext.PagingToolbar', {
+                store: landLordStore,
+                displayInfo: true,
+                displayMsg: 'نمایش رکورد {0} تا {1} از {2} رکورد',
+                emptyMsg: "داده ای یافت نشد.",
+            });
+            var filterBar = Ext.create('Ext.ux.grid.FilterBar',{renderHidden: false});
+            var gridPanel = Ext.create('Ext.grid.Panel', {
+                store: landLordStore,
+                rtl: true,
+                plugins: [filterBar, rowEditing],
+                border: false,
+                cls: 'landLordGrid',
+                region: region,
+                columns: {
+                    plugins: [{
+                            ptype: 'gridautoresizer'
+                    }],
+                    items: [
+                        { text: 'ردیف',xtype: 'rownumberer', width: 60, align: 'center',height: 20 },
+                        { text: 'نام', dataIndex: 'FirstName', width: 150, field: {xtype: 'textfield'}, align: 'center', filter: true },
+                        { text: 'نام خانوادگی', dataIndex: 'LastName', width: 150, field: {xtype: 'textfield'}, align: 'center', filter: true },
+                        { text: 'نام پدر', dataIndex: 'DadName', width: 150, field: {xtype: 'textfield'}, align: 'center', filter: true },
+                        { text: 'آدرس', dataIndex: 'Address', width: 220, field: {xtype: 'textfield'}, align: 'center', filter: true },
+                        { text: 'توضیحات', dataIndex: 'Description', flex: 1, field: {xtype: 'textfield'}, align: 'center', filter: true },
+                        { text: 'شرکا', dataIndex: 'Sharers', flex: 1, field: {xtype: 'textfield'}, align: 'center', filter: true }
+                    ]},
+                viewConfig: {
+                    stripeRows: true
+                },
+                bbar: [pagingToolbar,'->', {
+                    text: 'پرینت',
+                    iconCls: 'print-icon-16x16',
+                    handler : function() {
+                        window.params = {userId:userId};
+                        window.open('index.php?r=print/print', '_blank');
+                    }
+                }]
+            });
+
+            gridPanel.getSelectionModel().on('selectionchange', function(sm, selectedRecord) {
+                if (selectedRecord.length) {
+                    userId = selectedRecord[0].raw.id;
+                    lp.refresh();
+                    //land.setUserId(userId);
+                }
+            });
+
+            this.setVisible = function(flag){
+                gridPanel.setVisible(flag);
+            };
+            this.getPanel = function (){
+                return gridPanel;
+            };
+        };
+        var landPanel = function(region){
+            var sentParam = {userId: 1};
+            var loadEnd = function(e){
+                if(e.response.features.length<1) return;
+                map.zoomToExtent(segmentsLayer.getDataExtent());
+            };
+
+            var style = new OpenLayers.Style();
+            var rule = new OpenLayers.Rule({
+                symbolizer: {
+                    fillColor: '#ababab', fillOpacity:.8,
+                    pointRadius:5, strokeColor: '#151515',
+                    strokeWidth:2
+                }
+            });
+            style.addRules([rule]); 
+            var styleMap = new OpenLayers.StyleMap({
+                'default': style
+            });
+
+            var segmentsLayer = new OpenLayers.Layer.Vector("لایه قطعات یک زمین", {
+                projection: new OpenLayers.Projection("EPSG:4326"),
+                strategies: [new OpenLayers.Strategy.Fixed()],
+                protocol: new OpenLayers.Protocol.HTTP({
+                    params: sentParam,
+                    readWithPOST: true,
+                    url: "index.php?r=land/features",
+                    format: new OpenLayers.Format.GeoJSON({})
+                })
+            });
+            segmentsLayer.styleMap = styleMap;
+            map.addLayer(segmentsLayer);
+            
+            segmentsLayer.events.register('loadend', this, loadEnd);
+            var store = Ext.create('GeoExt.data.FeatureStore', {
+                layer: segmentsLayer,
+                fields: [
+                    {name: 'gid', type: 'int'},
+                    {name: 'areaPlat',  type: 'float'},
+                    {name: 'price',  type: 'float', sortable: false, menuDisabled: true},
+                    {name: 'waterType',  type: 'string'},
+                    {name: 'plantType',  type: 'string'},
+                    {name: 'villageName',  type: 'string'},
+                    {name: 'X',  type: 'float'},
+                    {name: 'Y',  type: 'float'},
+                    {name: 'sheetNo',  type: 'string'},
+                    {name: 'numAdjacent',  type: 'int'},
+                    {name: 'villageName',  type: 'string'},
+                    {name: 'usingType',  type: 'string'},
+                    {name: 'position',  type: 'string'},
+                    {name: 'HeaatiAcre',  type: 'string'},
+                    {name: 'PublicSource',  type: 'string'},
+                    {name: 'docStatus',  type: 'string'}
+                ],
+                autoLoad: true
+            });
+            var segmentGridPanel = Ext.create('Ext.grid.GridPanel', {
+                region: region,
+                store: store,
+                split: true,
+                height: 150,
+                columns: [
+                    {xtype: 'rownumberer',width: 30,sortable: false, menuDisabled: false},
+                    { text: 'کد',  dataIndex: 'gid', width: 60, field: {xtype: 'textfield'}, sortable: true, menuDisabled: true, align: 'center'},
+                    { text: 'مساحت', dataIndex: 'areaPlat', width: 110, field: {xtype: 'textfield'}, sortable: false, menuDisabled: true, align: 'center', renderer : function(val) {return '<span style="font-family:Tahoma; font-size: 13px;">' + val + '</span>';}},
+                    { text: 'قیمت', dataIndex: 'price', flex: 1, field: {xtype: 'textfield'}, sortable: false, menuDisabled: true, align: 'center'  },
+                    { text: 'نوع آبیاری', dataIndex: 'waterType',width: 60, field: {xtype: 'textfield'}, sortable: false, menuDisabled: true, align: 'center' },
+                    { text: 'نوع کشت', dataIndex: 'plantType', width: 80, field: {xtype: 'textfield'}, sortable: false, menuDisabled: true, align: 'center' },
+                    { text: 'روستا', dataIndex: 'villageName', width: 160, field: {xtype: 'textfield'}, sortable: false, menuDisabled: true, align: 'center' },
+                    { text: 'x', dataIndex: 'X', flex: 1, field: {xtype: 'textfield'}, sortable: false, menuDisabled: true, align: 'center', renderer : function(val) {return '<span style="font-family:Tahoma; font-size: 13px;">' + val + '</span>';}},
+                    { text: 'y', dataIndex: 'Y', flex: 1, field: {xtype: 'textfield'}, sortable: false, menuDisabled: true, align: 'center', renderer : function(val) {return '<span style="font-family:Tahoma; font-size: 13px;">' + val + '</span>';}},
+                    { text: 'شماره شیت', dataIndex: 'sheetNo', width: 65, field: {xtype: 'textfield'}, sortable: false, menuDisabled: true, align: 'center', renderer : function(val) {return '<span style="font-family:Tahoma; font-size: 13px;">' + val + '</span>';}},
+                    { text: 'تعداد مجاورت', dataIndex: 'numAdjacent', width: 50, field: {xtype: 'textfield'}, sortable: false, menuDisabled: true, align: 'center' },
+                    { text: 'سند', dataIndex: 'WithDocument', width: 50, field: {xtype: 'textfield'}, sortable: false, menuDisabled: true, align: 'center' },
+                    { text: 'نوع کاربری', dataIndex: 'usingType', width: 53, field: {xtype: 'textfield'}, sortable: false, menuDisabled: true, align: 'center' },
+                    { text: 'موقعیت', dataIndex: 'position', width: 70, field: {xtype: 'textfield'}, sortable: false, menuDisabled: true, align: 'center' },
+                    { text: 'ارازی هیئتی', dataIndex: 'HeaatiAcre', width:70, field: {xtype: 'textfield'}, sortable: false, menuDisabled: true, align: 'center' },
+                    { text: 'منابع ملی شده', dataIndex: 'PublicSource', width: 90, field: {xtype: 'textfield'}, sortable: false, menuDisabled: true, align: 'center' },
+                    { text: 'وضعیت زمین', dataIndex: 'docStatus', flex: 1, field: {xtype: 'textfield'}, sortable: false, menuDisabled: true, align: 'center' },                
+                            ],
+                //plugins: [landRowEditing],
+                selType: 'featuremodel'
+            });
+            segmentGridPanel.getSelectionModel().on('selectionchange', function(sm, selectedRecord) {
+                if (selectedRecord.length) {
+                    gid = selectedRecord[0].data.gid;
+                }
+            });
+            this.getLayer = function(){
+                return segmentsLayer;
+            };
+            this.getPanel = function(){
+                return segmentGridPanel;
+            };
+
+            this.refresh = function(){
+                sentParam.userId = userId;
+                segmentsLayer.refresh();
+            };
+            this.setVisible = function(flag){
+                segmentGridPanel.setVisible(flag);
+            };
+            this.getGid = function(){
+                return gid;
+            };
+        };
+        
+        var mp = new mapPanel('west');
+        var llp = new landLordPanel('center');
+        var lp = new landPanel("south");
         
         var panel = Ext.create('Ext.Panel', {
             layout: 'border',
-            items: [ landLord.getPanel(), land.getPanel(), map.getPanel()]
+            items: [ mp.getPanel(), llp.getPanel(), lp.getPanel()]
         });
         
         this.getPanel = function(){
@@ -493,164 +701,14 @@ Ext.define('MyDesktop.Landlord.Landlord', {
     createWindow : function(){
         var desktop = this.app.getDesktop();
         var me = this;
-        win = desktop.getWindow('Landlord-win');
+        var win = desktop.getWindow('shop-win');
         if(!win){
             //var allDataGridPanel = new me.allData(me);
-            var gid = '';
+            var gid;
             var chooseLandPanel = new me.chooseLand(me);
-            var shoppingPanel = new me.shopping()
-            var addToShopBtn = Ext.create('Ext.Button', {
-                text: 'ثبت خرید جدید',
-                iconCls: 'arrow-right-Btn',
-                iconAlign: 'right',
-                handler : function(){
-                    gid = chooseLandPanel.getGid();
-                    console.log("gid: " + gid);
-                    if(gid === ''){
-                        Ext.Msg.alert('Failed', 'لطفا یک قطعه زمین را انتخاب کنید');
-                        return;
-                    }
-                    chooseLandPanel.setPanelVisible(false);
-                    shoppingPanel.setPanelVisible(true);
-                    //uploadPanel.setPanelVisible(false);
-                    addToShopBtn.setVisible(false);
-                    regInfoBtn.setVisible(true);
-                    regInfoBackBtn.setVisible(true);
-                }
-            });
-            var regInfoBtn = Ext.create('Ext.Button', {
-                text: 'ذخیره اطلاعات',
-                iconCls: 'arrow-right-Btn',
-                iconAlign: 'right',
-                handler : function(){
-                    if(!shoppingPanel.formValidation()){
-                        Ext.Msg.alert('Failed', 'لطفا در ورود اطلاعات دقت فرمایید');
-                        return;
-                    }
-                    shoppingPanel.getPanel().getForm().submit({
-                        url: 'index.php?r=business/buy',
-                        params: {gid: gid},
-                        submitEmptyText: false,
-                        waitMsg: 'درد حال ذخیره اطلاعات ...',
-                        success: function(form, action) {
-                            uploadPanel = new me.uploading(gid);
-                            win.items.items.push(uploadPanel.getPanel());
-                            win.items.items[1].setVisible(false);
-                            //win.items.items[2].setVisible(true);
-                            Ext.Msg.alert('success', action.result.success);
-                            regInfoBtn.setVisible(false);
-                            uploadBackBtn.setVisible(true);
-                            //uploadPanel.setPanelVisible(true);
-                            hasEstelam.setVisible(true);
-                            regInfoBackBtn.setVisible(false);
-                            hasEsteshhad.setVisible(true);
-                            hasMadarek.setVisible(true);
-                            hasMap.setVisible(true);
-                            hasQabz.setVisible(true);
-                            hasSanad.setVisible(true);
-                            hasTayeediyeShura.setVisible(true);
-                            uploadPanel.setGid(gid);
-                        },
-                        failure: function(form, action) {
-                            f = form;
-                            a = action;
-                            //Ext.Msg.alert('Failed', action.response.responseText);
-                        }
-                    });
-                }
-            }).setVisible(false);
-            var regInfoBackBtn = Ext.create('Ext.Button', {
-                text: 'بازگشت به انتخاب قطعه زمین',
-                iconCls: 'arrow-left-Btn',
-                handler : function(){
-                    
-                    chooseLandPanel.setPanelVisible(true);
-                    shoppingPanel.setPanelVisible(false);
-                    //uploadPanel.setPanelVisible(false);
-                    addToShopBtn.setVisible(true);
-                    regInfoBtn.setVisible(false);
-                    regInfoBackBtn.setVisible(false);
-                }
-            });
-            regInfoBackBtn.setVisible(false);
-            
-            var uploadBackBtn = Ext.create('Ext.Button', {
-                text: 'بازگشت به ویرایش اطلاعات',
-                iconCls: 'arrow-left-Btn',
-                handler : function(){
-                    deleteRegister(gid);
-                    regInfoBackBtn.setVisible(true);
-                    uploadBackBtn.setVisible(false);
-                    chooseLandPanel.setPanelVisible(false);
-                    shoppingPanel.setPanelVisible(true);
-                    addToShopBtn.setVisible(false);
-                    regInfoBtn.setVisible(true);
-                    regInfoBackBtn.setVisible(true);
-                }
-            });
-            uploadBackBtn.setVisible(false);
-            
-            var refreshHasImages = function(){
-                Ext.Ajax.request({
-                    url: 'index.php?r=business/updateshop',
-                    params: {
-                        gid: gid,
-                        hasEsteshhad: hasEsteshhad.checked,
-                        hasMap: hasMap.checked,
-                        hasEstelam: hasEstelam.checked,
-                        hasMadarek: hasMadarek.checked,
-                        hasSanad: hasSanad.checked,
-                        hasTayeediyeShura: hasTayeediyeShura.checked,
-                        hasQabz: hasQabz.checked
-                    },
-                    success: function(response){
-                        text = response;
-                        // process server response here
-                    }
-                });
-            };
-            var deleteRegister = function(gid_){
-                Ext.Ajax.request({
-                    url: 'index.php?r=business/deleteRegister',
-                    params: {
-                        gid: gid
-                    },
-                    success: function(response){
-                        text = response;
-                    }
-                });
-            };
-            
-            var getCheckBox = function(name, boxLabel, checked){
-                var that = Ext.create('Ext.form.field.Checkbox', {
-                    name: name,
-                    boxLabel: boxLabel,
-                    checked: checked, 
-                    listeners: {
-                        click: {
-                            element: 'el', //bind to the underlying el property on the panel
-                            fn: function(){
-                                refreshHasImages();
-                                //landLordStore.proxy.extraParams[name] = that.checked;
-                                //landLordStore.reload();
-                            }
-                        }
-                    }
-                }).setVisible(false);
-
-                return that;
-            };
-        
-            var hasEsteshhad = getCheckBox('hasEsteshhad', 'استشهادنامه', true);
-            var hasMap = getCheckBox('hasMap', 'نقشه', true);
-            var hasEstelam = getCheckBox('hasEstelam', 'استعلام', true);
-            var hasMadarek = getCheckBox('hasMadarek', 'مدارک', true);
-            var hasSanad = getCheckBox('hasSanad', 'سند', true);
-            var hasTayeediyeShura = getCheckBox('hasTayeediyeShura', 'تاییدیه شورا', true);
-            var hasQabz = getCheckBox('hasQabz', 'قبض', true);
             
             win = desktop.createWindow({
-                id: 'Landlord-win',
+                id: 'shop-win',
                 title:'ثبت خرید',
                 width:1300,
                 rtl: true,
@@ -661,9 +719,9 @@ Ext.define('MyDesktop.Landlord.Landlord', {
                 align: 'right',
                 layout: 'fit',
                 //items: [allDataGridPanel.panel],
-                items: [ chooseLandPanel.getPanel(), shoppingPanel.getPanel()],
-                bbar: [regInfoBackBtn, uploadBackBtn, '->', addToShopBtn, regInfoBtn],
-                rbar: [hasEsteshhad, hasMap, hasEstelam, hasMadarek, hasSanad, hasTayeediyeShura, hasQabz]
+                items: [ chooseLandPanel.getPanel()],
+                //bbar: [regInfoBackBtn, uploadBackBtn, '->', addToShopBtn, regInfoBtn],
+                //rbar: [hasEsteshhad, hasMap, hasEstelam, hasMadarek, hasSanad, hasTayeediyeShura, hasQabz]
             });
         }
         return win;

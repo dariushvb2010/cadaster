@@ -59,9 +59,9 @@ class LandController extends Controller {
         $crit->limit = $limit;
         $crit->offset = $start;
         //-----------has...--------------
-        foreach (Land::$paramsForHas as $hasParam) {
+        foreach (LandShop::$paramsForHas as $hasParam) {
             $hasValue = Yii::app()->request->getParam($hasParam);
-            if (!empty($hasValue) && $hasValue!='false') {
+            if (!empty($hasValue) && $hasValue != 'false') {
                 $filter = new stdClass();
                 $filter->property = $hasParam;
                 $filter->operator = 'eq';
@@ -79,7 +79,7 @@ class LandController extends Controller {
             $landScope = $landScope->byFilter($filter);
         }
         $lands = $landScope->findAll($crit);
-        
+
         $main = array(
             'totalCount' => $count,
             'landDetail' => Land::buildArray($lands, true)
@@ -119,11 +119,11 @@ class LandController extends Controller {
         var_dump($a->attributes);
     }
 
-    protected function makeGeoJson($lands, $selectAll = false) {
+    protected function makeGeoJson($lands, $selectShopColumns = false) {
         $features = array();
         if (count($lands))
             foreach ($lands as $land) {
-                $features[] = $land->toFeature($selectAll);
+                $features[] = $land->toFeature($selectShopColumns);
             }
         return Gis::makeGeoJson2($features);
     }
@@ -135,12 +135,25 @@ class LandController extends Controller {
         return $model;
     }
 
-//    public function actionUpdate($id) {
-//        $model = $this->loadModel($id);
-//
-//        // Uncomment the following line if AJAX validation is needed
-//        // $this->performAjaxValidation($model);
-//
+    public function actionUpdate() {
+        $gid = $_REQUEST['gid'];
+        $land = $this->loadLand($gid);
+        $shop = $land->shop;
+        $land->set($_REQUEST);
+        if($land->update()){
+            echo 'land updated';
+        }
+        var_dump($_REQUEST);
+        var_dump($land);
+        
+        if (!empty($shop->id)) {
+            $shop->set($_REQUEST);
+            var_dump($shop);
+            if ($shop->update()) {
+                echo 'hi';
+            }
+        }
+
 //        if (isset($_POST['Land'])) {
 //            $model->attributes = $_POST['Land'];
 //            if ($model->save())
@@ -150,7 +163,13 @@ class LandController extends Controller {
 //        $this->render('update', array(
 //            'model' => $model,
 //        ));
-//    }
+    }
+
+    protected function loadLand($gid) {
+        $land = Land::model()->with('shop')->findByPk($gid * 1);
+        return $land;
+    }
+
 //    public function actionDelete($id) {
 //        $this->loadModel($id)->delete();
 //

@@ -19,7 +19,7 @@ class BusinessController extends Controller {
     public function accessRules() {
         return array(
             array('allow', // allow all users to perform 'index' and 'view' actions
-                'actions' => array('landbuy', 'salelist', 'buy', 'upload'),
+                'actions' => array('landbuy', 'salelist', 'buy', 'upload','updateshop','delete'),
                 'users' => array('*'),
             ),
             array('allow', // allow authenticated user to perform 'create' and 'update' actions
@@ -57,6 +57,10 @@ class BusinessController extends Controller {
                 $res = array('failure' => Yii::t('global', 'land with id {id} not found!', array('{id}' => $landId)));
                 echo json_encode($res);
                 return;
+            }elseif(!empty($land->shop->id)){
+                $res = array('failure' => Yii::t('global', 'land with id {id} has already been sold !', array('{id}' => $landId)));
+                echo json_encode($res);
+                return;
             }
             //$m['sellerUserId'] = $land->lord->id;
 
@@ -90,6 +94,31 @@ class BusinessController extends Controller {
         echo Gis::makeGeoJson2($res);
     }
 
+    public function actionUpdateShop(){
+        $gid = $_REQUEST['gid'];
+        $attr['hasEsteshhad'] = true;
+        $attr['hasMap'] = $_REQUEST['hasMap'];
+        $attr['hasEstelam'] = $_REQUEST['hasEstelam'];
+        
+        $land = $this->loadLand($gid);
+        $shop = $land->shop;
+        $shop->hasEsteshhad = $_REQUEST['hasEsteshhad']=='true' ? true : false;
+        $shop->hasMap = $_REQUEST['hasMap']=='true' ? true : false;
+        $shop->hasEstelam = $_REQUEST['hasEstelam']=='true' ? true : false;
+        $shop->hasMadarek = $_REQUEST['hasMadarek']=='true' ? true : false;
+        $shop->hasSanad = $_REQUEST['hasSanad']=='true' ? true : false;
+        $shop->hasTayeediyeShura = $_REQUEST['hasTayeediyeShura']=='true' ? true : false;
+        $shop->hasQabz = $_REQUEST['hasQabz']=='true' ? true : false;
+        
+        
+        
+        if($shop->update()){
+            $ret = array('success'=>Yii::t('global','Attributes were successfully updated!')); 
+        }else{
+            $ret = array('failure'=>Yii::t('global','An error occured when saving data!'));
+        }
+        echo json_encode($ret);
+    }
     public function actionUpload() {
 
         ob_start();
@@ -110,7 +139,7 @@ class BusinessController extends Controller {
             $res = $this->saveFile($file, $folder, $fKey);
             if ($res === true) {
                 
-                $property = 'has' . ucfirst($fKey); ////uppercase the first letter of $fKey
+                //$property = 'has' . ucfirst($fKey); ////uppercase the first letter of $fKey
                 //$land->shop->$property = true;
                 //$land->shop->save();
                 $msg.=Yii::t('global', 'file {file} has been uploaded.', array('{file}' => $file['name'])) . '<br/>';
@@ -176,8 +205,9 @@ class BusinessController extends Controller {
         $gid = $_REQUEST['gid'];
         $land = $this->loadLand($gid);
         $folder = $this->getUploadFolder($land);
-
+        
         if(!file_exists($folder)){
+           
             echo json_encode(array('images'=>array()));
             return;//rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr
         }
@@ -223,6 +253,20 @@ class BusinessController extends Controller {
         }
     }
 
+    public function actionDelete(){
+        
+        $gid = $_REQUEST['gid'];
+        $land = $this->loadLand($gid);
+        $shop = $land->shop;
+        $land->shopId = null;
+        
+        if($land->update() && $shop->delete()){
+            echo Yii::t('global','Successfully deleted!');
+        }else{
+            throw new CHttpException(404,Yii::t('global','An error occured!'));
+        }
+        
+    }
     protected function loadLand($gid) {
         $land = Land::model()->with('shop')->findByPk($gid * 1);
         return $land;

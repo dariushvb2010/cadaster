@@ -32,7 +32,7 @@ class ImportController extends Controller{
         );
     }
     
-	public function actionExcel(){
+    public function actionExcel(){
 		
 		if(strlen(isset($_FILES['excel_file']['tmp_name'])))
 		{
@@ -108,7 +108,7 @@ class ImportController extends Controller{
 		
 	}
 	public function actionIndex(){
-		$lands = Land::model()->byIntersectionWith("MULTIPOLYGON(((396017.372886415 3013244.53432914,395659.560336204 3012846.60149275,395656.339325044 3012839.65913958,395632.900483579 3012860.42116533,395634.241788627 3012863.312125,395977.94169221 3013245.54991241,396017.372886415 3013244.53432914)))")->findAll();
+		$lands = Land::model()->findAll();
 		var_dump($lands);
 	}
 	public function actionView(){
