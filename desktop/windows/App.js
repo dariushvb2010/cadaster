@@ -21,7 +21,6 @@ Ext.define('MyDesktop.App', {
         'MyDesktop.Notepad',
         'MyDesktop.BogusMenuModule',
         'MyDesktop.BogusModule',
-        'MyDesktop.Landlord.Landlord',
         'MyDesktop.Landlord.Register',
         'MyDesktop.Landlord.Shopping',
         'MyDesktop.Landlord.ChangePass',
@@ -46,7 +45,6 @@ Ext.define('MyDesktop.App', {
 
     getModules : function(){
         return [
-            new MyDesktop.Landlord.Landlord(),
             new MyDesktop.Landlord.Register(),
             new MyDesktop.Landlord.Shopping(),
             //new MyDesktop.Landlord.EditProfile(),
@@ -71,11 +69,11 @@ Ext.define('MyDesktop.App', {
             shortcuts: Ext.create('Ext.data.Store', {
                 model: 'Ext.ux.desktop.ShortcutModel',
                 data: [
-                    { name:  "تستی", iconCls: 'addUser-48x48',  module: 'shop-win'},
+                    { name:  "ثبت خرید", iconCls: 'grid-shortcut',  module: 'shop-win'},
                     { name:  "افزدون قطعه", iconCls: 'addUser-48x48',  module: 'addSegment-win'},// module: 'addSegment-win'},
                     { name:  "افزدون قطعات از اکسل", iconCls: 'excel-48x48',  module: 'import-win'},
                     { name:  "جستجو", iconCls: 'analyze-48x48',  module: 'search-win'},
-                    { name: 'ثبت خرید', iconCls: 'grid-shortcut', module: 'landlord-win' },               
+                    //{ name: 'ثبت خرید', iconCls: 'grid-shortcut', module: 'landlord-win' },               
                     //{ name: 'ویرایش مشخصات', iconCls: 'editProfile-48x48', module: 'editProfile-win' },
                     { name: 'مدیریت کاربران', iconCls: 'userManagement-48x48', module: 'userManagement-win' },
                     //{ name: 'افزودن کاربر جدید', iconCls: 'addUser-48x48', module: 'addUser-win' },
