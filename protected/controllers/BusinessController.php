@@ -5,7 +5,7 @@ class BusinessController extends Controller {
     public $layout = '//layouts/column2';
 
     const UPLOAD_FOLDER = 'upload';
-    const MAX_FILE_SIZE = 200000; // in Bytes
+    const MAX_FILE_SIZE = 2000000; // in Bytes
 
     private static $allowedExts = array("gif", "jpeg", "jpg", "png");
 

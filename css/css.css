@@ -82,3 +82,45 @@ salam bar mahdi
 .mmRTL{
     direction: rtl;
 }
+
+/*
+** by dariush slide show
+*/
+span#close-slide-show{
+    background-image: url('images/Close-red-32.png') !important;
+    background-size: 100%;
+    display:inline-block;
+    width:30px;
+    height:30px;
+    margin-left:30px;
+    cursor:pointer;
+}
+
+span#right-arrow{
+    display:inline-block;
+    width:30px;
+    height:30px;
+    margin-left:30px;
+    background-image: url('images/arrow-right-green-32.png');
+    background-size:100%;
+    cursor: pointer;
+}
+span#left-arrow{
+    display:inline-block;
+    width:30px;
+    height:30px;
+    margin-left:50px;
+    background-image: url('images/arrow-left-green-32.png');
+    background-size:100%;
+    cursor: pointer;
+}
+
+span#mmclose{
+    display:inline-block;
+    width:30px;
+    height:30px;
+    margin-left:50px;
+    background-image: url('images/Close-red-32.png');
+    background-size:100%;
+    cursor: pointer;
+}
