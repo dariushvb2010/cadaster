@@ -83,7 +83,8 @@ Ext.define('MyDesktop.Landlord.AddSegment', {
             name: 'plantType',
             queryMode: 'local',
             displayField: "type",
-            valueField: "type"
+            valueField: "type",
+            //allowBlank: false
         });
         
         var positionStore = Ext.create('Ext.data.Store', {
@@ -131,42 +132,6 @@ Ext.define('MyDesktop.Landlord.AddSegment', {
             displayField: 'type',
             valueField: 'type'
         });
-        
-        /*var panel = Ext.widget('form', {
-            region: 'south',
-            layout: {
-                type: 'vbox'
-                //align: 'stretch'
-            },
-            border: false,
-            bodyPadding: 4,
-            height: 300,
-            fieldDefaults: {
-                labelAlign: 'top',
-                labelWidth: 100,
-                labelStyle: 'font-weight:bold'
-            },
-            items: [usingType,sheetNo, numAdjacent, position, plantType, waterType],
-            buttons: [{
-                text: 'ثبت قطعه زمین',
-                formBind: true,
-                handler: function(){
-                    this.up('form').getForm().submit({
-                        url: 'index.php?r=land/create',
-                        params: {geoText: win.getGeoText()},
-                        submitEmptyText: false,
-                        waitMsg: 'Saving Data...',
-                        success: function(form, action) {
-                           Ext.Msg.alert('success', action.result.success);
-                        },
-                        failure: function(form, action) {
-                            Ext.Msg.alert('Failed', action.response.responseText);
-                        }
-                    });
-                }
-            }]
-        });
-        */
        
         var panel = Ext.create('Ext.form.Panel', {
             //renderTo: Ext.getBody(),
@@ -197,11 +162,6 @@ Ext.define('MyDesktop.Landlord.AddSegment', {
             }, {
                 items: [plantType, waterType],
                 bodyStyle: {background: '#ffc',padding: '10px',direction: 'rtl'},
-            }],
-            buttons: ['->', {
-                text: 'Save'
-            }, {
-                text: 'Cancel'
             }]
         });
         
@@ -209,41 +169,45 @@ Ext.define('MyDesktop.Landlord.AddSegment', {
             panel.setVisible(flag);
         };
         
-        return panel;
+        this.getPanel = function(){
+            return panel;
+        };
+        
+        this.formValidation = function(){
+            for(var i=0; i<panel.items.items.length; i++){
+                for(var j=0; j<panel.items.items[i].items.items.length; j++){
+                    if(!panel.items.items[i].items.items[j].isValid())
+                        return false;
+                }
+            }
+            return true;
+        };
     },
     
     mapPanel: function(win){
+        
         var beforefeatureadded = function(e, ee, eee){
             drawLayer.removeAllFeatures();
             intersectionLayer.removeAllFeatures();
         };
         var intersectionTestCallBack = function(){
-            //alert("in the name of Allah - Help me ya Allah");
-            var createText2SendServer = function(){
-                alert("salam bar mahdi");
-                var components = drawLayer.features[0].geometry.components[0].components;
-                var geoText = "MULTIPOLYGON(((";
-                for(var i=0; i<components.length; i++)
-                    geoText += components[i].x + ' ' + components[i].y + ',';
-                
-                geoText = geoText.slice(0, geoText.length-1);
-                geoText += ')))';
-                return geoText;
-            };
-            win.setGeoText(createText2SendServer());
+            var geoText = getGeoText();
+            if(geoText === undefined){
+                Ext.Msg.alert('خطا', 'لطفا یک قطعه به نقشه اضافه نمایید.');
+                return;
+            }
             Ext.Ajax.request({
                 url: '?r=land/Intersection',
                 params: {
-                    geoText: win.getGeoText()
+                    geoText: geoText
                 },
                 success: function(response){
-                    text = response.responseText;
+                    var text = response.responseText;
                     text = eval('(' + text + ')');
                     if(text.features.length<1){
-                        alert("السلام علیک یا سیدالشهدا - سلام بر لب تشنه ات یا حسین(علیه السلام) - هیچ گونه تداخلی صورت نگرفته است");
+                        //alert("السلام علیک یا سیدالشهدا - سلام بر لب تشنه ات یا حسین(علیه السلام) - هیچ گونه تداخلی صورت نگرفته است");
+                        Ext.Msg.alert('موفقیت', 'هیچگونه تداخلی صورت نگرفته است');
                     }else{
-                        alert("قطعه شما با قطعات دیگر تداخل دارد.");
-                        
                         var features = text.features;
                         var i = 0;
                         
@@ -266,6 +230,8 @@ Ext.define('MyDesktop.Landlord.AddSegment', {
                             ]);
                             intersectionLayer.redraw();
                         }
+                        
+                        Ext.Msg.alert('Failed', 'قطعه شما با قطعات دیگر تداخل دارد');
                     }
                 }
             });
@@ -336,7 +302,7 @@ Ext.define('MyDesktop.Landlord.AddSegment', {
             "http://ows.terrestris.de/osm/service?",
             {layers: 'OSM-WMS'}
         );
-        var layer = new OpenLayers.Layer.Vector("لایه استان", {
+        var layer = new OpenLayers.Layer.Vector("همه قطعات زمین", {
             projection: new OpenLayers.Projection("EPSG:4326"),
             strategies: [new OpenLayers.Strategy.Fixed()],
             protocol: new OpenLayers.Protocol.HTTP({
@@ -361,10 +327,12 @@ Ext.define('MyDesktop.Landlord.AddSegment', {
             })
         });
         segmentLayer.events.register('loadend', this, loadEnd);
+        
         var intersectionLayer = new OpenLayers.Layer.Vector("لایه ی تداخل");
         layer.styleMap = st.layerStyleMap();
         segmentLayer.styleMap = st.allSegmentsStyleMap();
         intersectionLayer.styleMap = st.getIntersectionStyleMap();
+        
         map.addLayers([open_streetMap_wms, layer, drawLayer, segmentLayer, intersectionLayer]);
         var toolbarItems = [];
         
@@ -420,6 +388,7 @@ Ext.define('MyDesktop.Landlord.AddSegment', {
                                             )
                                         ]);
                                         drawLayer.redraw();
+                                        map.zoomToExtent(drawLayer.getDataExtent());
                                     }
                                 }, 
                                 this,
@@ -458,9 +427,27 @@ Ext.define('MyDesktop.Landlord.AddSegment', {
         this.getPanel = function(){
             return mapPanel;
         };
+        this.getGeoText = function(){
+            
+            var geoText;
+            if(drawLayer.features.length>0){
+                geoText = "MULTIPOLYGON(((";
+                var components = drawLayer.features[0].geometry.components[0].components;
+                for(var i=0; i<components.length; i++)
+                    geoText += components[i].x + ' ' + components[i].y + ',';
+
+                geoText = geoText.slice(0, geoText.length-1);
+                geoText += ')))';
+            }
+            
+            
+            return geoText;
+        };
+        var getGeoText = this.getGeoText;
     },
     
     landLord: function(win){
+        var userId;
         var landLordModel = Ext.define('LandLordModel', {
             extend: 'Ext.data.Model',
             fields: [
@@ -528,7 +515,8 @@ Ext.define('MyDesktop.Landlord.AddSegment', {
         });
         gridPanel.getSelectionModel().on('selectionchange', function(sm, selectedRecord) {
             if (selectedRecord.length) {
-                win.setUserId(parseInt(selectedRecord[0].raw.id));
+                userId = parseInt(selectedRecord[0].raw.id);
+                win.setUserId(userId);
             }
         });
         
@@ -536,31 +524,65 @@ Ext.define('MyDesktop.Landlord.AddSegment', {
             return gridPanel;
         };
         
+        this.getUserId = function(){
+            return userId;
+        };
     },
     
     window: function(myThis){
-        
-        var geoText = '';
-        
         var desktop = myThis.app.getDesktop();
         var me = myThis;
         var win = desktop.getWindow('addSegment-win');
         
-        var myMapPanel = new me.mapPanel(this);
-        var landLord = new me.landLord(this);
+        myMapPanel = new me.mapPanel(this);
+        myLandLord = new me.landLord(this);
         var fieldFormPanel = new me.getFieldForm(this);
         
+        var saveBtn = Ext.create('Ext.Button', {
+                text: 'افزودن قطعه زمین',
+                handler : function(){
+                    if(!fieldFormPanel.formValidation()){
+                        Ext.Msg.alert('Failed', 'لطفا در ورود اطلاعات دقت فرمایید');
+                        return;
+                    }
+                    var userId = myLandLord.getUserId();
+                    if(userId === undefined){
+                        Ext.Msg.alert('خطا', 'لطفا یک مالک را انتخاب کنید.');
+                        return;
+                    }
+                    
+                    var geoText = myMapPanel.getGeoText();
+                    if(geoText === undefined){
+                        Ext.Msg.alert('خطا', 'لطفا یک قطعه به نقشه اضافه نمایید.');
+                        return;
+                    }
+                    fieldFormPanel.getPanel().getForm().submit({
+                        url: 'index.php?r=land/create',
+                        params: {geoText: geoText, userId: userId},
+                        submitEmptyText: false,
+                        waitMsg: 'درد حال ذخیره اطلاعات ...',
+                        success: function(form, action) {
+                            Ext.Msg.alert('نتیجه', 'قطعه شما با موفقیت ذخیره شد.');
+                        },
+                        failure: function(form, action) {
+                            f = form;
+                            a = action;
+                            //Ext.Msg.alert('Failed', action.response.responseText);
+                        }
+                    });
+                }
+            });
         
         this.setPanelVisible = function(mapPanelVisible, polygonPanelVisible, fieldFormPanelVisible){
             myMapPanel.setVisible(mapPanelVisible);
-            landLord.setVisible(polygonPanelVisible);
+            myLandLord.setVisible(polygonPanelVisible);
             fieldFormPanel.setVisible(fieldFormPanelVisible);
         };
 
         if(!win){
             var panel = Ext.create('Ext.Panel', {
                 layout: 'border',
-                items: [myMapPanel.getPanel(), landLord.getPanel(), fieldFormPanel]
+                items: [myMapPanel.getPanel(), myLandLord.getPanel(), fieldFormPanel.getPanel()]
             });
             win = desktop.createWindow({
                 id: 'addSegment-win',
@@ -576,17 +598,10 @@ Ext.define('MyDesktop.Landlord.AddSegment', {
                     type: 'fit',
                     align: 'left'
                 },
-                items: [panel]
+                items: [panel],
+                bbar: [saveBtn]
             });
         }
-        
-        this.setGeoText = function(gt){
-            geoText = gt;
-        };
-        
-        this.getGeoText = function(){
-            return geoText;
-        };
         
         this.getWin = function (){
             return win;
