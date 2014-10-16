@@ -297,11 +297,24 @@ Ext.define('MyDesktop.Landlord.AddSegment', {
         var mousePositionCtrl = new OpenLayers.Control.MousePosition();
         map.addControl(mousePositionCtrl);
         
+        var layerSwitcher = new OpenLayers.Control.LayerSwitcher();
+        map.addControl(layerSwitcher);
         var open_streetMap_wms = new OpenLayers.Layer.WMS(
             "OpenStreetMap WMS",
             "http://ows.terrestris.de/osm/service?",
             {layers: 'OSM-WMS'}
         );
+        
+        var ostan = new OpenLayers.Layer.WMS(
+            "استان",
+            "http://localhost:8080/geoserver/iran/wms?service=WMS",
+            {layers: 'ostan', transparent: true},{
+                isBaseLayer: false,
+                format:"image/png",
+                opacity: 1.0
+            }
+        );
+        map.addLayer(ostan);
         var layer = new OpenLayers.Layer.Vector("همه قطعات زمین", {
             projection: new OpenLayers.Projection("EPSG:4326"),
             strategies: [new OpenLayers.Strategy.Fixed()],
@@ -309,10 +322,11 @@ Ext.define('MyDesktop.Landlord.AddSegment', {
                 readWithPOST: true,
                 url: "index.php?r=land/features",
                 format: new OpenLayers.Format.GeoJSON({})
-            })
+            }), 
+            displayInLayerSwitcher: false
         });
         
-        var drawLayer = new OpenLayers.Layer.Vector("از این لایه برای رسم پلی گن ها استفاده می کنیم");
+        var drawLayer = new OpenLayers.Layer.Vector("از این لایه برای رسم پلی گن ها استفاده می کنیم", {displayInLayerSwitcher: false});
         drawLayer.events.register('featureadded', this, intersectionTestCallBack);
         drawLayer.events.register('beforefeatureadded', this, beforefeatureadded);
 
@@ -324,11 +338,12 @@ Ext.define('MyDesktop.Landlord.AddSegment', {
                 readWithPOST: true,
                 url: "index.php?r=land/features",
                 format: new OpenLayers.Format.GeoJSON({})
-            })
+            }),
+            displayInLayerSwitcher: false
         });
         segmentLayer.events.register('loadend', this, loadEnd);
         
-        var intersectionLayer = new OpenLayers.Layer.Vector("لایه ی تداخل");
+        var intersectionLayer = new OpenLayers.Layer.Vector("لایه ی تداخل", {displayInLayerSwitcher: false});
         layer.styleMap = st.layerStyleMap();
         segmentLayer.styleMap = st.allSegmentsStyleMap();
         intersectionLayer.styleMap = st.getIntersectionStyleMap();
