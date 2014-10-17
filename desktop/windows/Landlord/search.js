@@ -78,7 +78,7 @@ Ext.define('MyDesktop.Landlord.Search', {
         var hasSanad = getCheckBox('hasSanad', 'سند', false);
         var hasTayeediyeShura = getCheckBox('hasTayeediyeShura', 'تاییدیه شورا', false);
         var hasQabz = getCheckBox('hasQabz', 'قبض', false);
-        var registered = getCheckBox('registered', 'ثبت شده', true);
+        var hasShop = getCheckBox('hasShop', 'ثبت شده', true);
 
         var userSelectedGid;
 
@@ -230,7 +230,7 @@ Ext.define('MyDesktop.Landlord.Search', {
                 stripeRows: true
             },
             bbar: [pagingToolbar, '->', reportBtn, deleteShopBtn],
-            tbar: [registered,  '->', '', '', '', '', hasEsteshhad, '', '', '', '', hasMap, '', '', '', '', hasEstelam, '', '', '', '', hasMadarek, '', '', '', '', hasSanad, '', '', '', '', hasTayeediyeShura, '', '', '', '', hasQabz]
+            tbar: [hasShop,  '->', '', '', '', '', hasEsteshhad, '', '', '', '', hasMap, '', '', '', '', hasEstelam, '', '', '', '', hasMadarek, '', '', '', '', hasSanad, '', '', '', '', hasTayeediyeShura, '', '', '', '', hasQabz]
         });
 
         gridPanel.getSelectionModel().on('selectionchange', function (sm, selectedRecord) {
