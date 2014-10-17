@@ -112,7 +112,35 @@ Ext.define('MyDesktop.Landlord.Search', {
             text: 'ذخیره اکسل',
             iconCls: 'excel-16x16',
             handler: function () {
-                window.open('index.php?r=land/report', '_blank');
+                filterArray = '[';
+                for(var i=0; i<filterBar.filterArray.length; i++){
+                    filterArray += '{';
+                    filterArray += '"property": "' + filterBar.filterArray[i].property + '",';
+                    filterArray += '"value": "' + filterBar.filterArray[i].value + '",';
+                    filterArray += '"type": "' + filterBar.filterArray[i].type + '",';
+                    filterArray += '"operator": "' + filterBar.filterArray[i].operator + '"';
+                    filterArray += '},';
+                }
+                filterArray = filterArray.slice(0, filterArray.length-1);
+                filterArray += ']';
+                Ext.Ajax.request({
+                    url: 'index.php?r=land/createExcel',
+                    params: {
+                        hasEsteshhad: hasEsteshhad.checked,
+                        hasMap: hasMap.checked,
+                        hasEstelam: hasEstelam.checked,
+                        hasMadarek: hasMadarek.checked,
+                        hasSanad: hasSanad.checked,
+                        hasTayeediyeShura: hasTayeediyeShura.checked,
+                        hasQabz: hasQabz.checked,
+                        hasShop: hasShop.checked,
+                        filter: filterArray
+                    },
+                    success: function(response){
+                        text = response;
+                        // process server response here
+                    }
+                });
             }
         });
 
@@ -192,7 +220,7 @@ Ext.define('MyDesktop.Landlord.Search', {
             displayMsg: 'نمایش رکورد {0} تا {1} از {2} رکورد',
             emptyMsg: "داده ای یافت نشد.",
         });
-        var filterBar = Ext.create('Ext.ux.grid.FilterBar', {renderHidden: false});
+        filterBar = Ext.create('Ext.ux.grid.FilterBar', {renderHidden: false});
         var gridPanel = Ext.create('Ext.grid.Panel', {
             store: landLordStore,
             rtl: true,
