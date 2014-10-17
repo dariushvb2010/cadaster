@@ -316,7 +316,7 @@ Ext.define('MyDesktop.Landlord.AddSegment', {
         );
         var AX_point = new OpenLayers.Layer.WMS(
             "کیلومتر",
-            "http://http://csicc2014.sbu.ac.ir/:8080/geoserver/cadaster/wms?service=WMS",
+            "http://csicc2014.sbu.ac.ir/:8080/geoserver/cadaster/wms?service=WMS",
             {layers: 'AX-point', transparent: true},{
                 isBaseLayer: false,
                 format:"image/png",
@@ -326,7 +326,7 @@ Ext.define('MyDesktop.Landlord.AddSegment', {
 
         var AX_line = new OpenLayers.Layer.WMS(
             "خط",
-            "http://http://csicc2014.sbu.ac.ir/:8080/geoserver/cadaster/wms?service=WMS",
+            "http://csicc2014.sbu.ac.ir/:8080/geoserver/cadaster/wms?service=WMS",
             {layers: 'AX-line', transparent: true},{
                 isBaseLayer: false,
                 format:"image/png",
