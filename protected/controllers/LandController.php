@@ -14,7 +14,7 @@ class LandController extends Controller {
     public function accessRules() {
         return array(
             array('allow', // allow all users to perform 'index' and 'view' actions
-                'actions' => array('index', 'view', 'master', 'features', 'intersection', 'test'),
+                'actions' => array('index', 'view', 'master', 'features', 'intersection', 'test', 'report'),
                 'users' => array('*'),
             ),
             array('allow', // allow authenticated user to perform 'create' and 'update' actions
@@ -89,6 +89,9 @@ class LandController extends Controller {
         //Yii::app()->end();
     }
 
+    public function actionReport(){
+        $this->render('report');
+    }
     public function actionIntersection() {
         $geoText = $_REQUEST['geoText'];
         $lands = Land::model()->byIntersectionWith($geoText)->findAll();

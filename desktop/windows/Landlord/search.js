@@ -48,8 +48,8 @@ Ext.define('MyDesktop.Landlord.Search', {
     id: 'search-win',
     init: function () {
         this.launcher = {
-            text: 'جستجو',
-            iconCls: 'analyze-16x16'
+            text: 'گزارشگیری',
+            iconCls: 'report-16x16'
         };
     },
     landLord: function (region, imagePanel) {
@@ -78,12 +78,13 @@ Ext.define('MyDesktop.Landlord.Search', {
         var hasSanad = getCheckBox('hasSanad', 'سند', false);
         var hasTayeediyeShura = getCheckBox('hasTayeediyeShura', 'تاییدیه شورا', false);
         var hasQabz = getCheckBox('hasQabz', 'قبض', false);
+        var registered = getCheckBox('registered', 'ثبت شده', true);
 
         var userSelectedGid;
-        a = userSelectedGid;
 
         var deleteShopBtn = Ext.create('Ext.Button', {
             text: 'حذف خرید',
+            iconCls: 'delete-shop-Btn',
             handler: function () {
                 if (userSelectedGid == undefined) {
                     Ext.Msg.alert('Failed', 'لطفا یک قطعه زمین را انتخاب کنید');
@@ -104,6 +105,14 @@ Ext.define('MyDesktop.Landlord.Search', {
 
                     }
                 });
+            }
+        });
+        
+        var reportBtn = Ext.create('Ext.Button', {
+            text: 'ذخیره اکسل',
+            iconCls: 'excel-16x16',
+            handler: function () {
+                window.open('index.php?r=land/report', '_blank');
             }
         });
 
@@ -129,7 +138,7 @@ Ext.define('MyDesktop.Landlord.Search', {
                 {name: 'committeeDate', type: 'string'}
             ]
         });
-        landLordStore = Ext.create('Ext.data.Store', {
+        var landLordStore = Ext.create('Ext.data.Store', {
             model: 'LandLordModel',
             pageSize: 15,
             proxy: {
@@ -220,8 +229,8 @@ Ext.define('MyDesktop.Landlord.Search', {
             viewConfig: {
                 stripeRows: true
             },
-            bbar: [pagingToolbar, '->', deleteShopBtn],
-            tbar: ['->', hasEsteshhad, '', '', '', '', '', '', '', hasMap, '', '', '', '', '', '', '', hasEstelam, '', '', '', '', '', '', '', hasMadarek, '', '', '', '', '', '', '', hasSanad, '', '', '', '', '', '', '', hasTayeediyeShura, '', '', '', '', '', '', '', hasQabz]
+            bbar: [pagingToolbar, '->', reportBtn, deleteShopBtn],
+            tbar: [registered,  '->', '', '', '', '', hasEsteshhad, '', '', '', '', hasMap, '', '', '', '', hasEstelam, '', '', '', '', hasMadarek, '', '', '', '', hasSanad, '', '', '', '', hasTayeediyeShura, '', '', '', '', hasQabz]
         });
 
         gridPanel.getSelectionModel().on('selectionchange', function (sm, selectedRecord) {
@@ -237,8 +246,6 @@ Ext.define('MyDesktop.Landlord.Search', {
         this.getPanel = function () {
             return gridPanel;
         };
-    },
-    land: function (region, allData) {
     },
     images: function (region) {
         var gid = {gid: ''};
@@ -482,7 +489,7 @@ Ext.define('MyDesktop.Landlord.Search', {
                 width: 1300,
                 rtl: true,
                 height: 400,
-                iconCls: 'analyze-16x16',
+                iconCls: 'report-16x16',
                 collapsible: true,
                 constrainHeader: false,
                 align: 'right',

@@ -381,3 +381,11 @@
 .excel-48x48 {
     background-image: url('images/Excel-48x48.png') !important;
 }
+
+.report-48x48 {
+    background-image: url('images/report-48x48.png') !important;
+}
+
+.report-16x16 {
+    background-image: url('images/report-16x16.png') !important;
+}
