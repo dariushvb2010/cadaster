@@ -72,7 +72,7 @@ Ext.define('MyDesktop.App', {
                     { name:  "ثبت خرید", iconCls: 'grid-shortcut',  module: 'shop-win'},
                     { name:  "افزدون قطعه", iconCls: 'addUser-48x48',  module: 'addSegment-win'},// module: 'addSegment-win'},
                     { name:  "افزدون قطعات از اکسل", iconCls: 'excel-48x48',  module: 'import-win'},
-                    { name:  "جستجو", iconCls: 'analyze-48x48',  module: 'search-win'},
+                    { name:  "گزارشگیری", iconCls: 'report-48x48',  module: 'search-win'},
                     //{ name: 'ثبت خرید', iconCls: 'grid-shortcut', module: 'landlord-win' },               
                     //{ name: 'ویرایش مشخصات', iconCls: 'editProfile-48x48', module: 'editProfile-win' },
                     { name: 'مدیریت کاربران', iconCls: 'userManagement-48x48', module: 'userManagement-win' },
