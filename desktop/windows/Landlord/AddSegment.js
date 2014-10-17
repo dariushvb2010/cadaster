@@ -324,7 +324,6 @@ Ext.define('MyDesktop.Landlord.AddSegment', {
             }
         );
 
-        console.log("in the name of Allah");
         var AX_line = new OpenLayers.Layer.WMS(
             "خط",
             "http://csicc2014.sbu.ac.ir:8080/geoserver/cadaster/wms?service=WMS",

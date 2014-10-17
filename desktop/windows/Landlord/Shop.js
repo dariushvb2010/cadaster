@@ -283,19 +283,19 @@ Ext.define('MyDesktop.Landlord.Shop', {
             );
             mf = new OpenLayers.Control.SelectFeature(layer);
             
-             var AX_point = new OpenLayers.Layer.WMS(
+            var AX_point = new OpenLayers.Layer.WMS(
                 "کیلومتر",
-                "http://localhost:8080/geoserver/cadaster/wms?service=WMS",
+                "http://csicc2014.sbu.ac.ir:8080/geoserver/cadaster/wms?service=WMS",
                 {layers: 'AX-point', transparent: true},{
                     isBaseLayer: false,
                     format:"image/png",
                     opacity: 1.0
                 }
             );
-            
+
             var AX_line = new OpenLayers.Layer.WMS(
                 "خط",
-                "http://localhost:8080/geoserver/cadaster/wms?service=WMS",
+                "http://csicc2014.sbu.ac.ir:8080/geoserver/cadaster/wms?service=WMS",
                 {layers: 'AX-line', transparent: true},{
                     isBaseLayer: false,
                     format:"image/png",
