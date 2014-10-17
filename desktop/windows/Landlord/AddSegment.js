@@ -307,7 +307,7 @@ Ext.define('MyDesktop.Landlord.AddSegment', {
         
         var ostan = new OpenLayers.Layer.WMS(
             "استان",
-            "http://localhost:8080/geoserver/iran/wms?service=WMS",
+            "http://csicc2014.sbu.ac.ir:8080/geoserver/iran/wms?service=WMS",
             {layers: 'ostan', transparent: true},{
                 isBaseLayer: false,
                 format:"image/png",
