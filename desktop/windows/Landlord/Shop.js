@@ -46,7 +46,7 @@ Ext.define('MyDesktop.Landlord.Shop', {
 
     init : function(){
         this.launcher = {
-            text: 'ثبت خرید تستی',
+            text: 'ثبت خرید',
             iconCls:'icon-grid'
         };
     },
@@ -198,6 +198,8 @@ Ext.define('MyDesktop.Landlord.Shop', {
         
         var sentParam = {userId: 1, gid: 1};
         var map = new OpenLayers.Map('Our map',{numZoomLevels:21});
+        var layerSwitcher = new OpenLayers.Control.LayerSwitcher();
+        map.addControl(layerSwitcher);
         var gid, userId;
         var layer = new OpenLayers.Layer.Vector("لایه استان", {
             projection: new OpenLayers.Projection("EPSG:4326"),
@@ -206,7 +208,8 @@ Ext.define('MyDesktop.Landlord.Shop', {
                 readWithPOST: true,
                 url: "index.php?r=land/features",
                 format: new OpenLayers.Format.GeoJSON({})
-            })
+            }),
+            displayInLayerSwitcher: false
         });
         layer.events.register('featureselected', this, featureselected);
         
@@ -218,7 +221,8 @@ Ext.define('MyDesktop.Landlord.Shop', {
                 readWithPOST: true,
                 url: "index.php?r=land/features",
                 format: new OpenLayers.Format.GeoJSON({})
-            })
+            }), 
+            displayInLayerSwitcher: false
         });
         map.addLayers([segmentsLayer, layer]);
         //segmentsLayer.styleMap = styleMap;
@@ -265,10 +269,41 @@ Ext.define('MyDesktop.Landlord.Shop', {
                 {layers: "bluemarble"}
             );
             
-            map.addLayers([globalImagery]);
+            var wms3 = new OpenLayers.Layer.WMS(
+                'WMS Layer Title',
+                'http://vmap0.tiles.osgeo.org/wms/vmap0',
+                {layers: 'clabel,ctylabel,statelabel'}
+            );
+
+            var wms4 = new OpenLayers.Layer.WMS(
+                "OpenLayers WMS",
+                "http://demo.cubewerx.com/demo/cubeserv/cubeserv.cgi?",
+                {layers: 'Foundation.GTOPO30', version: '1.3.0'},
+                {singleTile: true, yx: []}
+            );
             mf = new OpenLayers.Control.SelectFeature(layer);
-            //map.addControls([mf]);
-            //mf.activate();
+            
+             var AX_point = new OpenLayers.Layer.WMS(
+                "کیلومتر",
+                "http://localhost:8080/geoserver/cadaster/wms?service=WMS",
+                {layers: 'AX-point', transparent: true},{
+                    isBaseLayer: false,
+                    format:"image/png",
+                    opacity: 1.0
+                }
+            );
+            
+            var AX_line = new OpenLayers.Layer.WMS(
+                "خط",
+                "http://localhost:8080/geoserver/cadaster/wms?service=WMS",
+                {layers: 'AX-line', transparent: true},{
+                    isBaseLayer: false,
+                    format:"image/png",
+                    opacity: 1.0
+                }
+            );
+    
+            map.addLayers([globalImagery, open_streetMap_wms, wms3, wms4, AX_point, AX_line]);
             
             var panel = Ext.create('GeoExt.panel.Map', {
                 title: 'نقشه',
@@ -347,6 +382,7 @@ Ext.define('MyDesktop.Landlord.Shop', {
             var gridPanel = Ext.create('Ext.grid.Panel', {
                 store: landLordStore,
                 rtl: true,
+                multiSelect: true,
                 plugins: [filterBar, rowEditing],
                 border: false,
                 cls: 'landLordGrid',
@@ -371,8 +407,14 @@ Ext.define('MyDesktop.Landlord.Shop', {
                     text: 'پرینت',
                     iconCls: 'print-icon-16x16',
                     handler : function() {
-                        window.params = {userId:userId};
-                        window.open('index.php?r=print/print', '_blank');
+                        var selected = gridPanel.getSelectionModel().getSelection();
+                        for(var i=0;i<selected.length;i++){
+                            //console.log("selctedId: " + selected[i].raw.id);
+                            window.params = {userId:selected[i].raw.id};
+                            window.open('index.php?r=print/print');
+                            //window.open("http://www.java2s.com/");
+                            //window.open("http://www.google.com/");
+                        }
                     }
                 }]
             });
@@ -385,7 +427,6 @@ Ext.define('MyDesktop.Landlord.Shop', {
                     mf.activate();
                     console.log("Help me ya Allahs");
                     lp.refresh();
-                    //land.setUserId(userId);
                 }
             });
 

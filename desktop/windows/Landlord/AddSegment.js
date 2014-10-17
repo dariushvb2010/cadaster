@@ -253,7 +253,7 @@ Ext.define('MyDesktop.Landlord.AddSegment', {
             var layerStyle = new OpenLayers.Style();
             var layerRule = new OpenLayers.Rule({
                 symbolizer: {
-                    fillColor: '#7AFF00', fillOpacity:.3,
+                    fillColor: '#A691EF', fillOpacity:.3,
                     pointRadius:5, strokeColor: '#00FFFF',
                     strokeWidth:2
                 }
@@ -266,7 +266,7 @@ Ext.define('MyDesktop.Landlord.AddSegment', {
             var allSegmentsStyle = new OpenLayers.Style();
             var allSegmentsRule = new OpenLayers.Rule({
                 symbolizer: {
-                    fillColor: '#00FF1F', fillOpacity:.3,
+                    fillColor: '#A691EF', fillOpacity:.3,
                     pointRadius:5, strokeColor: '#0000FF',
                     strokeWidth:2
                 }
@@ -314,7 +314,27 @@ Ext.define('MyDesktop.Landlord.AddSegment', {
                 opacity: 1.0
             }
         );
-        map.addLayer(ostan);
+        var AX_point = new OpenLayers.Layer.WMS(
+            "کیلومتر",
+            "http://http://csicc2014.sbu.ac.ir/:8080/geoserver/cadaster/wms?service=WMS",
+            {layers: 'AX-point', transparent: true},{
+                isBaseLayer: false,
+                format:"image/png",
+                opacity: 1.0
+            }
+        );
+
+        var AX_line = new OpenLayers.Layer.WMS(
+            "خط",
+            "http://http://csicc2014.sbu.ac.ir/:8080/geoserver/cadaster/wms?service=WMS",
+            {layers: 'AX-line', transparent: true},{
+                isBaseLayer: false,
+                format:"image/png",
+                opacity: 1.0
+            }
+        );
+
+        map.addLayers([ostan, AX_line, AX_point]);
         var layer = new OpenLayers.Layer.Vector("همه قطعات زمین", {
             projection: new OpenLayers.Projection("EPSG:4326"),
             strategies: [new OpenLayers.Strategy.Fixed()],

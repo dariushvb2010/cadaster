@@ -430,9 +430,9 @@ Ext.application({
             userId:window.opener.params.userId,
             simplified:1
         };
-        console.log('userId: ' + window.opener.params.userId);
-        var rootThis = this;
         
+        var rootThis = this;
+        window.open('google.com', '_blank');
         var request = new OpenLayers.Request.POST({
             url: "index.php?r=land/features",
             params: postData,
