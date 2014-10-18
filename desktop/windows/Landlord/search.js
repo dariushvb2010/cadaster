@@ -112,7 +112,8 @@ Ext.define('MyDesktop.Landlord.Search', {
             text: 'ذخیره اکسل',
             iconCls: 'excel-16x16',
             handler: function () {
-                filterArray = '[';
+                if(filterBar.filterArray.length){}
+                var filterArray = '[';
                 for(var i=0; i<filterBar.filterArray.length; i++){
                     filterArray += '{';
                     filterArray += '"property": "' + filterBar.filterArray[i].property + '",';
@@ -220,7 +221,7 @@ Ext.define('MyDesktop.Landlord.Search', {
             displayMsg: 'نمایش رکورد {0} تا {1} از {2} رکورد',
             emptyMsg: "داده ای یافت نشد.",
         });
-        filterBar = Ext.create('Ext.ux.grid.FilterBar', {renderHidden: false});
+        var filterBar = Ext.create('Ext.ux.grid.FilterBar', {renderHidden: false});
         var gridPanel = Ext.create('Ext.grid.Panel', {
             store: landLordStore,
             rtl: true,
