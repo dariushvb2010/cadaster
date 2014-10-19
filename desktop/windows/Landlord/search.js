@@ -476,6 +476,7 @@ Ext.define('MyDesktop.Landlord.Search', {
             rtl: false,
             collapsible: true,
             region: region,
+            resizable: true,
             //height: 550,
             width: 400,
             zoom: 5,

@@ -17,8 +17,11 @@
     <link rel="stylesheet" type="text/css" href="<?php echo Yii::app()->request->baseUrl; ?>/css/resources/css/uxs.css" />
 
     <script type="text/javascript" src="<?php echo Yii::app()->params['lib.ext'] ?>"></script>
-	<script type="text/javascript" src="<?php echo Yii::app()->params['lib.openlayers'] ?>"></script>
-	<script type="text/javascript" src="<?php echo Yii::app()->params['lib.ext.loader'] ?>"></script>
+    <script type="text/javascript" src="<?php echo Yii::app()->params['lib.openlayers'] ?>"></script>
+    <script type="text/javascript" src="<?php echo Yii::app()->params['lib.ext.loader'] ?>"></script>
+    
+    
+    <script src="http://maps.google.com/maps/api/js?v=3&amp;sensor=false&amp;language=fa"></script>
     
     <!------------------- Mirroring Extjs ---------------------->
     <!--
