@@ -189,6 +189,46 @@ Ext.define('MyDesktop.Landlord.Shop', {
         };
     },
     chooseLand: function(rootThis){
+        var setMap = function(){
+            var mousePositionCtrl = new OpenLayers.Control.MousePosition();
+            map.addControl(mousePositionCtrl);
+
+            var layerSwitcher = new OpenLayers.Control.LayerSwitcher();
+            map.addControl(layerSwitcher);
+            
+            var open_streetMap_wms = new OpenLayers.Layer.WMS(
+                "OpenStreetMap WMS",
+                "http://ows.terrestris.de/osm/service?",
+                {layers: 'OSM-WMS'}
+            );
+            
+            var gmap = new OpenLayers.Layer.Google("Google Streets",{numZoomLevels: 20});
+            var ghyb = new OpenLayers.Layer.Google("Google Hybrid",{type: google.maps.MapTypeId.HYBRID, numZoomLevels: 20, isBaseLayer: true});
+            var gsat = new OpenLayers.Layer.Google("Google Satellite",{type: google.maps.MapTypeId.SATELLITE, numZoomLevels: 22});
+            var gphy = new OpenLayers.Layer.Google("Google Physical",{type: google.maps.MapTypeId.TERRAIN});
+            
+            var AX_point = new OpenLayers.Layer.WMS(
+                "کیلومتر",
+                "http://csicc2014.sbu.ac.ir:8080/geoserver/cadaster/wms?service=WMS",
+                {layers: 'AX-point', transparent: true},{
+                    isBaseLayer: false,
+                    format:"image/png",
+                    opacity: 1.0
+                }
+            );
+
+            var AX_line = new OpenLayers.Layer.WMS(
+                "خط",
+                "http://csicc2014.sbu.ac.ir:8080/geoserver/cadaster/wms?service=WMS",
+                {layers: 'AX-line', transparent: true},{
+                    isBaseLayer: false,
+                    format:"image/png",
+                    opacity: 1.0
+                }
+            );
+
+            map.addLayers([ghyb, gsat, gphy, gmap, open_streetMap_wms, AX_line, AX_point]);
+        };
         var featureselected = function(e){
             userId = e.feature.data.userId;
             gid = e.feature.data.gid;
@@ -197,7 +237,14 @@ Ext.define('MyDesktop.Landlord.Shop', {
         };
         
         var sentParam = {userId: 1, gid: 1};
-        var map = new OpenLayers.Map('Our map',{numZoomLevels:21});
+        var Geographic = new OpenLayers.Projection("EPSG:4326");
+        var Mercator = new OpenLayers.Projection("EPSG:900913");
+        var map = new OpenLayers.Map('Our map', {
+            numZoomLevels:21,
+            projection: Mercator,
+            displayProjection: Geographic
+        });
+        setMap();
         var layerSwitcher = new OpenLayers.Control.LayerSwitcher();
         map.addControl(layerSwitcher);
         var gid, userId;
@@ -258,63 +305,24 @@ Ext.define('MyDesktop.Landlord.Shop', {
         styleMapInit();
         var mapPanel = function (region){
             
-            var open_streetMap_wms = new OpenLayers.Layer.WMS(
-                "OpenStreetMap WMS",
-                "http://ows.terrestris.de/osm/service?",
-                {layers: 'OSM-WMS'}
-            );
-            var globalImagery = new OpenLayers.Layer.WMS(
-                "Global Imagery",
-                "http://maps.opengeo.org/geowebcache/service/wms",
-                {layers: "bluemarble"}
-            );
             
-            var wms3 = new OpenLayers.Layer.WMS(
-                'WMS Layer Title',
-                'http://vmap0.tiles.osgeo.org/wms/vmap0',
-                {layers: 'clabel,ctylabel,statelabel'}
-            );
-
-            var wms4 = new OpenLayers.Layer.WMS(
-                "OpenLayers WMS",
-                "http://demo.cubewerx.com/demo/cubeserv/cubeserv.cgi?",
-                {layers: 'Foundation.GTOPO30', version: '1.3.0'},
-                {singleTile: true, yx: []}
-            );
             mf = new OpenLayers.Control.SelectFeature(layer);
             
-            var AX_point = new OpenLayers.Layer.WMS(
-                "کیلومتر",
-                "http://csicc2014.sbu.ac.ir:8080/geoserver/cadaster/wms?service=WMS",
-                {layers: 'AX-point', transparent: true},{
-                    isBaseLayer: false,
-                    format:"image/png",
-                    opacity: 1.0
-                }
-            );
-
-            var AX_line = new OpenLayers.Layer.WMS(
-                "خط",
-                "http://csicc2014.sbu.ac.ir:8080/geoserver/cadaster/wms?service=WMS",
-                {layers: 'AX-line', transparent: true},{
-                    isBaseLayer: false,
-                    format:"image/png",
-                    opacity: 1.0
-                }
-            );
+            
     
-            map.addLayers([globalImagery, open_streetMap_wms, wms3, wms4, AX_point, AX_line]);
+            //map.addLayers([globalImagery, open_streetMap_wms, wms3, wms4, AX_point, AX_line]);
             
             var panel = Ext.create('GeoExt.panel.Map', {
                 title: 'نقشه',
                 map: map,
                 rtl: false,
+                resizable: true,
                 collapsible: true,
                 region: region,
                 //height: 550,
                 width: 400,
                 zoom: 5,
-                center: [55,32.2]
+                center: [6122571.992777778,3489123.8364954195],
             });
 
             this.setVisible = function(flag){

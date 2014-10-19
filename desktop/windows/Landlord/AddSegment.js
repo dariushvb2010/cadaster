@@ -78,7 +78,7 @@ Ext.define('MyDesktop.Landlord.AddSegment', {
         });
         
         var plantType = Ext.create('Ext.form.ComboBox', {
-            fieldLabel: 'نوع آبیاری',
+            fieldLabel: 'نوع کشت',
             store: plantTypeStore,
             name: 'plantType',
             queryMode: 'local',
@@ -185,7 +185,46 @@ Ext.define('MyDesktop.Landlord.AddSegment', {
     },
     
     mapPanel: function(win){
-        
+        var setMap = function(){
+            var mousePositionCtrl = new OpenLayers.Control.MousePosition();
+            map.addControl(mousePositionCtrl);
+
+            var layerSwitcher = new OpenLayers.Control.LayerSwitcher();
+            map.addControl(layerSwitcher);
+            
+            var open_streetMap_wms = new OpenLayers.Layer.WMS(
+                "OpenStreetMap WMS",
+                "http://ows.terrestris.de/osm/service?",
+                {layers: 'OSM-WMS'}
+            );
+            
+            var gmap = new OpenLayers.Layer.Google("Google Streets",{numZoomLevels: 20});
+            var ghyb = new OpenLayers.Layer.Google("Google Hybrid",{type: google.maps.MapTypeId.HYBRID, numZoomLevels: 20, isBaseLayer: true});
+            var gsat = new OpenLayers.Layer.Google("Google Satellite",{type: google.maps.MapTypeId.SATELLITE, numZoomLevels: 22});
+            var gphy = new OpenLayers.Layer.Google("Google Physical",{type: google.maps.MapTypeId.TERRAIN});
+            
+            var AX_point = new OpenLayers.Layer.WMS(
+                "کیلومتر",
+                "http://csicc2014.sbu.ac.ir:8080/geoserver/cadaster/wms?service=WMS",
+                {layers: 'AX-point', transparent: true},{
+                    isBaseLayer: false,
+                    format:"image/png",
+                    opacity: 1.0
+                }
+            );
+
+            var AX_line = new OpenLayers.Layer.WMS(
+                "خط",
+                "http://csicc2014.sbu.ac.ir:8080/geoserver/cadaster/wms?service=WMS",
+                {layers: 'AX-line', transparent: true},{
+                    isBaseLayer: false,
+                    format:"image/png",
+                    opacity: 1.0
+                }
+            );
+
+            map.addLayers([ghyb, gsat, gphy, gmap, open_streetMap_wms, AX_line, AX_point]);
+        };
         var beforefeatureadded = function(e, ee, eee){
             drawLayer.removeAllFeatures();
             intersectionLayer.removeAllFeatures();
@@ -217,7 +256,8 @@ Ext.define('MyDesktop.Landlord.AddSegment', {
                             var geoPoints = [];
                             var j = 0;
                             while(j<points.length){
-                                geoPoints.push(new OpenLayers.Geometry.Point(points[j][0], points[j][1]));
+                                var newPoint = new OpenLayers.Geometry.Point(points[j][0], points[j][1]);
+                                geoPoints.push(newPoint.transform(Geographic, Mercator));
                                 j++;
                             }
                             i++;
@@ -293,48 +333,17 @@ Ext.define('MyDesktop.Landlord.AddSegment', {
         var geoText = '';
         var st = new stylePanel();
         var userId = {userId: 0};
-        var map = new OpenLayers.Map('Our map', {numZoomLevels:21});
-        var mousePositionCtrl = new OpenLayers.Control.MousePosition();
-        map.addControl(mousePositionCtrl);
         
-        var layerSwitcher = new OpenLayers.Control.LayerSwitcher();
-        map.addControl(layerSwitcher);
-        var open_streetMap_wms = new OpenLayers.Layer.WMS(
-            "OpenStreetMap WMS",
-            "http://ows.terrestris.de/osm/service?",
-            {layers: 'OSM-WMS'}
-        );
+        var Geographic = new OpenLayers.Projection("EPSG:4326");
+        var Mercator = new OpenLayers.Projection("EPSG:900913");
+        var map = new OpenLayers.Map('Our map', {
+            numZoomLevels:21,
+            projection: Mercator,
+            displayProjection: Geographic
+        });
         
-        var ostan = new OpenLayers.Layer.WMS(
-            "استان",
-            "http://csicc2014.sbu.ac.ir:8080/geoserver/iran/wms?service=WMS",
-            {layers: 'ostan', transparent: true},{
-                isBaseLayer: false,
-                format:"image/png",
-                opacity: 1.0
-            }
-        );
-        var AX_point = new OpenLayers.Layer.WMS(
-            "کیلومتر",
-            "http://csicc2014.sbu.ac.ir:8080/geoserver/cadaster/wms?service=WMS",
-            {layers: 'AX-point', transparent: true},{
-                isBaseLayer: false,
-                format:"image/png",
-                opacity: 1.0
-            }
-        );
-
-        var AX_line = new OpenLayers.Layer.WMS(
-            "خط",
-            "http://csicc2014.sbu.ac.ir:8080/geoserver/cadaster/wms?service=WMS",
-            {layers: 'AX-line', transparent: true},{
-                isBaseLayer: false,
-                format:"image/png",
-                opacity: 1.0
-            }
-        );
-
-        map.addLayers([ostan, AX_line, AX_point]);
+        setMap();
+        
         var layer = new OpenLayers.Layer.Vector("همه قطعات زمین", {
             projection: new OpenLayers.Projection("EPSG:4326"),
             strategies: [new OpenLayers.Strategy.Fixed()],
@@ -363,12 +372,12 @@ Ext.define('MyDesktop.Landlord.AddSegment', {
         });
         segmentLayer.events.register('loadend', this, loadEnd);
         
-        var intersectionLayer = new OpenLayers.Layer.Vector("لایه ی تداخل", {displayInLayerSwitcher: false});
+        var intersectionLayer = new OpenLayers.Layer.Vector("لایه ی تداخل", {displayInLayerSwitcher: false, projection: Geographic});
         layer.styleMap = st.layerStyleMap();
         segmentLayer.styleMap = st.allSegmentsStyleMap();
         intersectionLayer.styleMap = st.getIntersectionStyleMap();
         
-        map.addLayers([open_streetMap_wms, layer, drawLayer, segmentLayer, intersectionLayer]);
+        map.addLayers([layer, drawLayer, segmentLayer, intersectionLayer]);
         var toolbarItems = [];
         
         var drawPolygon = Ext.create('GeoExt.Action', {
@@ -396,7 +405,7 @@ Ext.define('MyDesktop.Landlord.AddSegment', {
         });
         toolbarItems.push(Ext.create('Ext.button.Button', modifyAction));
         var addPolygon = Ext.create('Ext.Button', {
-            text: 'افزودن با استفاده از نقاط',
+            text: 'افزودن با استفاده از مختصات',
             handler: function() {
                 Ext.Msg.prompt('افزودن یک قطعه با استفاده از نقاط موجود',
                                'لطفا نقاط خود را مانند مثال درون کادر زیر وارد نمایید<br>"x1,y1 x2,y2 x3,y3, ..." :فرمت ورود اطلاعات', 
@@ -409,9 +418,8 @@ Ext.define('MyDesktop.Landlord.AddSegment', {
                                         var i = 0;
                                         while(i<points.length){
                                             var point = points[i].split(",");
-                                            geoPoints.push(
-                                                    new OpenLayers.Geometry.Point(parseFloat(point[0]), parseFloat(point[1]))
-                                            );
+                                            var newPoint = new OpenLayers.Geometry.Point(parseFloat(point[0]), parseFloat(point[1]));
+                                            geoPoints.push(newPoint.transform(Geographic, Mercator));
                                             i++;
                                         };
                                         
@@ -432,14 +440,50 @@ Ext.define('MyDesktop.Landlord.AddSegment', {
                 );
             }
         });
+        var addUTMPolygon = Ext.create('Ext.Button', {
+            text: 'UTM افزودن با استفاده از',
+            handler: function() {
+                Ext.Msg.prompt('افزودن یک قطعه با استفاده از نقاط موجود',
+                               'لطفا نقاط خود را مانند مثال درون کادر زیر وارد نمایید<br>"x1,y1 x2,y2 x3,y3, ..." :فرمت ورود اطلاعات', 
+                               function(btn, text){
+                                    if (btn === 'ok'){
+                                        drawLayer.removeAllFeatures();
+                                        intersectionLayer.removeAllFeatures();
+                                        var geoPoints = [];
+                                        var points = text.split(" ");
+                                        var i = 0;
+                                        while(i<points.length){
+                                            var point = points[i].split(",");
+                                            var newPoint = new OpenLayers.Geometry.Point(parseFloat(point[0]), parseFloat(point[1]));
+                                            geoPoints.push(newPoint);
+                                            i++;
+                                        };
+                                        
+                                        drawLayer.addFeatures([
+                                            new OpenLayers.Feature.Vector(
+                                                new OpenLayers.Geometry.Polygon(
+                                                    new OpenLayers.Geometry.LinearRing(geoPoints)
+                                                )
+                                            )
+                                        ]);
+                                        drawLayer.redraw();
+                                        map.zoomToExtent(drawLayer.getDataExtent());
+                                    }
+                                }, 
+                                this,
+                                80
+                                //'55.803161797162,28.227430945601 55.804197129842,28.226508265699 55.804701385136,28.227414852346 55.803161797162,28.227430945601'
+                );
+            }
+        });
         toolbarItems.push(addPolygon);
+        toolbarItems.push(addUTMPolygon);
         var intersectionTestBtn = Ext.create('Ext.Button', {
             text: 'آزمایش تداخل',
             handler: intersectionTestCallBack
         });
         toolbarItems.push(intersectionTestBtn);
         var mapPanel = Ext.create('GeoExt.panel.Map', {
-            //title: 'افزودن با استفاده از نقشه',
             map: map,
             rtl: false,
             //resizable: true,
@@ -447,7 +491,8 @@ Ext.define('MyDesktop.Landlord.AddSegment', {
             region: "center",
             width: 400,
             zoom: 5,
-            center: [55,32.2],
+            //center: [55,34],
+            center: [6122571.992777778,3489123.8364954195],
             dockedItems: [{
                 xtype: 'toolbar',
                 dock: 'top',
@@ -468,14 +513,16 @@ Ext.define('MyDesktop.Landlord.AddSegment', {
             if(drawLayer.features.length>0){
                 geoText = "MULTIPOLYGON(((";
                 var components = drawLayer.features[0].geometry.components[0].components;
-                for(var i=0; i<components.length; i++)
-                    geoText += components[i].x + ' ' + components[i].y + ',';
-
+                for(var i=0; i<components.length; i++){
+                    var a = components[i].clone();
+                    var b = a.transform(Mercator, Geographic);
+                    geoText += b.x + ' ' + b.y + ',';
+                }
                 geoText = geoText.slice(0, geoText.length-1);
                 geoText += ')))';
             }
             
-            
+            console.log("geoText: " + geoText);
             return geoText;
         };
         var getGeoText = this.getGeoText;
