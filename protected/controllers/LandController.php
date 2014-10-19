@@ -58,10 +58,17 @@ class LandController extends Controller {
         foreach ($filters as $filter) {
             $landScope = $landScope->byFilter($filter);
         }
+		if(isset($_REQUEST['hasShop']) && $_REQUEST['hasShop']!='false'){
+			$landScope = $landScope->hasShop();
+		}
         $count = $landScope->count();
         foreach ($filters as $filter) {
             $landScope = $landScope->byFilter($filter);
         }
+		if(isset($_REQUEST['hasShop']) && $_REQUEST['hasShop']!='false'){
+		
+			$landScope = $landScope->hasShop();
+		}
         $lands = $landScope->findAll($crit);
 
         $main = array(
@@ -79,6 +86,9 @@ class LandController extends Controller {
         foreach ($filters as $filter) {
             $landScope = $landScope->byFilter($filter);
         }
+		if(isset($_REQUEST['hasShop']) && $_REQUEST['hasShop']!='false'){
+			$landScope = $landScope->hasShop();
+		}
         $lands = $landScope->findAll();
 		$landArray = Land::buildArray($lands, true);
 		//var_dump($landArray);

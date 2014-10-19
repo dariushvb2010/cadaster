@@ -116,7 +116,10 @@ class Land extends CActiveRecord {
                 'select' => array('ST_AsGeoJson(ST_Transform(ST_Simplify(geom,' . self::DEFAULT_SIMPLIFY_VALUE . '),4326)) as geojson'
                     , 'ST_Area(geom) as area'
                     , 'ST_Perimeter(geom) as perimeter')
-            )
+            ),
+			'hasShop'=>array(
+				'condition'=>'t."shopId" is not null'
+			)
         );
     }
 
@@ -202,6 +205,10 @@ class Land extends CActiveRecord {
         return $this;
     }
 
+	public function byHasShop(){
+		
+	}
+	
     /**
      * @see Land#byCondition
      * @param type $param
