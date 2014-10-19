@@ -18,7 +18,7 @@ class LandController extends Controller {
                 'users' => array('*'),
             ),
             array('allow', // allow authenticated user to perform 'create' and 'update' actions
-                'actions' => array('create', 'update', 'search'),
+                'actions' => array('create', 'update', 'search','createExcel'),
                 'roles' => array('admin'),
             ),
             array('allow', // allow admin user to perform 'admin' and 'delete' actions
@@ -44,31 +44,15 @@ class LandController extends Controller {
 
     public function actionSearch() {
 
-        $paramName = 'hasEsteshhad';
-        $paramValue = "true";
-        $operator = 'eq';
-
         $page = $_REQUEST['page'];
         $start = $_REQUEST['start'];
         $limit = $_REQUEST['limit'];
 
-        $filters = array();
-        if (isset($_GET['filter']))
-            $filters = json_decode($_REQUEST['filter']);
         $crit = new CDbCriteria();
         $crit->limit = $limit;
         $crit->offset = $start;
-        //-----------has...--------------
-        foreach (LandShop::$paramsForHas as $hasParam) {
-            $hasValue = Yii::app()->request->getParam($hasParam);
-            if (!empty($hasValue) && $hasValue != 'false') {
-                $filter = new stdClass();
-                $filter->property = $hasParam;
-                $filter->operator = 'eq';
-                $filter->value = $hasValue;
-                $filters[] = $filter;
-            }
-        }
+        
+        $filters = $this->makeFilters();
         //echo json_encode($filters);die();
         $landScope = Land::model();
         foreach ($filters as $filter) {
@@ -88,7 +72,52 @@ class LandController extends Controller {
         //var_dump($lands);
         //Yii::app()->end();
     }
-
+	public function actionCreateExcel(){
+		$filters = $this->makeFilters();
+		
+        $landScope = Land::model();
+        foreach ($filters as $filter) {
+            $landScope = $landScope->byFilter($filter);
+        }
+        $lands = $landScope->findAll();
+		$landArray = Land::buildArray($lands, true);
+		//var_dump($landArray);
+		$firstTry = true;
+		$writer = new LandExcelWriter();
+		
+		foreach($landArray as $key=>$value){
+			
+			if($firstTry){
+				$writer->writeLine($key);
+				$firstTry = false;
+			}
+			
+			$writer->writeLine($value);
+		}
+		$writer->close();
+		header('Content-disposition: attachment; filename=excel.html');
+		header('Content-type: image/jpg');
+		readfile(Yii::app()->params['excel.writer.file']);
+	}
+	private function makeFilters(){
+		$filters = array();
+        if (isset($_REQUEST['filter']))
+            $filters = json_decode($_REQUEST['filter']);
+		
+		//-----------has...--------------
+		foreach (LandShop::$paramsForHas as $hasParam) {
+            $hasValue = Yii::app()->request->getParam($hasParam);
+            if (!empty($hasValue) && $hasValue != 'false') {
+                $filter = new stdClass();
+                $filter->property = $hasParam;
+                $filter->operator = 'eq';
+                $filter->value = $hasValue;
+                $filters[] = $filter;
+            }
+        }
+		
+		return $filters;
+	}
     public function actionReport(){
         $this->render('report');
     }
