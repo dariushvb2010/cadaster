@@ -454,7 +454,7 @@ class Land extends CActiveRecord {
     }
 
     public static function buildGeoArray($lands, $selectShopColumns = false) {
-		$features = self::buildFeatures($land, $selectShopColumns);
+		$features = self::buildFeatures($lands, $selectShopColumns);
         $main = array('type' => 'FeatureCollection');
         $all = array();
         foreach ($features as $f) {
