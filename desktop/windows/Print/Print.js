@@ -432,7 +432,6 @@ Ext.application({
         };
         
         var rootThis = this;
-        window.open('google.com', '_blank');
         var request = new OpenLayers.Request.POST({
             url: "index.php?r=land/features",
             params: postData,

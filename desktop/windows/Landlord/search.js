@@ -42,6 +42,8 @@ Ext.define('MyDesktop.Landlord.Search', {
         'Ext.state.*',
         'Ext.data.*',
         'Ext.util.*',
+        'Ext.util.*',
+        'Ext.util.*',
         'Ext.form.*'
 
     ],
@@ -52,7 +54,7 @@ Ext.define('MyDesktop.Landlord.Search', {
             iconCls: 'report-16x16'
         };
     },
-    landLord: function (region, imagePanel) {
+    landLord: function (region, imagePanel, layer) {
         getCheckBox = function (name, boxLabel, checked) {
             var that = Ext.create('Ext.form.field.Checkbox', {
                 name: name,
@@ -112,36 +114,32 @@ Ext.define('MyDesktop.Landlord.Search', {
             text: 'ذخیره اکسل',
             iconCls: 'excel-16x16',
             handler: function () {
-                if(filterBar.filterArray.length){}
-                var filterArray = '[';
-                for(var i=0; i<filterBar.filterArray.length; i++){
-                    filterArray += '{';
-                    filterArray += '"property": "' + filterBar.filterArray[i].property + '",';
-                    filterArray += '"value": "' + filterBar.filterArray[i].value + '",';
-                    filterArray += '"type": "' + filterBar.filterArray[i].type + '",';
-                    filterArray += '"operator": "' + filterBar.filterArray[i].operator + '"';
-                    filterArray += '},';
+                var filterArray;
+                if(filterBar.filterArray.length>0){
+                    filterArray = '[';
+                    for(var i=0; i<filterBar.filterArray.length; i++){
+                        filterArray += '{';
+                        filterArray += '"property": "' + filterBar.filterArray[i].property + '",';
+                        filterArray += '"value": "' + filterBar.filterArray[i].value + '",';
+                        filterArray += '"type": "' + filterBar.filterArray[i].type + '",';
+                        filterArray += '"operator": "' + filterBar.filterArray[i].operator + '"';
+                        filterArray += '},';
+                    };
+                    filterArray = filterArray.slice(0, filterArray.length-1);
+                    filterArray += ']';
                 }
-                filterArray = filterArray.slice(0, filterArray.length-1);
-                filterArray += ']';
-                Ext.Ajax.request({
-                    url: 'index.php?r=land/createExcel',
-                    params: {
-                        hasEsteshhad: hasEsteshhad.checked,
-                        hasMap: hasMap.checked,
-                        hasEstelam: hasEstelam.checked,
-                        hasMadarek: hasMadarek.checked,
-                        hasSanad: hasSanad.checked,
-                        hasTayeediyeShura: hasTayeediyeShura.checked,
-                        hasQabz: hasQabz.checked,
-                        hasShop: hasShop.checked,
-                        filter: filterArray
-                    },
-                    success: function(response){
-                        text = response;
-                        // process server response here
-                    }
-                });
+                var createParams = 'hasEsteshhad='+hasEsteshhad.checked + '&' +
+                                    'hasMap=' + hasMap.checked + '&' +
+                                    'hasEstelam=' + hasEstelam.checked + '&' +
+                                    'hasMadarek=' + hasMadarek.checked + '&' +
+                                    'hasSanad=' + hasSanad.checked + '&' +
+                                    'hasTayeediyeShura=' + hasTayeediyeShura.checked + '&' +
+                                    'hasQabz=' + hasQabz.checked + '&' +
+                                    'hasShop=' + hasShop.checked;
+                if(filterArray !== undefined){
+                    createParams += '&filter=' + filterArray;
+                }
+                window.open('index.php?r=land/createExcel&'+createParams, '_blank');
             }
         });
 
@@ -167,32 +165,14 @@ Ext.define('MyDesktop.Landlord.Search', {
                 {name: 'committeeDate', type: 'string'}
             ]
         });
-        var landLordStore = Ext.create('Ext.data.Store', {
-            model: 'LandLordModel',
-            pageSize: 15,
-            proxy: {
-                type: 'ajax',
-                url: 'index.php?r=land/search',
-                reader: {
-                    type: 'json',
-                    root: 'landDetail',
-                    totalProperty: 'totalCount'
-                },
-                extraParams: {
-                    hasEsteshhad: hasEsteshhad.checked,
-                    hasMap: hasMap.checked,
-                    hasEstelam: hasEstelam.checked,
-                    hasMadarek: hasMadarek.checked,
-                    hasSanad: hasSanad.checked,
-                    hasTayeediyeShura: hasTayeediyeShura.checked,
-                    hasQabz: hasQabz.checked
-                }
-            },
-            filterParam: 'query',
-            encodeFilters: function (filters) {
-                return filters[0].value;
-            },
-            remoteFilter: true,
+        
+        l = layer;
+        landLordStore = Ext.create('GeoExt.data.FeatureStore', {
+            layer: layer,
+            fields: [
+                {name: 'name', type: 'string'},
+                {name: 'family', type: 'string'}
+            ],
             autoLoad: true
         });
         var rowEditing = Ext.create('Ext.grid.plugin.RowEditing', {
@@ -215,17 +195,18 @@ Ext.define('MyDesktop.Landlord.Search', {
                 }
             }
         });
-        var pagingToolbar = Ext.create('Ext.PagingToolbar', {
+        /*var pagingToolbar = Ext.create('Ext.PagingToolbar', {
             store: landLordStore,
             displayInfo: true,
             displayMsg: 'نمایش رکورد {0} تا {1} از {2} رکورد',
             emptyMsg: "داده ای یافت نشد.",
-        });
+        });*/
         var filterBar = Ext.create('Ext.ux.grid.FilterBar', {renderHidden: false});
-        var gridPanel = Ext.create('Ext.grid.Panel', {
+        gridPanel = Ext.create('Ext.grid.Panel', {
             store: landLordStore,
             rtl: true,
-            plugins: [filterBar, rowEditing, {ptype: 'gridautoresizer'}],
+            selType: 'featuremodel',
+            plugins: [rowEditing, {ptype: 'gridautoresizer'}],
             border: false,
             cls: 'landLordGrid',
             split: true,
@@ -258,7 +239,8 @@ Ext.define('MyDesktop.Landlord.Search', {
             viewConfig: {
                 stripeRows: true
             },
-            bbar: [pagingToolbar, '->', reportBtn, deleteShopBtn],
+            //bbar: [pagingToolbar, '->', reportBtn, deleteShopBtn],
+            bbar: ['->', reportBtn, deleteShopBtn],
             tbar: [hasShop,  '->', '', '', '', '', hasEsteshhad, '', '', '', '', hasMap, '', '', '', '', hasEstelam, '', '', '', '', hasMadarek, '', '', '', '', hasSanad, '', '', '', '', hasTayeediyeShura, '', '', '', '', hasQabz]
         });
 
@@ -445,31 +427,86 @@ Ext.define('MyDesktop.Landlord.Search', {
             gid.gid = gid_;
         };
     },
-    map: function (region) {
-        map = new OpenLayers.Map('Our map', {numZoomLevels: 21});
+    map: function (region, layer) {
+        var setMap = function(){
+            var mousePositionCtrl = new OpenLayers.Control.MousePosition();
+            map.addControl(mousePositionCtrl);
 
-        var open_streetMap_wms = new OpenLayers.Layer.WMS(
+            var layerSwitcher = new OpenLayers.Control.LayerSwitcher();
+            map.addControl(layerSwitcher);
+            
+            var open_streetMap_wms = new OpenLayers.Layer.WMS(
                 "OpenStreetMap WMS",
                 "http://ows.terrestris.de/osm/service?",
                 {layers: 'OSM-WMS'}
-        );
-        var globalImagery = new OpenLayers.Layer.WMS(
-                "Global Imagery",
-                "http://maps.opengeo.org/geowebcache/service/wms",
-                {layers: "bluemarble"}
-        );
-        var layer = new OpenLayers.Layer.Vector("لایه استان", {
-            projection: new OpenLayers.Projection("EPSG:4326"),
-            strategies: [new OpenLayers.Strategy.Fixed()],
-            protocol: new OpenLayers.Protocol.HTTP({
-                readWithPOST: true,
-                url: "index.php?r=land/features",
-                format: new OpenLayers.Format.GeoJSON({})
-            })
+            );
+            
+            var gmap = new OpenLayers.Layer.Google("Google Streets",{numZoomLevels: 20});
+            var ghyb = new OpenLayers.Layer.Google("Google Hybrid",{type: google.maps.MapTypeId.HYBRID, numZoomLevels: 20, isBaseLayer: true});
+            var gsat = new OpenLayers.Layer.Google("Google Satellite",{type: google.maps.MapTypeId.SATELLITE, numZoomLevels: 22});
+            var gphy = new OpenLayers.Layer.Google("Google Physical",{type: google.maps.MapTypeId.TERRAIN});
+            
+            var AX_point = new OpenLayers.Layer.WMS(
+                "کیلومتر",
+                "http://csicc2014.sbu.ac.ir:8080/geoserver/cadaster/wms?service=WMS",
+                {layers: 'AX-point', transparent: true},{
+                    isBaseLayer: false,
+                    format:"image/png",
+                    opacity: 1.0
+                }
+            );
+
+            var AX_line = new OpenLayers.Layer.WMS(
+                "خط",
+                "http://csicc2014.sbu.ac.ir:8080/geoserver/cadaster/wms?service=WMS",
+                {layers: 'AX-line', transparent: true},{
+                    isBaseLayer: false,
+                    format:"image/png",
+                    opacity: 1.0
+                }
+            );
+            map.addLayers([ghyb, gsat, gphy, gmap, open_streetMap_wms, AX_line, AX_point]);
+        };
+        var styleMapInit = function(){
+            var segmentStyle = new OpenLayers.Style();
+            var segmentRule = new OpenLayers.Rule({
+                symbolizer: {
+                    fillColor: '#0000FF', fillOpacity:.1,
+                    strokeColor: 'black',
+                    strokeWidth:2   
+                }
+            });
+            segmentStyle.addRules([segmentRule]); 
+            var segmentStyleMap = new OpenLayers.StyleMap({
+                'default': segmentStyle
+            });
+            //segmentsLayer.styleMap = segmentStyleMap;
+            
+            var layerStyle = new OpenLayers.Style();
+            var layerRule = new OpenLayers.Rule({
+                symbolizer: {
+                    fillOpacity:.0, strokeColor: 'black', strokeWidth:1
+                }
+            });
+            layerStyle.addRules([layerRule]); 
+            var layerStyleMap = new OpenLayers.StyleMap({
+                'default': layerStyle
+            });
+            layer.styleMap = layerStyleMap;
+        };
+        
+        var Geographic = new OpenLayers.Projection("EPSG:4326");
+        var Mercator = new OpenLayers.Projection("EPSG:900913");
+        var map = new OpenLayers.Map('Our map', {
+            numZoomLevels:21,
+            projection: Mercator,
+            displayProjection: Geographic
         });
-
-        map.addLayers([globalImagery, layer]);
-
+        setMap();
+        
+        map.addLayers([layer]);
+        styleMapInit();
+        
         var panel = Ext.create('GeoExt.panel.Map', {
             title: 'نقشه',
             map: map,
@@ -480,7 +517,7 @@ Ext.define('MyDesktop.Landlord.Search', {
             //height: 550,
             width: 400,
             zoom: 5,
-            center: [55, 32.2]
+            center: [6122571.992777778,3489123.8364954195],
         });
 
         this.addLayer2Map = function (layer_) {
@@ -492,19 +529,32 @@ Ext.define('MyDesktop.Landlord.Search', {
         this.getPanel = function () {
             return panel;
         };
+        this.getLayer = function(){
+            return layer;
+        };
     },
     allData: function (rootThis) {
         /////////////////////////////////////////////////////////////////////////////////
-
+        
+        var layer = new OpenLayers.Layer.Vector("همه زمین ها", {
+            projection: new OpenLayers.Projection("EPSG:4326"),
+            strategies: [new OpenLayers.Strategy.Fixed()],
+            protocol: new OpenLayers.Protocol.HTTP({
+                readWithPOST: true,
+                url: "index.php?r=land/features",
+                params:{hasShop:true},
+                format: new OpenLayers.Format.GeoJSON({})
+            })
+        });
         //var land = new rootThis.land("south", this);
+        var mp = new rootThis.map("west", layer);
         var imagePanel = new rootThis.images('south');
-        var landLord = new rootThis.landLord("center", imagePanel);
-        var map = new rootThis.map("west");
+        var landLord = new rootThis.landLord("center", imagePanel, layer);
         //map.addLayer2Map(land.getLayer());
 
         this.panel = Ext.create('Ext.Panel', {
             layout: 'border',
-            items: [landLord.getPanel(), map.getPanel(), imagePanel.getPanel()]
+            items: [landLord.getPanel(), mp.getPanel(), imagePanel.getPanel()]
         });
     },
     createWindow: function () {

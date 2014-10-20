@@ -30,7 +30,6 @@ Ext.define('MyDesktop.Landlord.Shop', {
         'GeoExt.tree.View',
         'GeoExt.panel.Map',
         'GeoExt.Action',
-    
         'Ext.tree.plugin.TreeViewDragDrop',
         'Ext.layout.container.Border',
         'Ext.selection.CellModel',
@@ -74,7 +73,7 @@ Ext.define('MyDesktop.Landlord.Shop', {
                 });
         };
         var getDateField = function (fieldLabel, name){
-            return Ext.create('Ext.form.field.Date', {
+            return Ext.create('Ext.form.field.PDate', {
                 anchor: '100%',
                 fieldLabel: fieldLabel,
                 name: name, 
@@ -322,7 +321,7 @@ Ext.define('MyDesktop.Landlord.Shop', {
                 //height: 550,
                 width: 400,
                 zoom: 5,
-                center: [6122571.992777778,3489123.8364954195],
+                center: [6122571.992777778,3489123.8364954195]
             });
 
             this.setVisible = function(flag){
@@ -503,7 +502,7 @@ Ext.define('MyDesktop.Landlord.Shop', {
                     { text: 'ارازی هیئتی', dataIndex: 'HeaatiAcre', width:70, field: {xtype: 'textfield'}, sortable: false, menuDisabled: true, align: 'center' },
                     { text: 'منابع ملی شده', dataIndex: 'PublicSource', width: 90, field: {xtype: 'textfield'}, sortable: false, menuDisabled: true, align: 'center' },
                     { text: 'وضعیت زمین', dataIndex: 'docStatus', flex: 1, field: {xtype: 'textfield'}, sortable: false, menuDisabled: true, align: 'center' },                
-                            ],
+                ],
                 //plugins: [landRowEditing],
                 selType: 'featuremodel'
             });

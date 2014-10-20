@@ -18,7 +18,7 @@ class LandController extends Controller {
                 'users' => array('*'),
             ),
             array('allow', // allow authenticated user to perform 'create' and 'update' actions
-                'actions' => array('create', 'update', 'search','createExcel'),
+                'actions' => array('create', 'update', 'search', 'createExcel'),
                 'roles' => array('admin'),
             ),
             array('allow', // allow admin user to perform 'admin' and 'delete' actions
@@ -51,71 +51,74 @@ class LandController extends Controller {
         $crit = new CDbCriteria();
         $crit->limit = $limit;
         $crit->offset = $start;
-        
+
         $filters = $this->makeFilters();
         //echo json_encode($filters);die();
         $landScope = Land::model();
         foreach ($filters as $filter) {
             $landScope = $landScope->byFilter($filter);
         }
-		if(isset($_REQUEST['hasShop']) && $_REQUEST['hasShop']!='false'){
-			$landScope = $landScope->hasShop();
-		}
+        if (isset($_REQUEST['hasShop']) && $_REQUEST['hasShop'] != 'false') {
+            $landScope = $landScope->hasShop();
+        }
         $count = $landScope->count();
         foreach ($filters as $filter) {
             $landScope = $landScope->byFilter($filter);
         }
-		if(isset($_REQUEST['hasShop']) && $_REQUEST['hasShop']!='false'){
-		
-			$landScope = $landScope->hasShop();
-		}
+        if (isset($_REQUEST['hasShop']) && $_REQUEST['hasShop'] != 'false') {
+
+            $landScope = $landScope->hasShop();
+        }
         $lands = $landScope->findAll($crit);
 
         $main = array(
             'totalCount' => $count,
-            'landDetail' => Land::buildArray($lands, true)
+            'landDetail' => Land::buildGeoArray($lands, true)
         );
         echo json_encode($main);
         //var_dump($lands);
         //Yii::app()->end();
     }
-	public function actionCreateExcel(){
-		$filters = $this->makeFilters();
-		
+
+    public function actionCreateExcel() {
+        $filters = $this->makeFilters();
+
         $landScope = Land::model();
         foreach ($filters as $filter) {
             $landScope = $landScope->byFilter($filter);
         }
-		if(isset($_REQUEST['hasShop']) && $_REQUEST['hasShop']!='false'){
-			$landScope = $landScope->hasShop();
-		}
+        if (isset($_REQUEST['hasShop']) && $_REQUEST['hasShop'] != 'false') {
+            $landScope = $landScope->hasShop();
+        }
         $lands = $landScope->findAll();
-		$landArray = Land::buildArray($lands, true);
-		//var_dump($landArray);
-		$firstTry = true;
-		$writer = new LandExcelWriter();
-		
-		foreach($landArray as $key=>$value){
-			
-			if($firstTry){
-				$writer->writeLine($key);
-				$firstTry = false;
-			}
-			
-			$writer->writeLine($value);
-		}
-		$writer->close();
-		header('Content-disposition: attachment; filename=excel.html');
-		header('Content-type: image/jpg');
-		readfile(Yii::app()->params['excel.writer.file']);
-	}
-	private function makeFilters(){
-		$filters = array();
+        $landArray = Land::buildArray($lands, true);
+        //var_dump($landArray);
+        $firstTry = true;
+        $writer = new LandExcelWriter();
+
+        foreach ($landArray as $value) {
+            if ($firstTry) {
+                $writer->writeLine(Land::labels());
+                $firstTry = false;
+            }
+            $temp = array();
+            foreach (Land::labels() as $key=>$v){
+                $temp[] = $value[$key];
+            }
+            $writer->writeLine($temp);
+        }
+        $writer->close();
+        header('Content-disposition: attachment; filename=excel.xls');
+        readfile(Yii::app()->params['excel.writer.file']);
+    }
+
+    private function makeFilters() {
+        $filters = array();
         if (isset($_REQUEST['filter']))
             $filters = json_decode($_REQUEST['filter']);
-		
-		//-----------has...--------------
-		foreach (LandShop::$paramsForHas as $hasParam) {
+
+        //-----------has...--------------
+        foreach (LandShop::$paramsForHas as $hasParam) {
             $hasValue = Yii::app()->request->getParam($hasParam);
             if (!empty($hasValue) && $hasValue != 'false') {
                 $filter = new stdClass();
@@ -125,12 +128,14 @@ class LandController extends Controller {
                 $filters[] = $filter;
             }
         }
-		
-		return $filters;
-	}
-    public function actionReport(){
+
+        return $filters;
+    }
+
+    public function actionReport() {
         $this->render('report');
     }
+
     public function actionIntersection() {
         $geoText = $_REQUEST['geoText'];
         $lands = Land::model()->byIntersectionWith($geoText)->findAll();
@@ -182,12 +187,12 @@ class LandController extends Controller {
         $land = $this->loadLand($gid);
         $shop = $land->shop;
         $land->set($_REQUEST);
-        if($land->update()){
+        if ($land->update()) {
             echo 'land updated';
         }
         var_dump($_REQUEST);
         var_dump($land);
-        
+
         if (!empty($shop->id)) {
             $shop->set($_REQUEST);
             var_dump($shop);

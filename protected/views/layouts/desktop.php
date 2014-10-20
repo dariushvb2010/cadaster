@@ -15,7 +15,7 @@
     <link rel="stylesheet" type="text/css" href="<?php echo Yii::app()->request->baseUrl; ?>/css/resources/css/app.css" />
     <link rel="stylesheet" type="text/css" href="<?php echo Yii::app()->request->baseUrl; ?>/css/resources/css/overrides.css" />
     <link rel="stylesheet" type="text/css" href="<?php echo Yii::app()->request->baseUrl; ?>/css/resources/css/uxs.css" />
-
+   
     <script type="text/javascript" src="<?php echo Yii::app()->params['lib.ext'] ?>"></script>
     <script type="text/javascript" src="<?php echo Yii::app()->params['lib.openlayers'] ?>"></script>
     <script type="text/javascript" src="<?php echo Yii::app()->params['lib.ext.loader'] ?>"></script>
@@ -28,8 +28,11 @@
     <script type="text/javascript" src="<?php echo Yii::app()->request->baseUrl; ?>/extjs-mirror-master/ext-mirror.js"></script>
     <link rel="stylesheet" type="text/css" href="<?php echo Yii::app()->request->baseUrl; ?>/extjs-mirror-master/resources/css/ext-mirror.css" />
     -->
-    
     <script type="text/javascript">
+        /////////////////////////////////////////////////////////////////
+
+
+        /////////////////////////////////////////////////////////////////
         Ext.Loader.setPath({
             'Ext.ux.desktop': '<?php echo Yii::app()->request->baseUrl; ?>/desktop/js',
             MyDesktop: '<?php echo Yii::app()->request->baseUrl; ?>/desktop/windows'

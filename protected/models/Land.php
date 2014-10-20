@@ -205,9 +205,7 @@ class Land extends CActiveRecord {
         return $this;
     }
 
-	public function byHasShop(){
-		
-	}
+	
 	
     /**
      * @see Land#byCondition
@@ -215,8 +213,8 @@ class Land extends CActiveRecord {
      */
     private static function paramAlternative($param) {
         $paramMap = array(
-//            'area' => 'ST_Area(geom)',
-            'area'=>'shop.area',
+            'area' => 'ST_Area(geom)',
+//            'area'=>'shop.area',
             'x' => 'ST_XMin(ST_Transform(geom,' . self::SRID_4326 . '))',
             'y' => 'ST_YMin(ST_Transform(geom,' . self::SRID_4326 . '))',
             'villageCode' => 'villageCode',
@@ -254,16 +252,36 @@ class Land extends CActiveRecord {
     /**
      * @return array customized attribute labels (name=>label)
      */
-    public function attributeLabels() {
+    public static function labels() {
         return array(
-            'gid' => 'ID',
-            'waterType' => 'Water Type',
-            'plantType' => 'Plant Type',
-            'sheetNO' => 'Sheet No',
-            'villageCode'=>'',
-            'position'=>'',
-            'numAdjacent'=>'',
-            'usingType'=>'',
+            'gid' => 'شناسه',
+            'waterType' => 'نوع آبیاری',
+            'plantType' => 'نوع کشت',
+            //'villageCode'=>'',
+            //'userId'=>'',
+            'position'=>'موقعیت',
+            'numAdjacent'=>'تعداد مجاورت',
+            'usingType'=>'نوع کاربری',
+            'docStatus'=>'وضعیت سند',
+            'name'=>'نام',
+            'seetNo'=>'شماره شیت',
+            'area'=>'مساحت',
+            'perimeter'=>'محیط',
+            'family'=>'نام خانوادگی',
+            'finalPrice'=>'قیمت نهایی',
+            'pricePerMeter'=>'قیمت هر متر',
+            'mobayeNo'=>'شماره مبایعه نامه',
+            'mobayeDate'=>'تاریخ مبایعه نامه',
+            'committeeNo'=>'شماره کمیته',
+            'committeeDate'=>'تاریخ کمیته',
+            'hasEsteshhad'=>'استشهادنامه محلی',
+            'hasMap'=>'نقشه',
+            'hasEstelam'=>'استعلام',
+            'hasSanad'=>'سند',
+            'hasMadarek'=>'مدارک',
+            'hasTayeediyeShura'=>'تاییدیه شورا',
+            'hasQabz'=>'قبض',
+            'hasShop'=>'خرید ثبت شده'
         );
     }
     public function set($request){
@@ -297,7 +315,7 @@ class Land extends CActiveRecord {
             return array(
                 'geometry' => $this->geojson,
                 'properties' => array_merge(
-                        $this->attributes, array(/*'area' => $this->area,*/ 'perimeter' => $this->perimeter)
+                        $this->attributes, array('area' => $this->area, 'perimeter' => $this->perimeter)
                 )
             );
         }
