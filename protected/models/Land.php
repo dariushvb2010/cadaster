@@ -454,18 +454,16 @@ class Land extends CActiveRecord {
     }
 
     public static function buildGeoArray($lands, $selectShopColumns = false) {
+		$features = self::buildFeatures($land, $selectShopColumns);
         $main = array('type' => 'FeatureCollection');
         $all = array();
-        if (count($lands)) {
-            foreach ($lands as $land) {
-                $f = $land->toFeature($selectShopColumns);
-                $properties = $f['properties'];
-                $geom = $f['geometry'];
-                $fnew = array('type' => 'feature');
-                $fnew['properties'] = $properties;
-                $fnew['geometry'] = json_decode($geom);
-                $all[] = $fnew;
-            }
+        foreach ($features as $f) {
+            $properties = $f['properties'];
+            $geom = $f['geometry'];
+            $fnew = array('type' => 'feature');
+            $fnew['properties'] = $properties;
+            $fnew['geometry'] = json_decode($geom);
+            $all[] = $fnew;
         }
         $main['features'] = $all;
         return $main;
@@ -482,5 +480,15 @@ class Land extends CActiveRecord {
         }
         return $all;
     }
+	public static function buildFeatures($lands, $selectShopColumns = false){
+		$res = array();
+        if (count($lands) > 0) {
+            foreach ($lands as $land) {
+                $res[] = $land->toFeature($selectShopColumns);
+            }
+        }
+        return $res;
+	
+	}
 
 }

@@ -35,7 +35,7 @@ class Gis {
         return json_encode($main);
     }
 
-    private static function makeGeoArray($features) {
+    public static function makeGeoArray($features) {
         $main = array('type' => 'FeatureCollection');
         $all = array();
         foreach ($features as $f) {
