@@ -71,11 +71,12 @@ class LandController extends Controller {
         }
         $lands = $landScope->findAll($crit);
 
-        $main = array(
-            'totalCount' => $count,
-            'landDetail' => Land::buildGeoArray($lands, true)
-        );
-        echo json_encode($main);
+        //$main = array(
+         //   'totalCount' => $count,
+         //   'landDetail' => Land::buildArray($lands, true)
+        //);
+        //echo json_encode($main);
+		echo json_encode(Land::buildGeoArray($lands,true));
         //var_dump($lands);
         //Yii::app()->end();
     }
