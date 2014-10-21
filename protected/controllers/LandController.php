@@ -14,7 +14,7 @@ class LandController extends Controller {
     public function accessRules() {
         return array(
             array('allow', // allow all users to perform 'index' and 'view' actions
-                'actions' => array('index', 'view', 'master', 'features', 'intersection', 'test', 'report'),
+                'actions' => array('index', 'view', 'master', 'features', 'intersection', 'test', 'getLand'),
                 'users' => array('*'),
             ),
             array('allow', // allow authenticated user to perform 'create' and 'update' actions
@@ -71,12 +71,12 @@ class LandController extends Controller {
         }
         $lands = $landScope->findAll($crit);
 
-        //$main = array(
-         //   'totalCount' => $count,
-         //   'landDetail' => Land::buildArray($lands, true)
-        //);
-        //echo json_encode($main);
-		echo json_encode(Land::buildGeoArray($lands,true));
+        $main = array(
+            'totalCount' => $count,
+            'landDetail' => Land::buildArray($lands, true)
+        );
+        echo json_encode($main);
+//		echo json_encode(Land::buildGeoArray($lands,true));
         //var_dump($lands);
         //Yii::app()->end();
     }
@@ -103,7 +103,7 @@ class LandController extends Controller {
                 $firstTry = false;
             }
             $temp = array();
-            foreach (Land::labels() as $key=>$v){
+            foreach (Land::labels() as $key => $v) {
                 $temp[] = $value[$key];
             }
             $writer->writeLine($temp);
@@ -133,8 +133,15 @@ class LandController extends Controller {
         return $filters;
     }
 
-    public function actionReport() {
-        $this->render('report');
+    public function actionGetLand() {
+        //$this->render('report');
+        $gid = $_REQUEST['gid'];
+        $land = $this->loadLand($gid);
+        $lands = array();
+        if (!empty($land)) {
+            $lands[] = $land;
+        }
+        echo json_encode(Land::buildGeoArray($lands, true));
     }
 
     public function actionIntersection() {

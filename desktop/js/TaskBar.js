@@ -106,7 +106,7 @@ Ext.define('Ext.ux.desktop.TaskBar', {
      */
     getTrayConfig: function () {
         var ret = {
-            width: 80,
+            width: 180,
             items: this.trayItems
         };
         delete this.trayItems;
@@ -221,7 +221,7 @@ Ext.define('Ext.ux.desktop.TrayClock', {
 
     timeFormat: 'g:i A',
 
-    tpl: '{time}',
+    tpl: '<a href="google.com">salam bar Mahdi</a> {time}',
 
     initComponent: function () {
         var me = this;

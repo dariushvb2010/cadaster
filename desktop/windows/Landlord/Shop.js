@@ -38,7 +38,8 @@ Ext.define('MyDesktop.Landlord.Shop', {
         'Ext.state.*',
         'Ext.data.*',
         'Ext.util.*',
-        'Ext.form.*'
+        'Ext.form.*',
+        'Ext.form.field.PDate'
 
     ],
     id:'shop-win',
