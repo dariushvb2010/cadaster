@@ -32,7 +32,8 @@ Ext.define('MyDesktop.App', {
         'MyDesktop.Landlord.Test',
         'MyDesktop.Settings',
         'MyDesktop.Landlord.Import',
-        'MyDesktop.Landlord.Shop'
+        'MyDesktop.Landlord.Shop',
+        'MyDesktop.SystemStatus'
     ],
 
     init: function() {
@@ -55,6 +56,7 @@ Ext.define('MyDesktop.App', {
             new MyDesktop.Landlord.Search(),
             new MyDesktop.Landlord.Test(),
             new MyDesktop.Landlord.Import(),
+            new MyDesktop.SystemStatus(),
             new MyDesktop.Landlord.Shop()
         ];
     },
@@ -78,8 +80,9 @@ Ext.define('MyDesktop.App', {
                     { name: 'مدیریت کاربران', iconCls: 'userManagement-48x48', module: 'userManagement-win' },
                     //{ name: 'افزودن کاربر جدید', iconCls: 'addUser-48x48', module: 'addUser-win' },
                     //{ name: 'ثبت مالک', iconCls: 'grid-shortcut', module: 'register-win' },
-                    { name: 'خرید زمین', iconCls: 'shopLand-48x48', module: 'shopping-win' },
+                    //{ name: 'خرید زمین', iconCls: 'shopLand-48x48', module: 'shopping-win' },
                     { name: 'تغییر رمز عبور', iconCls: 'changePassword-48x48', module: 'changePass-win' },
+                    { name: 'نمایش آزمایشی نمودار', iconCls: 'cpu-shortcut', module: 'systemstatus'}
                 ]
             }),
             
