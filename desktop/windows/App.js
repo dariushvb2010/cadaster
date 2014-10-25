@@ -70,7 +70,7 @@ Ext.define('MyDesktop.App', {
                 model: 'Ext.ux.desktop.ShortcutModel',
                 data: [
                     { name:  "ثبت خرید", iconCls: 'grid-shortcut',  module: 'shop-win'},
-                    { name:  "افزدون قطعه", iconCls: 'addUser-48x48',  module: 'addSegment-win'},// module: 'addSegment-win'},
+                    { name:  "افزدون قطعه", iconCls: 'add-segment-48x48',  module: 'addSegment-win'},// module: 'addSegment-win'},
                     { name:  "افزدون قطعات از اکسل", iconCls: 'excel-48x48',  module: 'import-win'},
                     { name:  "گزارشگیری", iconCls: 'report-48x48',  module: 'search-win'},
                     //{ name: 'ثبت خرید', iconCls: 'grid-shortcut', module: 'landlord-win' },               

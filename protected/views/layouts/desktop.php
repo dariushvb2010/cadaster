@@ -28,9 +28,41 @@
     <script type="text/javascript" src="<?php echo Yii::app()->request->baseUrl; ?>/extjs-mirror-master/ext-mirror.js"></script>
     <link rel="stylesheet" type="text/css" href="<?php echo Yii::app()->request->baseUrl; ?>/extjs-mirror-master/resources/css/ext-mirror.css" />
     -->
+    <style>
+        .x-mask.splashscreen {
+            background-color: white;
+            opacity: 1;
+        }
+
+        .x-mask-msg.splashscreen,
+        .x-mask-msg.splashscreen div {
+            font-size: 16px;
+            font-family: B mitra;
+            padding: 30px 5px 5px 5px;
+            border: none;
+            background-color: transparent;
+            background-position: top center;
+        }
+
+        .x-message-box .x-window-body .x-box-inner {
+            min-height: 110px !important;
+        }
+
+        .x-splash-icon {
+            /* Important required due to the loading symbols CSS selector */
+            background-image: url('images/Waiting.png') !important;
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+    </style>
     <script type="text/javascript">
         /////////////////////////////////////////////////////////////////
-
+        var splashscreen;
+        
+        Ext.onReady(function() {
+            splashscreen = Ext.getBody().mask('... در حال دانلود فایل های مورد نیاز', 'splashscreen');
+            //splashscreen.addCls('splashscreen');
+        });
 
         /////////////////////////////////////////////////////////////////
         Ext.Loader.setPath({
@@ -42,6 +74,22 @@
 
         var myDesktopApp;
         Ext.onReady(function () {
+            var task = new Ext.util.DelayedTask(function() {
+                splashscreen.fadeOut({
+                    duration: 1000,
+                    remove:true
+                });
+                splashscreen.next().fadeOut({
+                    duration: 1000,
+                    remove:true,
+                    listeners: {
+                        afteranimate: function() {
+                            Ext.getBody().unmask();
+                        }
+                    }
+                });
+            });
+            task.delay(500);
             myDesktopApp = new MyDesktop.App();
         });
     </script>
