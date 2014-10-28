@@ -106,7 +106,7 @@ Ext.define('Ext.ux.desktop.TaskBar', {
      */
     getTrayConfig: function () {
         var ret = {
-            width: 180,
+            width: 430,
             items: this.trayItems
         };
         delete this.trayItems;
@@ -221,7 +221,7 @@ Ext.define('Ext.ux.desktop.TrayClock', {
 
     timeFormat: 'g:i A',
 
-    tpl: '<a href="google.com">salam bar Mahdi</a> {time}',
+    tpl:'{time}' + 'طراحی و توسعه توسط گروه نرم افزاری جوان به سفارش شرکت تیوکاوان اطلس ',
 
     initComponent: function () {
         var me = this;

@@ -30,6 +30,7 @@ Ext.define('MyDesktop.App', {
         'MyDesktop.Landlord.AddSegment',
         'MyDesktop.Landlord.Search',
         'MyDesktop.Landlord.Test',
+        'MyDesktop.LandLord.Chart',
         'MyDesktop.Settings',
         'MyDesktop.Landlord.Import',
         'MyDesktop.Landlord.Shop',
@@ -57,6 +58,7 @@ Ext.define('MyDesktop.App', {
             new MyDesktop.Landlord.Test(),
             new MyDesktop.Landlord.Import(),
             new MyDesktop.SystemStatus(),
+            new MyDesktop.LandLord.Chart(),
             new MyDesktop.Landlord.Shop()
         ];
     },
@@ -72,6 +74,7 @@ Ext.define('MyDesktop.App', {
                 model: 'Ext.ux.desktop.ShortcutModel',
                 data: [
                     { name:  "ثبت خرید", iconCls: 'grid-shortcut',  module: 'shop-win'},
+                    { name:  "نمودار", iconCls: 'grid-shortcut',  module: 'chart-win'},
                     { name:  "افزدون قطعه", iconCls: 'add-segment-48x48',  module: 'addSegment-win'},// module: 'addSegment-win'},
                     { name:  "افزدون قطعات از اکسل", iconCls: 'excel-48x48',  module: 'import-win'},
                     { name:  "گزارشگیری", iconCls: 'report-48x48',  module: 'search-win'},
