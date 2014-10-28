@@ -284,6 +284,11 @@ class Land extends CActiveRecord {
             'hasShop'=>'خرید ثبت شده'
         );
     }
+	public static function label($key){
+		$labels = self::labels();
+		return $labels[$key];
+	
+	}
     public function set($request){
         foreach ($this->attributeLabels() as $key=>$value){
             if(isset($request[$key])){
@@ -490,5 +495,20 @@ class Land extends CActiveRecord {
         return $res;
 	
 	}
+	
+	public static function makeHasFilters() {
+        
+        foreach (LandShop::$paramsForHas as $hasParam) {
+            
+                $filter = new stdClass();
+                $filter->property = $hasParam;
+                $filter->operator = 'eq';
+                $filter->value = true;
+                $filters[] = $filter;
+            
+        }
+
+        return $filters;
+    }
 
 }

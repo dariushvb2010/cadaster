@@ -37,13 +37,26 @@ class BusinessController extends Controller {
     }
     
     public function actionChart(){
-        $data = array("chartData"=> array(
-            array(name=>"salam", number=>14), 
-            array(name=>"Bar Mahdi", number=>12),
-            array(name=>"Ya Mahdi", number=>20),
-            array(name=>"Ya Hossein", number=>18),
-            array(name=>"Ya Ali", number=>14)
-            ));
+		
+		$filters = Land::makeHasFilters();
+		
+		$chartData = array();
+		
+		foreach($filters as $filter){
+			//var_dump($filter);
+			$land = Land::model()->byFilter($filter);
+			
+			$count = $land->count();
+			$chartData[] = array(name=>Land::label($filter->property),number=>$count);
+		}
+		$data = array('chartData'=>$chartData);
+        //$data = array('chartData'=> array(
+        //    array(name=>'salam', number=>14), 
+        //    array(name=>'Bar Mahdi', number=>12),
+        //    array(name=>'Ya Mahdi', number=>20),
+        //    array(name=>'Ya Hossein', number=>18),
+        //    array(name=>'Ya Ali', number=>14)
+        //    ));
         echo json_encode($data);
         
     }
