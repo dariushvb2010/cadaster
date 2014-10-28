@@ -37,33 +37,19 @@ Ext.define('MyDesktop.SystemStatus', {
 
     createNewWindow: function () {
         var me = this,
-            desktop = me.app.getDesktop();
-
-        me.cpuLoadData = [];
-        me.cpuLoadStore = Ext.create('store.json', {
-            fields: ['core1', 'core2', 'time']
-        });
-
-        me.memoryArray = ['Wired', 'Active', 'Inactive', 'Free'];
-        me.memoryStore = Ext.create('store.json', {
-                fields: ['name', 'memory'],
-                data: me.generateData(me.memoryArray)
-            });
-
-        me.pass = 0;
+        desktop = me.app.getDesktop();
+        
         me.processArray = ['explorer', 'monitor', 'charts', 'desktop', 'Ext3', 'Ext4'];
-        me.processesMemoryStore = Ext.create('store.json', {
-            fields: ['name', 'memory'],
+        /*me.processesMemoryStore = Ext.create('store.json', {
+            fields: ['name', 'number'],
             data: me.generateData(me.processArray)
-        });
-
-        me.generateCpuLoad();
-
+        });*/
+        
         return desktop.createWindow({
             id: 'systemstatus',
             title: 'System Status',
             width: 800,
-            height: 600,
+            height: 400,
             animCollapse:false,
             constrainHeader:true,
             border: false,
@@ -74,17 +60,6 @@ Ext.define('MyDesktop.SystemStatus', {
             bodyStyle: {
                 'background-color': '#FFF'
             },
-            listeners: {
-                afterrender: {
-                    fn: me.updateCharts,
-                    delay: 100
-                },
-                destroy: function () {
-                    clearTimeout(me.updateTimer);
-                    me.updateTimer = null;
-                },
-                scope: me
-            },
             items: [{
                 flex: 1,
                 xtype: 'container',
@@ -93,18 +68,7 @@ Ext.define('MyDesktop.SystemStatus', {
                     align: 'stretch'
                 },
                 items: [
-                    me.createCpu1LoadChart(),
-                    me.createCpu2LoadChart()
-                ]
-            }, {
-                flex: 1,
-                xtype: 'container',
-                layout: {
-                    type: 'vbox',
-                    align: 'stretch'
-                },
-                items: [
-                    me.createMemoryPieChart(),
+                    //me.createMemoryPieChart(),
                     me.createProcessChart()
                 ]
             }]
@@ -118,149 +82,28 @@ Ext.define('MyDesktop.SystemStatus', {
         }
         return win;
     },
-
-    createCpu1LoadChart: function () {
-        return {
-            flex: 1,
-            xtype: 'chart',
-            theme: 'Category1',
-            animate: false,
-            store: this.cpuLoadStore,
-            legend: {
-                position: 'bottom'
-            },
-            axes: [{
-                type: 'Numeric',
-                position: 'left',
-                minimum: 0,
-                maximum: 100,
-                fields: ['core1'],
-                title: 'CPU Load',
-                grid: true,
-                labelTitle: {
-                    font: '13px Arial'
-                },
-                label: {
-                    font: '11px Arial'
-                }
-            }],
-            series: [{
-                title: 'Core 1 (3.4GHz)',
-                type: 'line',
-                lineWidth: 4,
-                showMarkers: false,
-                fill: true,
-                axis: 'left',
-                xField: 'time',
-                yField: 'core1',
-                style: {
-                    'stroke-width': 1
-                }
-            }]
-        };
-    },
-
-    createCpu2LoadChart: function () {
-        return {
-            flex: 1,
-            xtype: 'chart',
-            theme: 'Category2',
-            animate: false,
-            store: this.cpuLoadStore,
-            legend: {
-                position: 'bottom'
-            },
-            axes: [{
-                type: 'Numeric',
-                position: 'left',
-                minimum: 0,
-                maximum: 100,
-                grid: true,
-                fields: ['core2'],
-                title: 'CPU Load',
-                labelTitle: {
-                    font: '13px Arial'
-                },
-                label: {
-                    font: '11px Arial'
-                }
-            }],
-            series: [{
-                title: 'Core 2 (3.4GHz)',
-                type: 'line',
-                lineWidth: 4,
-                showMarkers: false,
-                fill: true,
-                axis: 'left',
-                xField: 'time',
-                yField: 'core2',
-                style: {
-                    'stroke-width': 1
-                }
-            }]
-        };
-    },
-
-    createMemoryPieChart: function () {
-        var me = this;
-
-        return {
-            flex: 1,
-            xtype: 'chart',
-            animate: {
-                duration: 250
-            },
-            store: this.memoryStore,
-            shadow: true,
-
-            legend: {
-                position: 'right'
-            },
-            insetPadding: 40,
-            theme: 'Memory:gradients',
-            series: [{
-                donut: 30,
-                type: 'pie',
-                field: 'memory',
-                showInLegend: true,
-                tips: {
-                    trackMouse: true,
-                    width: 140,
-                    height: 28,
-                    renderer: function(storeItem, item) {
-                        //calculate percentage.
-                        var total = 0;
-                        me.memoryStore.each(function(rec) {
-                            total += rec.get('memory');
-                        });
-                        this.setTitle(storeItem.get('name') + ': ' +
-                            Math.round(storeItem.get('memory') / total * 100) + '%');
-                    }
-                },
-                highlight: {
-                    segment: {
-                        margin: 20
-                    }
-                },
-                labelTitle: {
-                    font: '13px Arial'
-                },
-                label: {
-                    field: 'name',
-                    display: 'rotate',
-                    contrast: true,
-                    font: '12px Arial'
-                }
-            }]
-        };
-    },
-
+    
     createProcessChart: function () {
+        as = new Ext.data.JsonStore({
+            proxy: {
+                type: 'ajax',
+                url: 'index.php?r=business/chart',
+                reader: {
+                    type: 'json',
+                    root: 'chartData'
+                    //idProperty: 'name'
+                }
+            },
+
+            //alternatively, a Ext.data.Model name can be given (see Ext.data.Store for an example)
+            fields: ['name', 'number']
+        }).reload();
+        
         return {
             flex: 1,
             xtype: 'chart',
             theme: 'Category1',
-            store: this.processesMemoryStore,
+            store: as,
             animate: {
                 easing: 'ease-in-out',
                 duration: 750
@@ -269,20 +112,20 @@ Ext.define('MyDesktop.SystemStatus', {
                 type: 'Numeric',
                 position: 'left',
                 minimum: 0,
-                maximum: 10,
-                fields: ['memory'],
-                title: 'Memory',
+                //maximum: 10,
+                fields: ['number'],
+                title: 'تعداد',
                 labelTitle: {
-                    font: '13px Arial'
+                    font: 'bold 16px "b mitra"'
                 },
                 label: {
-                    font: '11px Arial'
+                    font: 'bold 14px "b mitra"'
                 }
             },{
                 type: 'Category',
                 position: 'bottom',
                 fields: ['name'],
-                title: 'System Processes',
+                title: 'اسناد و مدارک',
                 labelTitle: {
                     font: 'bold 14px Arial'
                 },
@@ -294,8 +137,8 @@ Ext.define('MyDesktop.SystemStatus', {
             },{
                 type: 'Numeric',
                 position: 'top',
-                fields: ['memory'],
-                title: 'Memory Usage',
+                fields: ['number'],
+                title: 'نمایش نموداری تعداد اسناد و مدارک در خرید های ثبت شده',
                 labelTitle: {
                     font: 'bold 14px Arial'
                 },
@@ -312,74 +155,9 @@ Ext.define('MyDesktop.SystemStatus', {
                 title: 'Processes',
                 type: 'column',
                 xField: 'name',
-                yField: 'memory',
-                renderer: function(sprite, record, attr, index, store) {
-                    var lowColor = Ext.draw.Color.fromString('#b1da5a'),
-                        value = record.get('memory'),
-                        color;
-
-                    if (value > 5) {
-                        color = lowColor.getDarker((value - 5) / 15).toString();
-                    } else {
-                        color = lowColor.getLighter(((5 - value) / 20)).toString();
-                    }
-
-                    if (value >= 8) {
-                        color = '#CD0000';
-                    }
-
-                    return Ext.apply(attr, {
-                        fill: color
-                    });
-                }
+                yField: 'number'
             }]
         };
-    },
-
-    generateCpuLoad: function () {
-        var me = this,
-            data = me.cpuLoadData;
-
-        function generate(factor) {
-            var value = factor + ((Math.floor(Math.random() * 2) % 2) ? -1 : 1) * Math.floor(Math.random() * 9);
-
-            if (value < 0 || value > 100) {
-                value = 50;
-            }
-
-            return value;
-        }
-
-        if (data.length === 0) {
-            data.push({
-                core1: 0,
-                core2: 0,
-                time: 0
-            });
-
-            for (var i = 1; i < 100; i++) {
-                data.push({
-                    core1: generate(data[i - 1].core1),
-                    core2: generate(data[i - 1].core2),
-                    time: i
-                });
-            }
-
-            me.cpuLoadStore.loadData(data);
-        } else {
-            me.cpuLoadStore.data.removeAt(0);
-            me.cpuLoadStore.data.each(function(item, key) {
-                item.data.time = key;
-            });
-
-            var lastData = me.cpuLoadStore.last().data;
-            me.cpuLoadStore.loadData([{
-                core1: generate(lastData.core1),
-                core2: generate(lastData.core2),
-                time: lastData.time + 1
-            }], true);
-        }
-
     },
 
     generateData: function (names) {
@@ -388,39 +166,14 @@ Ext.define('MyDesktop.SystemStatus', {
             rest = names.length, consume;
 
         for (i = 0; i < names.length; i++) {
-            consume = Math.floor(Math.random() * rest * 100) / 100 + 2;
-            rest = rest - (consume - 5);
+            consume = Math.floor(Math.random() * 100) / 10   + 12;
+            //rest = rest - (consume - 5);
             data.push({
                 name: names[i],
-                memory: consume
+                number: consume
             });
         }
 
         return data;
-    },
-
-    updateCharts: function () {
-        var me = this;
-        clearTimeout(me.updateTimer);
-        me.updateTimer = setTimeout(function() {
-            var start = new Date().getTime();
-            if (me.pass % 3 === 0) {
-                me.memoryStore.loadData(me.generateData(me.memoryArray));
-            }
-
-            if (me.pass % 5 === 0) {
-                me.processesMemoryStore.loadData(me.generateData(me.processArray));
-            }
-
-            me.generateCpuLoad();
-
-            var end = new Date().getTime();
-
-            // no more than 25% average CPU load
-            me.refreshRate = Math.max(me.refreshRate, (end - start) * 4);
-
-            me.updateCharts();
-            me.pass++;
-        }, me.refreshRate);
     }
 });

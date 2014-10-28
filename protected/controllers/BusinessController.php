@@ -19,7 +19,7 @@ class BusinessController extends Controller {
     public function accessRules() {
         return array(
             array('allow', // allow all users to perform 'index' and 'view' actions
-                'actions' => array('landbuy', 'salelist', 'buy', 'upload','updateshop','delete'),
+                'actions' => array('landbuy', 'salelist', 'buy', 'upload','updateshop','delete', 'chart'),
                 'users' => array('*'),
             ),
             array('allow', // allow authenticated user to perform 'create' and 'update' actions
@@ -34,6 +34,18 @@ class BusinessController extends Controller {
                 'users' => array('*'),
             ),
         );
+    }
+    
+    public function actionChart(){
+        $data = array("chartData"=> array(
+            array(name=>"salam", number=>14), 
+            array(name=>"Bar Mahdi", number=>12),
+            array(name=>"Ya Mahdi", number=>20),
+            array(name=>"Ya Hossein", number=>18),
+            array(name=>"Ya Ali", number=>14)
+            ));
+        echo json_encode($data);
+        
     }
 
     public function actionBuy() {
