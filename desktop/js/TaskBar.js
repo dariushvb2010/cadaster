@@ -1,4 +1,4 @@
-/*!
+﻿/*!
  * Ext JS Library 4.0
  * Copyright(c) 2006-2011 Sencha Inc.
  * licensing@sencha.com
@@ -106,7 +106,7 @@ Ext.define('Ext.ux.desktop.TaskBar', {
      */
     getTrayConfig: function () {
         var ret = {
-            width: 180,
+            width: 220,
             items: this.trayItems
         };
         delete this.trayItems;
@@ -219,9 +219,9 @@ Ext.define('Ext.ux.desktop.TrayClock', {
 
     html: '&#160;',
 
-    timeFormat: 'g:i A',
+    timeFormat: 'g:i',
 
-    tpl: '<a href="google.com">salam bar Mahdi</a> {time}',
+    tpl: ' {time} ' + 'شرکت مشاوره تیوکاوان اطلس',
 
     initComponent: function () {
         var me = this;
