@@ -112,7 +112,9 @@ Ext.define('MyDesktop.SystemStatus', {
                 type: 'Numeric',
                 position: 'left',
                 minimum: 0,
+                length: 2,
                 //maximum: 10,
+                grid: true,
                 fields: ['number'],
                 title: 'تعداد',
                 labelTitle: {
@@ -127,12 +129,13 @@ Ext.define('MyDesktop.SystemStatus', {
                 fields: ['name'],
                 title: 'اسناد و مدارک',
                 labelTitle: {
-                    font: 'bold 14px Arial'
+                    font: 'bold 14px "b mitra"'
                 },
                 label: {
                     rotation: {
                         degrees: 45
-                    }
+                    },
+                    font: 'bold 14px "b mitra"'
                 }
             },{
                 type: 'Numeric',
@@ -140,7 +143,7 @@ Ext.define('MyDesktop.SystemStatus', {
                 fields: ['number'],
                 title: 'نمایش نموداری تعداد اسناد و مدارک در خرید های ثبت شده',
                 labelTitle: {
-                    font: 'bold 14px Arial'
+                    font: 'bold 14px "b mitra"'
                 },
                 label: {
                     fill: '#FFFFFF',

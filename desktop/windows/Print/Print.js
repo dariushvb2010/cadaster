@@ -17,6 +17,13 @@ Ext.application({
     name: 'ActionExample',
     
     info: function(lord, land, region){
+        var getAre = function(){
+            var a = 0;
+            for(var i=0; i<land.features.length; i++){
+                a += parseFloat(land.features[i].properties.area);
+            }
+            return a.toFixed(2);
+        };
         var getFieldDisplay = function(fieldLabel, name, value, labelWidth, width){
             //var labelWidth = fieldLabel.length * 7 + 10;
             //var width = 210;//value.length * 5 + 55 + labelWidth;
@@ -33,10 +40,12 @@ Ext.application({
             });
         };
         var landFieldSet = function(){
-            var plantType = getFieldDisplay('نوع کشت', 'plantType', land.plantType, 60, 210);
-            var waterType = getFieldDisplay('نوع آبیاری', 'waterType', land.waterType, 60, 210);
-            var usingType = getFieldDisplay('نوع کاربری', 'usingType', land.usingType, 65, 210);
-            var docStatus = getFieldDisplay('وضعیت سند', 'docStatus', land.docStatus, 68, 210);
+            as = land;
+            var plantType = getFieldDisplay('نوع کشت', 'plantType', land.features[0].properties.plantType, 60, 180);
+            var waterType = getFieldDisplay('نوع آبیاری', 'waterType', land.features[0].properties.waterType, 60, 180);
+            var usingType = getFieldDisplay('نوع کاربری', 'usingType', land.features[0].properties.usingType, 65, 180);
+            var docStatus = getFieldDisplay('وضعیت سند', 'docStatus', land.features[0].properties.docStatus, 68, 180);
+            var area = getFieldDisplay('مساحت کل', 'area', getAre(), 68, 180);
             var fieldset = {
                 xtype: 'fieldset',
                 cls: 'baseFieldset',
@@ -45,7 +54,7 @@ Ext.application({
                 defaults: {layout: {type: 'hbox', align: 'stretch', itemCls: 'layout'}},
                 items: [{
                     xtype: 'fieldcontainer',
-                    items: [plantType, waterType, usingType, docStatus]
+                    items: [plantType, waterType, usingType, docStatus, area]
                 }]
             };
 
@@ -413,7 +422,7 @@ Ext.application({
     },
     
     printPanel: function(land, lord, rootThis){
-        var infoPanel = rootThis.info(lord, land.features[0].properties, 'north');
+        var infoPanel = rootThis.info(lord, land, 'north');
         
         var geoPanel = rootThis.geo(land, "center");
         
@@ -447,8 +456,8 @@ Ext.application({
                         "Content-Type": "text/xml;charset=utf-8"
                     },
                     callback: function (lordResponse) {
-                        var land = eval ('(' + landResponse.responseText + ')');
-                        var lord = eval ('(' + lordResponse.responseText + ')');
+                        land = eval ('(' + landResponse.responseText + ')');
+                        lord = eval ('(' + lordResponse.responseText + ')');
                         if (land.features.length<1){ alert('فرد دارای هیچ گونه ملکی نمی باشد.'); return;}
                         
                         var printPanel = rootThis.printPanel(land, lord, rootThis);
@@ -457,8 +466,6 @@ Ext.application({
                         alert("Something went wrong in the request");
                     }
                 });
-                
-                
             },
             failure: function (response) {
                 alert("Something went wrong in the request");
