@@ -15,7 +15,7 @@ class LandlordController extends Controller {
         return array(
             array('allow', // allow all users to perform 'index' and 'view' actions
                 'actions' => array('index', 'view', 'AllLandlord', 'register'),
-                'users' => array('*'),
+                'roles' => array('admin'),
             ),
             array('allow', // allow authenticated user to perform 'create' and 'update' actions
                 'actions' => array('create', 'update'),

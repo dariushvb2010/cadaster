@@ -40,7 +40,6 @@ Ext.application({
             });
         };
         var landFieldSet = function(){
-            as = land;
             var plantType = getFieldDisplay('نوع کشت', 'plantType', land.features[0].properties.plantType, 60, 180);
             var waterType = getFieldDisplay('نوع آبیاری', 'waterType', land.features[0].properties.waterType, 60, 180);
             var usingType = getFieldDisplay('نوع کاربری', 'usingType', land.features[0].properties.usingType, 65, 180);
@@ -212,62 +211,8 @@ Ext.application({
             }
             
         };
-        var getCoordinatePanel = function(features){
-            me = features;
-            /*var getFieldDisplayItems = function(e){
-                var i = 0;
-                var items = [];
-                while(i<e.length){
-                    var j = 0;
-                    while(j<e[i].length){
-                        items.push(getFieldDisplay((j+1).toString(), 'itsme', e[i][j][1] + " " + e[i][j][1], 10, 200, 'segment'+i));
-                        j++;
-                    }
-                    i++;
-                };
-                return items;
-            };
-            var rightItems = getFieldDisplayItems(obj.right);
-            var rightPanel = Ext.create('Ext.panel.Panel', {
-                titleAlign: 'center',
-                title: 'محدوده راست',
-                width: 310,
-                region: 'east',
-                items: rightItems
-            });
-            var rangeItems = getFieldDisplayItems(obj.range);
-            var centerPanel = Ext.create('Ext.panel.Panel', {
-                titleAlign: 'center',
-                title: 'داخل محدوده',
-                width: 305,
-                region: 'center',
-                //collapsible: true,
-                items: rangeItems
-            });
-            var leftItems = getFieldDisplayItems(obj.left);
-            var leftPanel = Ext.create('Ext.panel.Panel', {
-                //bodyPadding: 5,  // Don't want content to crunch against the borders
-                titleAlign: 'center',
-                title: 'محدوده چپ',
-                width: 305,
-                region: 'west',
-                items: leftItems
-            });
-            return Ext.create('Ext.panel.Panel', {
-                //title: 'Salam Bar Hossein - Ext.panel.Panel - north',
-                region: 'center',
-                layout: {
-                    type: 'hbox',       // Arrange child items vertically
-                    align: 'stretch',    // Each takes up full width
-                },
-                draggable: true,
-                resizable: true,
-                items: [leftPanel, centerPanel, rightPanel]//items
-            });*/
-        };
         
         var getSegmentInfoPanel = function (title, features, region, color){
-            me = features;
             var width = 930-15;
             var getFieldDisplay = function(fieldLabel, name, value, labelWidth, width, labelCls, fieldCls){
                 return Ext.create('Ext.form.field.Display', {
@@ -299,10 +244,16 @@ Ext.application({
                 var coordinates = features[i].geometry.coordinates[0][0];
                 var j=0;
                 while(j<coordinates.length){
+                    
+                    var proj1 = new OpenLayers.Projection("EPSG:4326");
+                    var proj2 = new OpenLayers.Projection("EPSG:900913");
+                    var point = new OpenLayers.LonLat(coordinates[j][0], coordinates[j][1]);
+                    point.transform(proj1, proj2);
+                    
                     data.push({
                         id:'<span style="color:' + color[i] + '">' + String(j+1) + '</span>',
-                        x: '<span style="color:' + color[i] + '">' + coordinates[j][0] + '</span>',
-                        y: '<span style="color:' + color[i] + '">' + coordinates[j][1] + '</span>'
+                        x: '<span style="color:' + color[i] + '">' + point.lon.toFixed(4) + '</span>',
+                        y: '<span style="color:' + color[i] + '">' + point.lat.toFixed(4) + '</span>'
                     });
                     j++;
                 }
