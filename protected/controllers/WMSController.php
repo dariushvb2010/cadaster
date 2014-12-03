@@ -1,7 +1,7 @@
 <?php
 //require_once(Yii::app()->baseUrl.'/extensions/excel.php');
 //require_once Yii::getPathOfAlias('application.extensions.excel.excel').'.php';
-class GeoController extends Controller{
+class WMSController extends Controller{
 
     public $layout='//layouts/column2';
 
@@ -15,7 +15,7 @@ class GeoController extends Controller{
     public function accessRules(){
         return array(
                 array('allow',  // allow all users to perform 'index' and 'view' actions
-                        'actions'=>array('index','ax', 'file','view'),
+                        'actions'=>array('index','getMap', 'file','view'),
                         'roles'=>array('admin'),
                 ),
                 array('deny',  // deny all users
@@ -29,7 +29,7 @@ class GeoController extends Controller{
 		$lands = Land::model()->findAll();
 		var_dump($lands);
 	}
-	public function actionAx(){
+	public function actionGetMap(){
 		$curl = curl_init();
 		$url = 'http://localhost:8080/geoserver/cadaster/wms';
 		$query_str = "service=WMS&LAYERS=".$_GET['LAYERS']."&TRANSPARENT=".$_GET['TRANSPARENT']."&VERSION=".$_GET['VERSION']."&REQUEST=".$_GET['REQUEST']."&STYLES=".$_GET['STYLES']."&FORMAT=".$_GET['FORMAT']."&SRS=".$_GET['SRS']."&BBOX=".$_GET['BBOX']."&WIDTH=".$_GET['WIDTH']."&HEIGHT=".$_GET['HEIGHT'];
