@@ -15,8 +15,8 @@ class ImportController extends Controller{
     public function accessRules(){
         return array(
                 array('allow',  // allow all users to perform 'index' and 'view' actions
-                        'actions'=>array('index','excel', 'file'),
-                        'users'=>array('*'),
+                        'actions'=>array('index','excel', 'file','view'),
+                        'roles'=>array('admin'),
                 ),
                 array('allow', // allow authenticated user to perform 'create' and 'update' actions
                         'actions'=>array('create','update'),
@@ -112,6 +112,7 @@ class ImportController extends Controller{
 		var_dump($lands);
 	}
 	public function actionView(){
+		
 		$this->render('view');
 	}
     

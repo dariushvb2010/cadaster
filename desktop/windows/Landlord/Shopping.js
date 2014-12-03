@@ -48,7 +48,7 @@ Ext.define('MyDesktop.Landlord.Shopping', {
 
     init : function(){
         this.launcher = {
-            text: 'خرید زمین',
+            text: 'خرید زمینasdf',
             iconCls:'shopLand-16x16'
         };
     },

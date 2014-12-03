@@ -14,22 +14,14 @@ Ext.define('MyDesktop.App', {
         'Ext.ux.desktop.ShortcutModel',
 
         'MyDesktop.SystemStatus',
-        'MyDesktop.VideoWindow',
-        'MyDesktop.GridWindow',
-        'MyDesktop.TabWindow',
-        'MyDesktop.AccordionWindow',
-        'MyDesktop.Notepad',
-        'MyDesktop.BogusMenuModule',
-        'MyDesktop.BogusModule',
         'MyDesktop.Landlord.Register',
-        'MyDesktop.Landlord.Shopping',
+        //'MyDesktop.Landlord.Shopping',
         'MyDesktop.Landlord.ChangePass',
-        //'MyDesktop.Landlord.EditProfile',
         'MyDesktop.Landlord.UserManagement',
         'MyDesktop.Landlord.AddUser',
         'MyDesktop.Landlord.AddSegment',
         'MyDesktop.Landlord.Search',
-        'MyDesktop.Landlord.Test',
+        //'MyDesktop.Landlord.Test',
         'MyDesktop.LandLord.Chart',
         'MyDesktop.Settings',
         'MyDesktop.Landlord.Import',
@@ -48,14 +40,12 @@ Ext.define('MyDesktop.App', {
     getModules : function(){
         return [
             new MyDesktop.Landlord.Register(),
-            new MyDesktop.Landlord.Shopping(),
-            //new MyDesktop.Landlord.EditProfile(),
+            //new MyDesktop.Landlord.Shopping(),
             new MyDesktop.Landlord.ChangePass(),
             new MyDesktop.Landlord.UserManagement(),
-            //new MyDesktop.Landlord.AddUser(),
             new MyDesktop.Landlord.AddSegment(),
             new MyDesktop.Landlord.Search(),
-            new MyDesktop.Landlord.Test(),
+            //new MyDesktop.Landlord.Test(),
             new MyDesktop.Landlord.Import(),
             new MyDesktop.SystemStatus(),
             new MyDesktop.LandLord.Chart(),
@@ -78,12 +68,7 @@ Ext.define('MyDesktop.App', {
                     { name:  "افزدون قطعه", iconCls: 'add-segment-48x48',  module: 'addSegment-win'},// module: 'addSegment-win'},
                     { name:  "افزدون قطعات از اکسل", iconCls: 'excel-48x48',  module: 'import-win'},
                     { name:  "گزارشگیری", iconCls: 'report-48x48',  module: 'search-win'},
-                    //{ name: 'ثبت خرید', iconCls: 'grid-shortcut', module: 'landlord-win' },               
-                    //{ name: 'ویرایش مشخصات', iconCls: 'editProfile-48x48', module: 'editProfile-win' },
                     { name: 'مدیریت کاربران', iconCls: 'userManagement-48x48', module: 'userManagement-win' },
-                    //{ name: 'افزودن کاربر جدید', iconCls: 'addUser-48x48', module: 'addUser-win' },
-                    //{ name: 'ثبت مالک', iconCls: 'grid-shortcut', module: 'register-win' },
-                    //{ name: 'خرید زمین', iconCls: 'shopLand-48x48', module: 'shopping-win' },
                     { name: 'تغییر رمز عبور', iconCls: 'changePassword-48x48', module: 'changePass-win' },
                     { name: 'نمایش آزمایشی نمودار', iconCls: 'cpu-shortcut', module: 'systemstatus'}
                 ]
@@ -106,16 +91,10 @@ Ext.define('MyDesktop.App', {
             height: 300,
             toolConfig: {
                 width: 100,
-                items: [
-                    /*{
-                        text:'Settings',
-                        iconCls:'settings',
-                        handler: me.onSettings,
-                        scope: me
-                    }, */{
+                items: [{
                         text:'مدیریت کاربران',
                         iconCls:'userManagement-16x16',
-                        handler: function () { location.href = "index.php?r=user/login"; location.target="_blank" },
+                        handler: function () { location.href = "index.php?r=user/admin"; location.target="_blank" },
                         scope: me
                     },
                     '-',
@@ -135,8 +114,6 @@ Ext.define('MyDesktop.App', {
 
         return Ext.apply(ret, {
             quickStart: [
-                //{ name: 'خرید زمین', iconCls: 'shopLand-16x16', module: 'shopping-win' },
-                //{ name: 'ویرایش مشخصات', iconCls: 'editProfile-16x16', module: 'editProfile-win' },
                 { name: 'مدیریت کاربران', iconCls: 'userManagement-16x16', module: 'userManagement-win' }
             ],
             trayItems: [

@@ -40,7 +40,6 @@ Ext.application({
             });
         };
         var landFieldSet = function(){
-            as = land;
             var plantType = getFieldDisplay('نوع کشت', 'plantType', land.features[0].properties.plantType, 60, 180);
             var waterType = getFieldDisplay('نوع آبیاری', 'waterType', land.features[0].properties.waterType, 60, 180);
             var usingType = getFieldDisplay('نوع کاربری', 'usingType', land.features[0].properties.usingType, 65, 180);
@@ -270,6 +269,7 @@ Ext.application({
             });
 
         };
+
         
         var getSegmentInfoPanel = function (title, features, region, color){
             var width = 930-15;
@@ -303,10 +303,16 @@ Ext.application({
                 var coordinates = features[i].geometry.coordinates[0][0];
                 var j=0;
                 while(j<coordinates.length){
+                    
+                    var proj1 = new OpenLayers.Projection("EPSG:4326");
+                    var proj2 = new OpenLayers.Projection("EPSG:900913");
+                    var point = new OpenLayers.LonLat(coordinates[j][0], coordinates[j][1]);
+                    point.transform(proj1, proj2);
+                    
                     data.push({
                         id:'<span style="color:' + color[i] + '">' + String(j+1) + '</span>',
-                        x: '<span style="color:' + color[i] + '">' + coordinates[j][0] + '</span>',
-                        y: '<span style="color:' + color[i] + '">' + coordinates[j][1] + '</span>'
+                        x: '<span style="color:' + color[i] + '">' + point.lon.toFixed(4) + '</span>',
+                        y: '<span style="color:' + color[i] + '">' + point.lat.toFixed(4) + '</span>'
                     });
                     j++;
                 }

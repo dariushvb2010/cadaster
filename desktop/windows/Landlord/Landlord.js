@@ -46,7 +46,7 @@ Ext.define('MyDesktop.Landlord.Landlord', {
 
     init : function(){
         this.launcher = {
-            text: 'ثبت خرید',
+            text: 'ثبت خریدadsfasd',
             iconCls:'icon-grid'
         };
     },

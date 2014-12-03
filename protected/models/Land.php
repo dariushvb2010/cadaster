@@ -71,7 +71,7 @@ class Land extends CActiveRecord {
      * @return string the associated database table name
      */
     public function tableName() {
-        return 'morteza2';
+        return 'land';
     }
 
 //    public function relateions() {

@@ -504,7 +504,7 @@ Ext.define('MyDesktop.Landlord.Search', {
                 
                 var AX_point = new OpenLayers.Layer.WMS(
                     "کیلومتر",
-                    "http://csicc2014.sbu.ac.ir:8080/geoserver/cadaster/wms?service=WMS",
+                    "index.php?r=geo/ax",
                     {layers: 'AX-point', transparent: true},{
                         isBaseLayer: false,
                         format:"image/png",
