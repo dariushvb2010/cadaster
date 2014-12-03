@@ -209,7 +209,7 @@ Ext.define('MyDesktop.Landlord.Shop', {
             
             var AX_point = new OpenLayers.Layer.WMS(
                 "کیلومتر",
-                "http://csicc2014.sbu.ac.ir:8080/geoserver/cadaster/wms?service=WMS",
+                "index.php?r=WMS/getMap",
                 {layers: 'AX-point', transparent: true},{
                     isBaseLayer: false,
                     format:"image/png",
@@ -219,7 +219,7 @@ Ext.define('MyDesktop.Landlord.Shop', {
 
             var AX_line = new OpenLayers.Layer.WMS(
                 "خط",
-                "http://csicc2014.sbu.ac.ir:8080/geoserver/cadaster/wms?service=WMS",
+                "index.php?r=WMS/getMap",
                 {layers: 'AX-line', transparent: true},{
                     isBaseLayer: false,
                     format:"image/png",
