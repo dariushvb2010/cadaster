@@ -117,6 +117,30 @@ Ext.application({
         var rightColors = ['#2900FF', '#00ADFF', '#00FFFF', '#000000'];
         var leftColors = ['#FF0000', '#FF00B8', '#AD00FF', '#000000'];
         var inColors = ['#00FF00', '#F5FF00', '#FFC200', '#000000'];
+        
+        var addInitLayers = function(){
+            var AX_point = new OpenLayers.Layer.WMS(
+                "کیلومتر",
+                "http://csicc2014.sbu.ac.ir:8080/geoserver/cadaster/wms?service=WMS",
+                {layers: 'AX-point', transparent: true},{
+                    isBaseLayer: false,
+                    format:"image/png",
+                    opacity: 1.0
+                }
+            );
+
+            var AX_line = new OpenLayers.Layer.WMS(
+                "خط",
+                "http://csicc2014.sbu.ac.ir:8080/geoserver/cadaster/wms?service=WMS",
+                {layers: 'AX-line', transparent: true},{
+                    isBaseLayer: false,
+                    format:"image/png",
+                    opacity: 1.0
+                }
+            );
+
+            map.addLayers([AX_line, AX_point]);
+        };
         var getPointStyleMap = function(){
             
             var vector_style = new OpenLayers.Style();
@@ -212,62 +236,42 @@ Ext.application({
             }
             
         };
-        var getCoordinatePanel = function(features){
-            me = features;
-            /*var getFieldDisplayItems = function(e){
-                var i = 0;
-                var items = [];
-                while(i<e.length){
-                    var j = 0;
-                    while(j<e[i].length){
-                        items.push(getFieldDisplay((j+1).toString(), 'itsme', e[i][j][1] + " " + e[i][j][1], 10, 200, 'segment'+i));
-                        j++;
-                    }
-                    i++;
-                };
-                return items;
-            };
-            var rightItems = getFieldDisplayItems(obj.right);
-            var rightPanel = Ext.create('Ext.panel.Panel', {
-                titleAlign: 'center',
-                title: 'محدوده راست',
-                width: 310,
-                region: 'east',
-                items: rightItems
+        var mapPanel = function(){
+            var zoomToExtent = Ext.create('Ext.Button', {
+                text: 'زوم کردن روی قطعه',
+                handler: function() {
+                    map.zoomToExtent(vectorLayer.getDataExtent());
+                    zoomToExtent.setVisible(false);
+                }
             });
-            var rangeItems = getFieldDisplayItems(obj.range);
-            var centerPanel = Ext.create('Ext.panel.Panel', {
-                titleAlign: 'center',
-                title: 'داخل محدوده',
-                width: 305,
+            var panel = Ext.create('GeoExt.panel.Map', {
+                title: 'نقشه',
                 region: 'center',
-                //collapsible: true,
-                items: rangeItems
+                collapsible: true,
+                //width: 900,
+                resizable: true,
+                height: 500,
+                tbar: [zoomToExtent],
+                map: map
             });
-            var leftItems = getFieldDisplayItems(obj.left);
-            var leftPanel = Ext.create('Ext.panel.Panel', {
-                //bodyPadding: 5,  // Don't want content to crunch against the borders
-                titleAlign: 'center',
-                title: 'محدوده چپ',
-                width: 305,
-                region: 'west',
-                items: leftItems
+            var legandPanel = Ext.create('Ext.panel.Panel', {
+                region: 'east',
+                html: 'In the name of Allah'
+                //height: 1700,
+                //items: []
             });
             return Ext.create('Ext.panel.Panel', {
-                //title: 'Salam Bar Hossein - Ext.panel.Panel - north',
-                region: 'center',
                 layout: {
-                    type: 'hbox',       // Arrange child items vertically
-                    align: 'stretch',    // Each takes up full width
+                    type: 'hbox',
+                    align: 'stretch'
                 },
-                draggable: true,
-                resizable: true,
-                items: [leftPanel, centerPanel, rightPanel]//items
-            });*/
+                height: 600,
+                items: [panel, legandPanel]
+            });
+
         };
         
         var getSegmentInfoPanel = function (title, features, region, color){
-            me = features;
             var width = 930-15;
             var getFieldDisplay = function(fieldLabel, name, value, labelWidth, width, labelCls, fieldCls){
                 return Ext.create('Ext.form.field.Display', {
@@ -348,7 +352,9 @@ Ext.application({
             });
         };
         
-        map = new OpenLayers.Map({numZoomLevels:21});
+        var map = new OpenLayers.Map({numZoomLevels:21});
+        addInitLayers();
+        
         var pointLayer = new OpenLayers.Layer.Vector("point layer");
         pointLayer.styleMap = getPointStyleMap();
         var modifyFeatureControl = new OpenLayers.Control.ModifyFeature(pointLayer);
@@ -378,23 +384,6 @@ Ext.application({
             {layers: 'basic'}
         );
         map.addLayers([wms, pointLayer, vectorLayer]);
-        var zoomToExtent = Ext.create('Ext.Button', {
-            text: 'زوم کردن روی قطعه',
-            handler: function() {
-                map.zoomToExtent(vectorLayer.getDataExtent());
-                zoomToExtent.setVisible(false);
-            }
-        });
-        var mapPanel = Ext.create('GeoExt.panel.Map', {
-            title: 'Salam Bar Mahdi Saheb Zaman - GeoExt.panel.Map - center',
-            region: 'south',
-            collapsible: true,
-            //width: 900,
-            resizable: true,
-            height: 500,
-            tbar: [zoomToExtent],
-            map: map
-        });
         
         var segmentPanel = Ext.create('Ext.panel.Panel', {
             region: 'center',
@@ -411,7 +400,7 @@ Ext.application({
         var centerPanel = Ext.create('Ext.panel.Panel', {
             region: 'center',
             //height: 1700,
-            items: [segmentPanel, mapPanel]
+            items: [segmentPanel, mapPanel()]
         });
         
         map.zoomToExtent(pointLayer.getDataExtent());

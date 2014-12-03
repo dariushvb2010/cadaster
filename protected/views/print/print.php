@@ -11,6 +11,9 @@
         <script type="text/javascript" src="<?php echo Yii::app()->params['lib.openlayers'] ?>"></script>
         <script type="text/javascript" src="<?php echo Yii::app()->params['lib.ext.loader'] ?>"></script>
         <script type="text/javascript" src="<?php echo Yii::app()->request->baseUrl ?>/desktop/windows/print/print.js"></script>
+        
+        <script src="http://maps.google.com/maps/api/js?v=3&amp;sensor=false&amp;language=fa"></script>
+    
     <head>
     <body>
         <div style="alignment-adjust: central;" id='printPanel'></div>
