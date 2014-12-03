@@ -110,7 +110,7 @@ Ext.define('MyDesktop.Landlord.ChangePass', {
                         });
                     }
                 },{
-                    text: 'بی خیال',
+                    text: 'انصراف',
                     handler: function(){win.close();}
                 }]
             });
