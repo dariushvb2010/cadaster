@@ -34,7 +34,13 @@ class WMSController extends Controller {
 		header("Content-type:image/png");
         $curl = curl_init();
         $url = 'http://localhost:8080/geoserver/cadaster/wms';
-        $query_str = "service=WMS&LAYERS=" . $_GET['LAYERS'] . "&TRANSPARENT=" . $_GET['TRANSPARENT'] . "&VERSION=" . $_GET['VERSION'] . "&REQUEST=" . $_GET['REQUEST'] . "&STYLES=" . $_GET['STYLES'] . "&FORMAT=" . $_GET['FORMAT'] . "&SRS=" . $_GET['SRS'] . "&BBOX=" . $_GET['BBOX'] . "&WIDTH=" . $_GET['WIDTH'] . "&HEIGHT=" . $_GET['HEIGHT'];
+        //$query_str = "service=WMS&LAYERS=" . $_GET['LAYERS'] . "&TRANSPARENT=" . $_GET['TRANSPARENT'] . "&VERSION=" . $_GET['VERSION'] . "&REQUEST=" . $_GET['REQUEST'] . "&STYLES=" . $_GET['STYLES'] . "&FORMAT=" . $_GET['FORMAT'] . "&SRS=" . $_GET['SRS'] . "&BBOX=" . $_GET['BBOX'] . "&WIDTH=" . $_GET['WIDTH'] . "&HEIGHT=" . $_GET['HEIGHT'];
+		$query_str='';
+		foreach($_GET as $key=>$value){
+			if($key!='r'){
+			$query_str.=$key.'='.$value.'&';
+			}
+		}
         $query = $url . '?' . $query_str;
         //var_dump($query);
         curl_setopt_array($curl, array(
@@ -47,27 +53,13 @@ class WMSController extends Controller {
         set_time_limit(30);                     // set time in secods for PHP
         curl_setopt($curl, CURLOPT_TIMEOUT, 30);
         curl_setopt($curl, CURLOPT_USERPWD, "admin:geoserver");
-        //$outFile = fopen(,"wb");
-        //curl_setopt($curl, CURLOPT_FILE, $outFile);
-        // Send the request & save response to $resp
+
         $resp = curl_exec($curl);
         curl_close($curl);
         echo ($resp);
-		/*
-        $saveTo = "c:\\file2.png";
-        if (file_exists($saveTo)) {
-            unlink($saveTo);
-        }
-        $fp = fopen($saveTo, 'wb');
-        fwrite($fp, $resp);
-        fclose($fp);
+		
 
-        header("Content-type:image/png");
-        $fp = fopen($saveTo, 'rb');
-        fpassthru($fp);
-*/
-
-        Yii:app()->end();
+        //Yii:app()->end();
     }
 
 }
