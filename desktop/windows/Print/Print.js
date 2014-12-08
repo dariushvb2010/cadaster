@@ -251,20 +251,28 @@ Ext.application({
                 //width: 900,
                 resizable: true,
                 height: 500,
+                width: 615,
                 tbar: [zoomToExtent],
                 map: map
             });
+            
+            var wrappedImage = Ext.create('Ext.Img', {
+                src: 'images/Legand.jpg',
+                autoEl: 'div', // wrap in a div
+                width: 350,
+                height: 500
+            });
+            
             var legandPanel = Ext.create('Ext.panel.Panel', {
                 region: 'east',
-                html: 'In the name of Allah'
+                //html: 'In the name of Allah',
+                items: [wrappedImage],
+                width: 310,
                 //height: 1700,
                 //items: []
             });
             return Ext.create('Ext.panel.Panel', {
-                layout: {
-                    type: 'hbox',
-                    align: 'stretch'
-                },
+                layout: 'hbox',
                 height: 600,
                 items: [panel, legandPanel]
             });
@@ -273,7 +281,7 @@ Ext.application({
 
         
         var getSegmentInfoPanel = function (title, features, region, color){
-            var width = 930-15;
+            var width = 930-8;
             var getFieldDisplay = function(fieldLabel, name, value, labelWidth, width, labelCls, fieldCls){
                 return Ext.create('Ext.form.field.Display', {
                     fieldLabel: fieldLabel,
@@ -452,8 +460,8 @@ Ext.application({
                         "Content-Type": "text/xml;charset=utf-8"
                     },
                     callback: function (lordResponse) {
-                        land = eval ('(' + landResponse.responseText + ')');
-                        lord = eval ('(' + lordResponse.responseText + ')');
+                        var land = eval ('(' + landResponse.responseText + ')');
+                        var lord = eval ('(' + lordResponse.responseText + ')');
                         if (land.features.length<1){ alert('فرد دارای هیچ گونه ملکی نمی باشد.'); return;}
                         
                         var printPanel = rootThis.printPanel(land, lord, rootThis);

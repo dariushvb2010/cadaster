@@ -107,13 +107,13 @@ class ImportController extends Controller{
 		echo 'number of failed users: '.$newUserFailedCount.'<br/>';
 		
 	}
-	public function actionIndex(){
-		$lands = Land::model()->findAll();
-		var_dump($lands);
-	}
-	public function actionView(){
-		
-		$this->render('view');
+    public function actionIndex(){
+            $lands = Land::model()->findAll();
+            var_dump($lands);
+    }
+    public function actionView(){
+
+            $this->render('view');
 	}
     
     

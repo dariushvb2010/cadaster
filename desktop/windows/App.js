@@ -14,7 +14,7 @@ Ext.define('MyDesktop.App', {
         'Ext.ux.desktop.ShortcutModel',
 
         'MyDesktop.SystemStatus',
-        'MyDesktop.Landlord.Register',
+        //'MyDesktop.Landlord.Register',
         //'MyDesktop.Landlord.Shopping',
         'MyDesktop.Landlord.ChangePass',
         'MyDesktop.Landlord.UserManagement',
@@ -39,7 +39,7 @@ Ext.define('MyDesktop.App', {
 
     getModules : function(){
         return [
-            new MyDesktop.Landlord.Register(),
+            //new MyDesktop.Landlord.Register(),
             //new MyDesktop.Landlord.Shopping(),
             new MyDesktop.Landlord.ChangePass(),
             new MyDesktop.Landlord.UserManagement(),

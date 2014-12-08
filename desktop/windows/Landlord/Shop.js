@@ -10,6 +10,7 @@ Ext.define('MyDesktop.Landlord.Shop', {
 
     requires: [
         'Ext.data.ArrayStore',
+        'Ext.grid.Panel',
         'Ext.grid.RowNumberer',
         'Ext.util.*',
         'Ext.util.Format',
@@ -417,11 +418,8 @@ Ext.define('MyDesktop.Landlord.Shop', {
                     handler : function() {
                         var selected = gridPanel.getSelectionModel().getSelection();
                         for(var i=0;i<selected.length;i++){
-                            //console.log("selctedId: " + selected[i].raw.id);
                             window.params = {userId:selected[i].raw.id};
                             window.open('index.php?r=print/print');
-                            //window.open("http://www.java2s.com/");
-                            //window.open("http://www.google.com/");
                         }
                     }
                 }]
@@ -448,7 +446,6 @@ Ext.define('MyDesktop.Landlord.Shop', {
             this.refresh = function(){
                 Param.userId = userId;
                 landLordStore.load({params: Param});
-                console.log("salam bar mahdi - llp.refresh()");
             };
         };
         var landPanel = function(region){
@@ -712,7 +709,7 @@ Ext.define('MyDesktop.Landlord.Shop', {
 
                 return that;
             };
-        
+            
             var hasEsteshhad = getCheckBox('hasEsteshhad', 'استشهادنامه', true);
             var hasMap = getCheckBox('hasMap', 'نقشه', true);
             var hasEstelam = getCheckBox('hasEstelam', 'استعلام', true);
