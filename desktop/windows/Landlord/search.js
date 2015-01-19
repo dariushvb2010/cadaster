@@ -57,7 +57,8 @@ Ext.define('MyDesktop.Landlord.Search', {
     
     allData: function (rootThis) {
         var loadEnd = function(e){
-            if(e.response.features.length<1) return;
+            me = e;
+            if(e.response.features === null || e.response.features.length<1) return;
             map.zoomToExtent(segmentLayer.getDataExtent());
         };
         
@@ -68,7 +69,7 @@ Ext.define('MyDesktop.Landlord.Search', {
             projection: Mercator,
             displayProjection: Geographic
         });
-        segmentLayer = new OpenLayers.Layer.Vector("یک قطعه زمین", {
+        var segmentLayer = new OpenLayers.Layer.Vector("یک قطعه زمین", {
             projection: new OpenLayers.Projection("EPSG:4326"),
             strategies: [new OpenLayers.Strategy.Fixed()],
             protocol: new OpenLayers.Protocol.HTTP({
@@ -89,7 +90,30 @@ Ext.define('MyDesktop.Landlord.Search', {
                     })
                 });
         var landLord =  function (region, imagePanel) {
-            getCheckBox = function (name, boxLabel, checked) {
+            var getTotalNumbers = function(){
+                var params = {
+                    hasEsteshhad: hasEsteshhad.checked,
+                    hasMap: hasMap.checked,
+                    hasEstelam: hasEstelam.checked,
+                    hasMadarek: hasMadarek.checked,
+                    hasSanad: hasSanad.checked,
+                    hasTayeediyeShura: hasTayeediyeShura.checked,
+                    hasQabz: hasQabz.checked,
+                    hasShop: hasShop.checked
+                };
+                Ext.Ajax.request({
+                    url: 'index.php?r=land/getTotalNumbers',
+                    params: params,
+                    success: function (response) {
+                        var text = eval('('+ response.responseText + ')');
+                        sumAreaDis.setValue(text.area);
+                        sumPerimeterDis.setValue(text.perimeter);
+                        sumPriceDis.setValue(text.price);
+                    }
+                });
+            };
+            
+            var getCheckBox = function (name, boxLabel, checked) {
                 var that = Ext.create('Ext.form.field.Checkbox', {
                     name: name,
                     boxLabel: boxLabel,
@@ -100,6 +124,7 @@ Ext.define('MyDesktop.Landlord.Search', {
                             fn: function () {
                                 landLordStore.proxy.extraParams[name] = that.checked;
                                 landLordStore.reload();
+                                getTotalNumbers();
                             }
                         }
                     }
@@ -107,6 +132,7 @@ Ext.define('MyDesktop.Landlord.Search', {
 
                 return that;
             };
+            
             var hasEsteshhad = getCheckBox('hasEsteshhad', 'استشهادنامه', true);
             var hasMap = getCheckBox('hasMap', 'نقشه', false);
             var hasEstelam = getCheckBox('hasEstelam', 'استعلام', false);
@@ -176,7 +202,20 @@ Ext.define('MyDesktop.Landlord.Search', {
                     window.open('index.php?r=land/createExcel&'+createParams, '_blank');
                 }
             });
-
+            
+            var getDisplay = function(label, value, width, labelWidth){
+                return new Ext.create('Ext.form.field.Display', {
+                    fieldLabel: label,
+                    //value: value, 
+                    labelWidth: labelWidth,
+                    width: width
+                });
+            };
+            var sumAreaDis = getDisplay("مساحت کل", 123, 120, 63);
+            var sumPerimeterDis =  getDisplay("محیط کل", 123, 110, 50);
+            var sumPriceDis = getDisplay("قیمت کل", 123, 120, 50);
+            
+            
             var landLordModel = Ext.define('LandLordModel', {
                 extend: 'Ext.data.Model',
                 fields: [
@@ -218,7 +257,8 @@ Ext.define('MyDesktop.Landlord.Search', {
                         hasMadarek: hasMadarek.checked,
                         hasSanad: hasSanad.checked,
                         hasTayeediyeShura: hasTayeediyeShura.checked,
-                        hasQabz: hasQabz.checked
+                        hasQabz: hasQabz.checked,
+                        hasShop: hasShop.checked
                     }
                 },
                 filterParam: 'query',
@@ -251,7 +291,8 @@ Ext.define('MyDesktop.Landlord.Search', {
             var pagingToolbar = Ext.create('Ext.PagingToolbar', {
                 store: landLordStore,
                 displayInfo: true,
-                displayMsg: 'نمایش رکورد {0} تا {1} از {2} رکورد',
+                //displayMsg: 'نمایش رکورد {0} تا {1} از {2} رکورد',
+                displayMsg: 'رکورد {0} تا {1} از {2} رکورد',
                 emptyMsg: "داده ای یافت نشد.",
             });
             var filterBar = Ext.create('Ext.ux.grid.FilterBar', {renderHidden: false});
@@ -292,7 +333,15 @@ Ext.define('MyDesktop.Landlord.Search', {
                 viewConfig: {
                     stripeRows: true
                 },
-                bbar: [pagingToolbar, '->', reportBtn, deleteShopBtn],
+                dockedItems: [{
+                    xtype: 'toolbar',
+                    dock: 'bottom',
+                    style: {
+                        direction: 'rtl'
+                    },
+                    items: [pagingToolbar, '->', sumPriceDis, sumPerimeterDis, sumAreaDis,  reportBtn, deleteShopBtn]
+                }],
+                //bbar: [pagingToolbar, '->',sumAreaDis, reportBtn, deleteShopBtn],
                 tbar: [hasShop,  '->', '', '', '', '', hasEsteshhad, '', '', '', '', hasMap, '', '', '', '', hasEstelam, '', '', '', '', hasMadarek, '', '', '', '', hasSanad, '', '', '', '', hasTayeediyeShura, '', '', '', '', hasQabz]
             });
 
@@ -304,7 +353,8 @@ Ext.define('MyDesktop.Landlord.Search', {
                     imagePanel.loadStore(selectedRecord[0].raw.gid);
                 }
             });
-
+            
+            getTotalNumbers();
             this.setVisible = function (flag) {
                 gridPanel.setVisible(flag)
             };
@@ -587,17 +637,14 @@ Ext.define('MyDesktop.Landlord.Search', {
         var mp = new mapPanel("west");
         var imagePanel = new images('south');
         var landLord = new landLord("center", imagePanel);
-        //map.addLayer2Map(land.getLayer());
-
+        
         this.panel = Ext.create('Ext.Panel', {
             layout: 'border',
             items: [landLord.getPanel(), mp.getPanel(), imagePanel.getPanel()]
         });
         
         var loadSegmentWithGid = function(gid){
-            console.log("In the name of Allah - Salam Bar Mahdi");
             segmentLayer.refresh({params: {gid: gid}});
-            //map.zoomToExtent(segmentLayer.getDataExtent());
         };
     },
     createWindow: function () {

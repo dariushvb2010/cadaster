@@ -14,7 +14,7 @@ class LandController extends Controller {
     public function accessRules() {
         return array(
             array('allow', // allow all users to perform 'index' and 'view' actions
-                'actions' => array('index', 'view', 'master', 'features', 'intersection', 'test', 'getLand'),
+                'actions' => array('index', 'view', 'master', 'features', 'intersection', 'test', 'getLand','getTotalNumbers'),
                 'users' => array('*'),
             ),
             array('allow', // allow authenticated user to perform 'create' and 'update' actions
@@ -174,6 +174,31 @@ class LandController extends Controller {
         var_dump($a->attributes);
     }
 
+	public function actionGetTotalNumbers(){
+		$crit = new CDbCriteria();
+		$filters=array();
+        //$filters = $this->makeFilters();
+        $landScope = Land::model();
+        foreach ($filters as $filter) {
+            $landScope = $landScope->byFilter($filter);
+        }
+        if (isset($_REQUEST['hasShop']) && $_REQUEST['hasShop'] != 'false') {
+            $landScope = $landScope->hasShop();
+        }
+        
+		//$crit->select=array('total'=>new CDbExpression('count(t.gid) as mysum'));
+		
+        //$lands = $landScope->byTotal()->findAll();
+		$area = $landScope->totalArea();
+		$perimeter=$landScope->totalPerimeter();
+		$price = $landScope->totalPrice();
+		$res = array(
+			'area'=>round($area,2),
+			'perimeter'=>round($perimeter,2),
+			'price'=>round($price,2)
+		);
+        echo json_encode($res);
+	}
     protected function makeGeoJson($lands, $selectShopColumns = false) {
         $features = array();
         if (count($lands))

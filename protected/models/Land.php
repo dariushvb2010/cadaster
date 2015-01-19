@@ -119,6 +119,9 @@ class Land extends CActiveRecord {
             ),
 			'hasShop'=>array(
 				'condition'=>'t."shopId" is not null'
+			),
+			'total'=>array(
+				'select'=>'sum(ST_Area(geom)) as area2, sum(ST_Perimeter(geom)) as perimeter2'
 			)
         );
     }
@@ -204,7 +207,33 @@ class Land extends CActiveRecord {
         $this->getDbCriteria()->mergeWith($crit);
         return $this;
     }
+	public function totalArea(){
+		$crit = $this->getDbCriteria();
+		//$crit->with = array('shop','lord');
+		$crit->select = 'sum(ST_Area(geom)) as area2';
+		//$this->setDbCriteria($crit);
+		
+		return $this->commandBuilder->createFindCommand($this->getTableSchema(),$crit)->queryScalar();
+	}
 
+	public function totalPerimeter(){
+		$crit = $this->getDbCriteria();
+		//$crit->with = array('shop','lord');
+		$crit->select = 'sum(ST_Perimeter(geom)) as perimeter2';
+		//$this->setDbCriteria($crit);
+		
+		return $this->commandBuilder->createFindCommand($this->getTableSchema(),$crit)->queryScalar();
+	}
+	
+	public function totalPrice(){
+		$crit = $this->getDbCriteria();
+		//$crit->with = array('shop','lord');
+		$crit->join = 'JOIN {{"landShop"}}  ON {{"landShop"}}.id = t."shopId"'; 
+		$crit->select = 'sum({{"landShop"}}."finalPrice")';
+		//$this->setDbCriteria($crit);
+		
+		return $this->commandBuilder->createFindCommand($this->getTableSchema(),$crit)->queryScalar();
+	}
 	
 	
     /**
