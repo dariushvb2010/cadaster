@@ -63,7 +63,6 @@ class Land extends CActiveRecord {
         'lte' => '<=',
         'like' => 'like'
     );
-    
 
     const DEFAULT_SIMPLIFY_VALUE = 1;
 
@@ -73,12 +72,6 @@ class Land extends CActiveRecord {
     public function tableName() {
         return 'land';
     }
-
-//    public function relateions() {
-//        return array(
-//            'user' => array(self::BELONGS_TO, 'MyUser', 'userId'),
-//        );
-//    }
 
     /**
      * @return array validation rules for model attributes.
@@ -117,12 +110,12 @@ class Land extends CActiveRecord {
                     , 'ST_Area(geom) as area'
                     , 'ST_Perimeter(geom) as perimeter')
             ),
-			'hasShop'=>array(
-				'condition'=>'t."shopId" is not null'
-			),
-			'total'=>array(
-				'select'=>'sum(ST_Area(geom)) as area2, sum(ST_Perimeter(geom)) as perimeter2'
-			)
+            'hasShop' => array(
+                'condition' => 't."shopId" is not null'
+            ),
+            'total' => array(
+                'select' => 'sum(ST_Area(geom)) as area2, sum(ST_Perimeter(geom)) as perimeter2'
+            )
         );
     }
 
@@ -185,7 +178,7 @@ class Land extends CActiveRecord {
     }
 
     /**
-     * 
+     * SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSScope
      * @param stdClass $filter
      * filter->property
      * filter->type
@@ -198,7 +191,7 @@ class Land extends CActiveRecord {
         $operator = self::$operatorMap[$filter->operator];
         $crit = new CDbCriteria();
         $column = self::paramAlternative($filter->property);
-        $crit->with = array('shop','lord');
+        $crit->with = array('shop', 'lord');
         if ($operator == 'like') { // string search
             $crit->addSearchCondition(Yii::app()->db->quoteColumnName($column), $filter->value); // see compare documentation
         } else { //other operators = < > ...
@@ -207,35 +200,35 @@ class Land extends CActiveRecord {
         $this->getDbCriteria()->mergeWith($crit);
         return $this;
     }
-	public function totalArea(){
-		$crit = $this->getDbCriteria();
-		//$crit->with = array('shop','lord');
-		$crit->select = 'sum(ST_Area(geom)) as area2';
-		//$this->setDbCriteria($crit);
-		
-		return $this->commandBuilder->createFindCommand($this->getTableSchema(),$crit)->queryScalar();
-	}
 
-	public function totalPerimeter(){
-		$crit = $this->getDbCriteria();
-		//$crit->with = array('shop','lord');
-		$crit->select = 'sum(ST_Perimeter(geom)) as perimeter2';
-		//$this->setDbCriteria($crit);
-		
-		return $this->commandBuilder->createFindCommand($this->getTableSchema(),$crit)->queryScalar();
-	}
-	
-	public function totalPrice(){
-		$crit = $this->getDbCriteria();
-		//$crit->with = array('shop','lord');
-		$crit->join = 'JOIN {{"landShop"}}  ON {{"landShop"}}.id = t."shopId"'; 
-		$crit->select = 'sum({{"landShop"}}."finalPrice")';
-		//$this->setDbCriteria($crit);
-		
-		return $this->commandBuilder->createFindCommand($this->getTableSchema(),$crit)->queryScalar();
-	}
-	
-	
+    public function totalArea() {
+        $crit = $this->getDbCriteria();
+        //$crit->with = array('shop','lord');
+        $crit->select = 'sum(ST_Area(geom)) as area2';
+        //$this->setDbCriteria($crit);
+
+        return $this->commandBuilder->createFindCommand($this->getTableSchema(), $crit)->queryScalar();
+    }
+
+    public function totalPerimeter() {
+        $crit = $this->getDbCriteria();
+        //$crit->with = array('shop','lord');
+        $crit->select = 'sum(ST_Perimeter(geom)) as perimeter2';
+        //$this->setDbCriteria($crit);
+
+        return $this->commandBuilder->createFindCommand($this->getTableSchema(), $crit)->queryScalar();
+    }
+
+    public function totalPrice() {
+        $crit = $this->getDbCriteria();
+        //$crit->with = array('shop','lord');
+        $crit->join = 'JOIN {{"landShop"}}  ON {{"landShop"}}.id = t."shopId"';
+        $crit->select = 'sum({{"landShop"}}."finalPrice")';
+        //$this->setDbCriteria($crit);
+
+        return $this->commandBuilder->createFindCommand($this->getTableSchema(), $crit)->queryScalar();
+    }
+
     /**
      * @see Land#byCondition
      * @param type $param
@@ -254,10 +247,8 @@ class Land extends CActiveRecord {
             'waterType' => 'waterType',
             'position' => 'position',
             'numAdjacent' => 'numAdjacent',
-            
-            'name'=>'lord.FirstName',
-            'family'=>'lord.LastName',
-            
+            'name' => 'lord.FirstName',
+            'family' => 'lord.LastName',
             'finalPrice' => 'shop.finalPrice',
             'pricePerMeter' => 'shop.pricePerMeter',
             'mobayeNo' => 'shop.mobayeNo',
@@ -276,7 +267,6 @@ class Land extends CActiveRecord {
         }
         return $paramMap[$param];
     }
-    
 
     /**
      * @return array customized attribute labels (name=>label)
@@ -288,39 +278,40 @@ class Land extends CActiveRecord {
             'plantType' => 'نوع کشت',
             //'villageCode'=>'',
             //'userId'=>'',
-            'position'=>'موقعیت',
-            'numAdjacent'=>'تعداد مجاورت',
-            'usingType'=>'نوع کاربری',
-            'docStatus'=>'وضعیت سند',
-            'name'=>'نام',
-            'seetNo'=>'شماره شیت',
-            'area'=>'مساحت',
-            'perimeter'=>'محیط',
-            'family'=>'نام خانوادگی',
-            'finalPrice'=>'قیمت نهایی',
-            'pricePerMeter'=>'قیمت هر متر',
-            'mobayeNo'=>'شماره مبایعه نامه',
-            'mobayeDate'=>'تاریخ مبایعه نامه',
-            'committeeNo'=>'شماره کمیته',
-            'committeeDate'=>'تاریخ کمیته',
-            'hasEsteshhad'=>'استشهادنامه محلی',
-            'hasMap'=>'نقشه',
-            'hasEstelam'=>'استعلام',
-            'hasSanad'=>'سند',
-            'hasMadarek'=>'مدارک',
-            'hasTayeediyeShura'=>'تاییدیه شورا',
-            'hasQabz'=>'قبض',
-            'hasShop'=>'خرید ثبت شده'
+            'position' => 'موقعیت',
+            'numAdjacent' => 'تعداد مجاورت',
+            'usingType' => 'نوع کاربری',
+            'docStatus' => 'وضعیت سند',
+            'name' => 'نام',
+            'seetNo' => 'شماره شیت',
+            'area' => 'مساحت',
+            'perimeter' => 'محیط',
+            'family' => 'نام خانوادگی',
+            'finalPrice' => 'قیمت نهایی',
+            'pricePerMeter' => 'قیمت هر متر',
+            'mobayeNo' => 'شماره مبایعه نامه',
+            'mobayeDate' => 'تاریخ مبایعه نامه',
+            'committeeNo' => 'شماره کمیته',
+            'committeeDate' => 'تاریخ کمیته',
+            'hasEsteshhad' => 'استشهادنامه محلی',
+            'hasMap' => 'نقشه',
+            'hasEstelam' => 'استعلام',
+            'hasSanad' => 'سند',
+            'hasMadarek' => 'مدارک',
+            'hasTayeediyeShura' => 'تاییدیه شورا',
+            'hasQabz' => 'قبض',
+            'hasShop' => 'خرید ثبت شده'
         );
     }
-	public static function label($key){
-		$labels = self::labels();
-		return $labels[$key];
-	
-	}
-    public function set($request){
-        foreach ($this->attributeLabels() as $key=>$value){
-            if(isset($request[$key])){
+
+    public static function label($key) {
+        $labels = self::labels();
+        return $labels[$key];
+    }
+
+    public function set($request) {
+        foreach ($this->attributeLabels() as $key => $value) {
+            if (isset($request[$key])) {
                 $this->{$key} = $request[$key];
             }
         }
@@ -363,10 +354,10 @@ class Land extends CActiveRecord {
             'geometry' => $this->geojson,
             'properties' => array_merge($this->attributes, array(
 //                'area' => $this->area,
-                'area'=>$this->shop->area,
+                'area' => $this->shop->area,
                 'perimeter' => $this->perimeter,
-                'name'=>$this->lord->FirstName,
-                'family'=>$this->lord->LastName,
+                'name' => $this->lord->FirstName,
+                'family' => $this->lord->LastName,
                 'finalPrice' => $this->shop->finalPrice,
                 'pricePerMeter' => $this->shop->pricePerMeter,
                 'mobayeNo' => $this->shop->mobayeNo,
@@ -488,7 +479,7 @@ class Land extends CActiveRecord {
     }
 
     public static function buildGeoArray($lands, $selectShopColumns = false) {
-		$features = self::buildFeatures($lands, $selectShopColumns);
+        $features = self::buildFeatures($lands, $selectShopColumns);
         $main = array('type' => 'FeatureCollection');
         $all = array();
         foreach ($features as $f) {
@@ -514,27 +505,26 @@ class Land extends CActiveRecord {
         }
         return $all;
     }
-	public static function buildFeatures($lands, $selectShopColumns = false){
-		$res = array();
+
+    public static function buildFeatures($lands, $selectShopColumns = false) {
+        $res = array();
         if (count($lands) > 0) {
             foreach ($lands as $land) {
                 $res[] = $land->toFeature($selectShopColumns);
             }
         }
         return $res;
-	
-	}
-	
-	public static function makeHasFilters() {
-        
+    }
+
+    public static function makeHasFilters() {
+
         foreach (LandShop::$paramsForHas as $hasParam) {
-            
-                $filter = new stdClass();
-                $filter->property = $hasParam;
-                $filter->operator = 'eq';
-                $filter->value = true;
-                $filters[] = $filter;
-            
+
+            $filter = new stdClass();
+            $filter->property = $hasParam;
+            $filter->operator = 'eq';
+            $filter->value = true;
+            $filters[] = $filter;
         }
 
         return $filters;
