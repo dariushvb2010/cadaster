@@ -233,6 +233,8 @@ Ext.define('MyDesktop.Landlord.Shop', {
         var featureselected = function(e){
             userId = e.feature.data.userId;
             gid = e.feature.data.gid;
+			
+			sentParam.gid = gid;
             lp.refresh();
             llp.refresh();
         };
@@ -249,7 +251,7 @@ Ext.define('MyDesktop.Landlord.Shop', {
         var layerSwitcher = new OpenLayers.Control.LayerSwitcher();
         map.addControl(layerSwitcher);
         var gid, userId;
-        var layer = new OpenLayers.Layer.Vector("لایه استان", {
+        var layer = new OpenLayers.Layer.Vector("لایه زمین ها(همراه با کل عارضه ها)", {
             projection: new OpenLayers.Projection("EPSG:4326"),
             strategies: [new OpenLayers.Strategy.Fixed()],
             protocol: new OpenLayers.Protocol.HTTP({
@@ -306,11 +308,27 @@ Ext.define('MyDesktop.Landlord.Shop', {
         styleMapInit();
         var mapPanel = function (region){
             
-            
             mf = new OpenLayers.Control.SelectFeature(layer);
             
-            
-    
+            var enterCode = Ext.create('Ext.form.TextField', {
+				width: 160,
+				labelWidth: 110,
+				name: 'enterCode',
+				fieldLabel: 'شماره کد قطعه زمین',
+			});
+			
+			var chooseBtn = Ext.create('Ext.Button', {
+				text: 'انتخاب',
+				renderTo: Ext.getBody(),
+				handler: function() {
+					userId = '';
+					gid = enterCode.getValue();
+					
+					sentParam.gid = gid;
+					lp.refresh();
+					llp.refresh();
+				}
+			});
             //map.addLayers([globalImagery, open_streetMap_wms, wms3, wms4, AX_point, AX_line]);
             
             var panel = Ext.create('GeoExt.panel.Map', {
@@ -323,7 +341,8 @@ Ext.define('MyDesktop.Landlord.Shop', {
                 //height: 550,
                 width: 400,
                 zoom: 5,
-                center: [6122571.992777778,3489123.8364954195]
+                center: [6122571.992777778,3489123.8364954195],
+				tbar: [enterCode, chooseBtn]
             });
 
             this.setVisible = function(flag){
@@ -334,7 +353,7 @@ Ext.define('MyDesktop.Landlord.Shop', {
             };
         };
         var landLordPanel = function(region){
-            var Param = {userId: ''};
+            var Param = {userId: '', gid: ''};
             var landLordModel = Ext.define('LandLordModel', {
                 extend: 'Ext.data.Model',
                 fields: [
@@ -445,6 +464,7 @@ Ext.define('MyDesktop.Landlord.Shop', {
             
             this.refresh = function(){
                 Param.userId = userId;
+				Param.gid = gid;
                 landLordStore.load({params: Param});
             };
         };
