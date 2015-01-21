@@ -239,7 +239,7 @@ Ext.define('MyDesktop.Landlord.Shop', {
             llp.refresh();
         };
         
-        var sentParam = {userId: 1, gid: 1};
+        var sentParam = {userId:1};
         var Geographic = new OpenLayers.Projection("EPSG:4326");
         var Mercator = new OpenLayers.Projection("EPSG:900913");
         var map = new OpenLayers.Map('Our map', {
@@ -251,7 +251,7 @@ Ext.define('MyDesktop.Landlord.Shop', {
         var layerSwitcher = new OpenLayers.Control.LayerSwitcher();
         map.addControl(layerSwitcher);
         var gid, userId;
-        var layer = new OpenLayers.Layer.Vector("لایه زمین ها(همراه با کل عارضه ها)", {
+        layer = new OpenLayers.Layer.Vector("لایه زمین ها(همراه با کل عارضه ها)", {
             projection: new OpenLayers.Projection("EPSG:4326"),
             strategies: [new OpenLayers.Strategy.Fixed()],
             protocol: new OpenLayers.Protocol.HTTP({
@@ -463,9 +463,14 @@ Ext.define('MyDesktop.Landlord.Shop', {
             };
             
             this.refresh = function(){
-                Param.userId = userId;
-				Param.gid = gid;
-                landLordStore.load({params: Param});
+				var me1={};
+				if(userId != null)
+					me1.userId = userId;
+				if(gid != null)
+					me1.gid = gid;
+                landLordStore.load({params: me1});
+				Param.userId = me1.userId;
+				Param.gid = me1.gid;
             };
         };
         var landPanel = function(region){
@@ -537,7 +542,10 @@ Ext.define('MyDesktop.Landlord.Shop', {
             };
 
             this.refresh = function(){
-                sentParam.userId = userId;
+				if(userId == null || userId === "")
+					delete sentParam['userId'];
+				else
+					sentParam.userId = userId;
                 segmentsLayer.refresh();
             };
             this.setVisible = function(flag){
