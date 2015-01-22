@@ -36,6 +36,17 @@ class LandController extends Controller {
         if (isset($_REQUEST['userId'])) {
             $userId = $_REQUEST['userId'];
             echo Land::loadAsGeoJsonByUserId($userId, $simplified);
+        } else if (isset($_REQUEST['gid'])) {
+            $gid = $_REQUEST['gid'];
+          $land = Land::model()->findByPK($gid*1);
+          if(empty($land)){
+              $res = array();
+              $res['failure']='زمین یافت نشد! gid='.$gid;
+              echo json_encode($res);
+          }else{
+              $userId = $land->userId;
+              echo Land::loadAsGeoJsonByUserId($userId, $simplified);
+          }
         } else {
             $lands = ($simplified ? Land::model()->simplified()->findAll() : Land::model()->findAll());
             echo $this->makeGeoJson($lands);

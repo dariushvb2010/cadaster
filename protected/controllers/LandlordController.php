@@ -48,11 +48,19 @@ class LandlordController extends Controller {
             //var_dump($_REQUEST);
             $returnedArray = array();
             $returnSpecialUser = false;
-            if (isset($_REQUEST['userId'])) {
+            if (!empty($_REQUEST['userId'])) {
+
                 $id = $_REQUEST['userId'];
                 $lord = MyUser::model()->findByPk($id);
                 if (!empty($lord->id)) {
                     $returnedArray[] = $this->lordClassToArray($lord);
+                    $returnSpecialUser = true;
+                }
+            } else if (!empty($_REQUEST['gid'])) {
+                $gid = $_REQUEST['gid'];
+                $land = Land::model()->findByPK($gid);
+                if (!empty($land->lord)) {
+                    $returnedArray[] = $this->lordClassToArray($land->lord);
                     $returnSpecialUser = true;
                 }
             }
