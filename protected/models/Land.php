@@ -136,7 +136,7 @@ class Land extends CActiveRecord {
      */
     public function simplifiedBy($value) {
         $criteria = new CDbCriteria();
-        $criteria->select = array('ST_AsGeoJson(ST_Transform(ST_Simplify(geom,' . $value . '),4326)) as geojson'
+        $criteria->select = array('ST_AsGeoJson(ST_Simplify(geom,' . $value . ')) as geojson'
             , 'ST_Area(geom) as area'
             , 'ST_Perimeter(geom) as perimeter');
         $this->getDbCriteria()->mergeWith($criteria);
