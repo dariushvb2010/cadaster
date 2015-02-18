@@ -186,9 +186,7 @@ class LandController extends Controller {
     }
 
     public function actionGetTotalNumbers() {
-        $crit = new CDbCriteria();
-        $filters = array();
-        //$filters = $this->makeFilters();
+        $filters = $this->makeFilters();
         $landScope = Land::model();
         foreach ($filters as $filter) {
             $landScope = $landScope->byFilter($filter);
@@ -196,9 +194,6 @@ class LandController extends Controller {
         if (isset($_REQUEST['hasShop']) && $_REQUEST['hasShop'] != 'false') {
             $landScope = $landScope->hasShop();
         }
-
-        //$crit->select=array('total'=>new CDbExpression('count(t.gid) as mysum'));
-        //$lands = $landScope->byTotal()->findAll();
         $area = $landScope->totalArea();
         $perimeter = $landScope->totalPerimeter();
         $price = $landScope->totalPrice();
