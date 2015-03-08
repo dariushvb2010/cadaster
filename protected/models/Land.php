@@ -344,12 +344,11 @@ class Land extends CActiveRecord {
      * contains more attributes, landShop attributes
      */
     private function toFeatureShop() {
-        return array(
-            'geometry' => $this->geojson,
-            'properties' => array_merge($this->attributes, array(
+	$properties = array_merge($this->attributes,array('perimeter' => $this->perimeter));
+		if($this->shop){
+			$properties = array_merge($properties, array(
 //                'area' => $this->area,
                 'area' => $this->shop->area,
-                'perimeter' => $this->perimeter,
                 'name' => $this->lord->FirstName,
                 'family' => $this->lord->LastName,
                 'finalPrice' => $this->shop->finalPrice,
@@ -365,7 +364,11 @@ class Land extends CActiveRecord {
                 'hasMadarek' => $this->shop->hasMadarek,
                 'hasTayeediyeShura' => $this->shop->hasTayeediyeShura,
                 'hasQabz' => $this->shop->hasQabz,
-            ))
+            ));
+		}
+        return array(
+            'geometry' => $this->geojson,
+            'properties' => $properties
         );
     }
 

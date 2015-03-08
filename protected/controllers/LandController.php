@@ -54,8 +54,15 @@ class LandController extends Controller {
     }
 
     public function actionSearch() {
+		if(empty($_REQUEST['gid'])){
+			$this->doSearch();
+		}else{
+			$this->searchShopedLand($_REQUEST['gid']);
+		}
+    }
 
-        $page = $_REQUEST['page'];
+	private function doSearch(){
+		$page = $_REQUEST['page'];
         $start = $_REQUEST['start'];
         $limit = $_REQUEST['limit'];
 
@@ -87,11 +94,21 @@ class LandController extends Controller {
             'landDetail' => Land::buildArray($lands, true)
         );
         echo json_encode($main);
-//		echo json_encode(Land::buildGeoArray($lands,true));
-        //var_dump($lands);
-        //Yii::app()->end();
-    }
-
+	}
+	private function searchShopedLand($gid){
+		$land = $this->loadLand($gid);
+		$lands = array();
+		$totalCount=0;
+		if (!empty($land) && !empty($land->shop)) {
+			$totalCount=1;
+			$lands[] = $land;
+		}
+		$main = array(
+            'totalCount' => $totalCount,
+            'landDetail' => Land::buildArray($lands, true)
+        );
+        echo json_encode($main);
+	}
     public function actionCreateExcel() {
         $filters = $this->makeFilters();
 
@@ -186,23 +203,33 @@ class LandController extends Controller {
     }
 
     public function actionGetTotalNumbers() {
-        $filters = $this->makeFilters();
-        $landScope = Land::model();
-        foreach ($filters as $filter) {
-            $landScope = $landScope->byFilter($filter);
-        }
-        if (isset($_REQUEST['hasShop']) && $_REQUEST['hasShop'] != 'false') {
-            $landScope = $landScope->hasShop();
-        }
-        $area = $landScope->totalArea();
-        $perimeter = $landScope->totalPerimeter();
-        $price = $landScope->totalPrice();
-        $res = array(
-            'area' => round($area, 2),
-            'perimeter' => round($perimeter, 2),
-            'price' => round($price, 2)
-        );
-        echo json_encode($res);
+		if(empty($_REQUEST['gid'])){
+			$filters = $this->makeFilters();
+			$landScope = Land::model();
+			foreach ($filters as $filter) {
+				$landScope = $landScope->byFilter($filter);
+			}
+			if (isset($_REQUEST['hasShop']) && $_REQUEST['hasShop'] != 'false') {
+				$landScope = $landScope->hasShop();
+			}
+			$area = $landScope->totalArea();
+			$perimeter = $landScope->totalPerimeter();
+			$price = $landScope->totalPrice();
+		}else{
+			$land = $this->loadLand($_REQUEST['gid']);
+			if(!empty($land) && !empty($land->shop)){
+				$area = $land->shop->area;
+				$perimeter = $land->perimeter;
+				$price = $land->shop->finalPrice;
+			}
+		}
+		
+		$res = array(
+				'area' => round($area, 2),
+				'perimeter' => round($perimeter, 2),
+				'price' => round($price, 2)
+			);
+		echo json_encode($res);
     }
 
     protected function makeGeoJson($lands, $selectShopColumns = false) {

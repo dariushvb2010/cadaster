@@ -316,7 +316,7 @@ Ext.application({
                     var proj1 = new OpenLayers.Projection("EPSG:4326");
                     var proj2 = new OpenLayers.Projection("EPSG:900913");
                     var point = new OpenLayers.LonLat(coordinates[j][0], coordinates[j][1]);
-                    point.transform(proj1, proj2);
+                    //point.transform(proj1, proj2);
                     
                     data.push({
                         id:'<span style="color:' + color[i] + '">' + String(j+1) + '</span>',
@@ -460,8 +460,8 @@ Ext.application({
                         "Content-Type": "text/xml;charset=utf-8"
                     },
                     callback: function (lordResponse) {
-                        var land = eval ('(' + landResponse.responseText + ')');
-                        var lord = eval ('(' + lordResponse.responseText + ')');
+						land = eval ('(' + landResponse.responseText + ')');
+                        lord = eval ('(' + lordResponse.responseText + ')');
                         if (land.features.length<1){ alert('فرد دارای هیچ گونه ملکی نمی باشد.'); return;}
                         
                         var printPanel = rootThis.printPanel(land, lord, rootThis);

@@ -90,8 +90,23 @@ Ext.define('MyDesktop.Landlord.Search', {
                     })
                 });
         var landLord =  function (region, imagePanel) {
+			var gid;
+			this.refreshLandlordWithGid = function(_gid){
+				console.log("Salam Bar Mahdi");
+				gid = _gid;
+				landLordStore.proxy.extraParams['gid'] = gid;
+				landLordStore.reload();
+				getTotalNumbers();
+				/*landLordStore.load({
+					params: {
+						gid: gid,
+					},
+					scope: this
+				});*/
+			};
             var getTotalNumbers = function(){
                 var params = {
+					gid: gid,
                     hasEsteshhad: hasEsteshhad.checked,
                     hasMap: hasMap.checked,
                     hasEstelam: hasEstelam.checked,
@@ -122,6 +137,7 @@ Ext.define('MyDesktop.Landlord.Search', {
                         click: {
                             element: 'el', //bind to the underlying el property on the panel
                             fn: function () {
+								gid = "";
                                 landLordStore.proxy.extraParams[name] = that.checked;
                                 landLordStore.reload();
                                 getTotalNumbers();
@@ -251,6 +267,7 @@ Ext.define('MyDesktop.Landlord.Search', {
                         totalProperty: 'totalCount'
                     },
                     extraParams: {
+						gid: "",
                         hasEsteshhad: hasEsteshhad.checked,
                         hasMap: hasMap.checked,
                         hasEstelam: hasEstelam.checked,
@@ -531,7 +548,7 @@ Ext.define('MyDesktop.Landlord.Search', {
                 gid.gid = gid_;
             };
         };
-        var mapPanel = function (region) {
+        var mapPanel = function (region, landlord) {
             var setMap = function(){
                 var mousePositionCtrl = new OpenLayers.Control.MousePosition();
                 map.addControl(mousePositionCtrl);
@@ -604,7 +621,23 @@ Ext.define('MyDesktop.Landlord.Search', {
             setMap();
 
             styleMapInit();
-
+			
+			var enterCode = Ext.create('Ext.form.TextField', {
+				width: 160,
+				labelWidth: 110,
+				name: 'enterCode',
+				fieldLabel: 'شماره کد قطعه زمین',
+			});
+			
+			var chooseBtn = Ext.create('Ext.Button', {
+				text: 'انتخاب',
+				renderTo: Ext.getBody(),
+				handler: function() {
+					if(enterCode.getValue() != "")
+						landlord.refreshLandlordWithGid(enterCode.getValue());
+				}
+			});
+			
             var panel = Ext.create('GeoExt.panel.Map', {
                 title: 'نقشه',
                 map: map,
@@ -615,6 +648,7 @@ Ext.define('MyDesktop.Landlord.Search', {
                 //height: 550,
                 width: 400,
                 zoom: 5,
+				tbar: [enterCode, chooseBtn],
                 center: [6122571.992777778,3489123.8364954195],
             });
 
@@ -633,14 +667,16 @@ Ext.define('MyDesktop.Landlord.Search', {
             
         };
         
-        //var land = new rootThis.land("south", this);
-        var mp = new mapPanel("west");
-        var imagePanel = new images('south');
-        var landLord = new landLord("center", imagePanel);
         
+        var imagePanel = new images('south');
+        var landLord1 = new landLord("center", imagePanel);
+        
+		//var land = new rootThis.land("south", this);
+        var mp = new mapPanel("west", landLord1);
+		
         this.panel = Ext.create('Ext.Panel', {
             layout: 'border',
-            items: [landLord.getPanel(), mp.getPanel(), imagePanel.getPanel()]
+            items: [landLord1.getPanel(), mp.getPanel(), imagePanel.getPanel()]
         });
         
         var loadSegmentWithGid = function(gid){
